@@ -19,6 +19,7 @@ const errorMsg = ref('')
 const searchQuery = ref('')
 const selectedProvince = ref('')
 const selectedStatus = ref('')
+const showSavedOnly = ref(false)
 
 // Bookmark State (loaded from localStorage)
 const savedIds = ref<number[]>(JSON.parse(localStorage.getItem('saved_institutions') || '[]'))
@@ -53,6 +54,7 @@ const provinces = computed(() => {
   return [...new Set(list)].filter(Boolean).sort()
 })
 
+// Filter including Saved state toggle
 const filteredInstitutions = computed(() => {
   return institutions.value.filter((inst) => {
     const matchesSearch = inst.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
@@ -60,8 +62,9 @@ const filteredInstitutions = computed(() => {
     
     const matchesProvince = !selectedProvince.value || inst.province === selectedProvince.value
     const matchesStatus = !selectedStatus.value || inst.application_status === selectedStatus.value
+    const matchesSaved = !showSavedOnly.value || savedIds.value.includes(inst.institution_id)
 
-    return matchesSearch && matchesProvince && matchesStatus
+    return matchesSearch && matchesProvince && matchesStatus && matchesSaved
   })
 })
 
@@ -69,6 +72,7 @@ const resetFilters = () => {
   searchQuery.value = ''
   selectedProvince.value = ''
   selectedStatus.value = ''
+  showSavedOnly.value = false
 }
 
 onMounted(() => {
@@ -78,11 +82,17 @@ onMounted(() => {
 
 <template>
   <div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
       <h2 class="fw-bold m-0">South African Tertiary Institutions</h2>
-      <span class="badge bg-primary fs-6">
-        Saved: {{ savedIds.length }}
-      </span>
+      
+      <!-- Saved Filter Toggle Button -->
+      <button 
+        @click="showSavedOnly = !showSavedOnly" 
+        class="btn shadow-sm"
+        :class="showSavedOnly ? 'btn-warning text-dark fw-bold' : 'btn-outline-warning text-dark'"
+      >
+        ★ {{ showSavedOnly ? 'Showing Saved' : 'View Saved' }} ({{ savedIds.length }})
+      </button>
     </div>
 
     <!-- Search & Filter Bar -->
@@ -147,7 +157,7 @@ onMounted(() => {
                 class="btn btn-sm p-0 border-0 ms-2"
                 :title="savedIds.includes(item.institution_id) ? 'Remove Bookmark' : 'Bookmark Institution'"
               >
-                <span class="fs-5">{{ savedIds.includes(item.institution_id) ? '★' : '☆' }}</span>
+                <span class="fs-4">{{ savedIds.includes(item.institution_id) ? '★' : '☆' }}</span>
               </button>
             </div>
             
@@ -175,7 +185,11 @@ onMounted(() => {
 
     <!-- Empty State -->
     <div v-else class="text-center my-5 text-muted">
-      <h5>No institutions match your search criteria.</h5>
+      <h5 v-if="showSavedOnly">You haven't bookmarked any institutions yet.</h5>
+      <h5 v-else>No institutions match your search criteria.</h5>
+      <button v-if="showSavedOnly" @click="showSavedOnly = false" class="btn btn-link">
+        View all institutions
+      </button>
     </div>
   </div>
 </template>
