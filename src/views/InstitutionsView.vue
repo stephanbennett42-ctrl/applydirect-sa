@@ -20,6 +20,9 @@ const searchQuery = ref('')
 const selectedProvince = ref('')
 const selectedStatus = ref('')
 
+// Bookmark State (loaded from localStorage)
+const savedIds = ref<number[]>(JSON.parse(localStorage.getItem('saved_institutions') || '[]'))
+
 const fetchInstitutions = async () => {
   try {
     const res = await fetch('http://localhost:3000/api/institutions')
@@ -36,13 +39,20 @@ const fetchInstitutions = async () => {
   }
 }
 
-// Dynamically extract unique provinces for the dropdown list
+const toggleBookmark = (id: number) => {
+  if (savedIds.value.includes(id)) {
+    savedIds.value = savedIds.value.filter(item => item !== id)
+  } else {
+    savedIds.value.push(id)
+  }
+  localStorage.setItem('saved_institutions', JSON.stringify(savedIds.value))
+}
+
 const provinces = computed(() => {
   const list = institutions.value.map(i => i.province)
   return [...new Set(list)].filter(Boolean).sort()
 })
 
-// Real-time reactive filtering logic
 const filteredInstitutions = computed(() => {
   return institutions.value.filter((inst) => {
     const matchesSearch = inst.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
@@ -68,12 +78,16 @@ onMounted(() => {
 
 <template>
   <div class="container my-4">
-    <h2 class="mb-4 fw-bold">South African Tertiary Institutions</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold m-0">South African Tertiary Institutions</h2>
+      <span class="badge bg-primary fs-6">
+        Saved: {{ savedIds.length }}
+      </span>
+    </div>
 
     <!-- Search & Filter Bar -->
     <div class="card p-3 mb-4 shadow-sm border-0 bg-light">
       <div class="row g-3">
-        <!-- Search Field -->
         <div class="col-md-5">
           <input 
             v-model="searchQuery" 
@@ -82,8 +96,6 @@ onMounted(() => {
             placeholder="Search by institution name or type..."
           />
         </div>
-
-        <!-- Province Dropdown -->
         <div class="col-md-3">
           <select v-model="selectedProvince" class="form-select">
             <option value="">All Provinces</option>
@@ -92,8 +104,6 @@ onMounted(() => {
             </option>
           </select>
         </div>
-
-        <!-- Application Status Dropdown -->
         <div class="col-md-2">
           <select v-model="selectedStatus" class="form-select">
             <option value="">All Statuses</option>
@@ -101,8 +111,6 @@ onMounted(() => {
             <option value="Closed">Closed</option>
           </select>
         </div>
-
-        <!-- Reset Button -->
         <div class="col-md-2">
           <button @click="resetFilters" class="btn btn-outline-secondary w-100">
             Reset
@@ -116,7 +124,6 @@ onMounted(() => {
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-      <p class="mt-2 text-muted">Loading institutions database...</p>
     </div>
 
     <!-- Error Alert -->
@@ -135,12 +142,13 @@ onMounted(() => {
           <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h5 class="card-title h6 mb-0 fw-bold">{{ item.name }}</h5>
-              <span 
-                class="badge ms-2" 
-                :class="item.application_status === 'Open' ? 'bg-success' : 'bg-danger'"
+              <button 
+                @click="toggleBookmark(item.institution_id)"
+                class="btn btn-sm p-0 border-0 ms-2"
+                :title="savedIds.includes(item.institution_id) ? 'Remove Bookmark' : 'Bookmark Institution'"
               >
-                {{ item.application_status }}
-              </span>
+                <span class="fs-5">{{ savedIds.includes(item.institution_id) ? '★' : '☆' }}</span>
+              </button>
             </div>
             
             <p class="text-muted small mb-2">
@@ -165,10 +173,9 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Empty Results Fallback -->
+    <!-- Empty State -->
     <div v-else class="text-center my-5 text-muted">
       <h5>No institutions match your search criteria.</h5>
-      <p>Try clearing your search terms or resetting filters.</p>
     </div>
   </div>
 </template>
