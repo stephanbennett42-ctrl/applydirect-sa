@@ -21,30 +21,55 @@
           My Application
         </div>
 
-        <div class="sidebar-item active">
+        <button
+          class="sidebar-item"
+          :class="{ active: activeSection === 'personal' }"
+          type="button"
+          @click="activeSection = 'personal'"
+        >
           <span class="number">1</span>
           Personal Details
-        </div>
+        </button>
 
-        <div class="sidebar-item">
+        <button
+          class="sidebar-item"
+          :class="{ active: activeSection === 'academic' }"
+          type="button"
+          @click="activeSection = 'academic'"
+        >
           <span class="number">2</span>
           Academic Details
-        </div>
+        </button>
 
-        <div class="sidebar-item">
+        <button
+          class="sidebar-item"
+          :class="{ active: activeSection === 'preferences' }"
+          type="button"
+          @click="activeSection = 'preferences'"
+        >
           <span class="number">3</span>
           Study Preferences
-        </div>
+        </button>
 
-        <div class="sidebar-item">
+        <button
+          class="sidebar-item"
+          :class="{ active: activeSection === 'documents' }"
+          type="button"
+          @click="activeSection = 'documents'"
+        >
           <span class="number">4</span>
           Documents
-        </div>
+        </button>
 
-        <div class="sidebar-item">
+        <button
+          class="sidebar-item"
+          :class="{ active: activeSection === 'status' }"
+          type="button"
+          @click="activeSection = 'status'"
+        >
           <span class="number">5</span>
           Application Status
-        </div>
+        </button>
 
       </aside>
 
@@ -61,7 +86,7 @@
 
 
         <!-- Personal Details -->
-        <section class="card">
+        <section v-if="activeSection === 'personal'" class="card">
 
           <div class="section-header">
             <div>
@@ -197,7 +222,7 @@
 
 
         <!-- Academic Details -->
-        <section class="card">
+        <section v-if="activeSection === 'academic'" class="card">
 
           <div class="section-header">
             <div>
@@ -316,7 +341,7 @@
 
 
         <!-- Study Preferences -->
-        <section class="card">
+        <section v-if="activeSection === 'preferences'" class="card">
 
           <div class="section-header">
             <div>
@@ -367,6 +392,34 @@
 
           </div>
 
+        </section>
+
+        <section v-if="activeSection === 'documents'" class="card">
+          <div class="section-header">
+            <div>
+              <h2>Documents</h2>
+              <p>Upload the documents required for your application.</p>
+            </div>
+          </div>
+
+          <div class="empty-section">
+            <h3>Documents</h3>
+            <p>Document uploads will be available here once your profile is complete.</p>
+          </div>
+        </section>
+
+        <section v-if="activeSection === 'status'" class="card">
+          <div class="section-header">
+            <div>
+              <h2>Application Status</h2>
+              <p>Track the progress of your application.</p>
+            </div>
+          </div>
+
+          <div class="status-message">
+            <strong>Profile in progress</strong>
+            <p>Complete your profile and save it to continue with your application.</p>
+          </div>
         </section>
 
 
@@ -428,6 +481,8 @@ export default {
         ]
 
       },
+
+      activeSection: "personal",
 
       subjectSuggestions: [
         "Accounting",
@@ -641,6 +696,10 @@ export default {
   color: #64748b;
 
   cursor: pointer;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
 }
 
 .sidebar-item.active {
@@ -739,6 +798,28 @@ export default {
   font-size: 14px;
 
   color: #6b7280;
+}
+
+.empty-section,
+.status-message {
+  padding: 20px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.empty-section h3,
+.status-message strong {
+  display: block;
+  margin: 0 0 6px;
+  color: #123b63;
+}
+
+.empty-section p,
+.status-message p {
+  margin: 0;
+  font-size: 14px;
 }
 
 
