@@ -15,24 +15,18 @@ const institutions = ref<Institution[]>([])
 const loading = ref(true)
 const errorMsg = ref('')
 
-// Filter State Variables
 const searchQuery = ref('')
 const selectedProvince = ref('')
 const selectedStatus = ref('')
-const showSavedOnly = ref(false)
-
-// Bookmark State (loaded from localStorage)
+const activeModalItem = ref<Institution | null>(null)
 const savedIds = ref<number[]>(JSON.parse(localStorage.getItem('saved_institutions') || '[]'))
 
 const fetchInstitutions = async () => {
   try {
     const res = await fetch('http://localhost:3000/api/institutions')
     if (!res.ok) throw new Error('Failed to fetch data from server')
-    
     const json = await res.json()
-    if (json.success) {
-      institutions.value = json.data
-    }
+    if (json.success) institutions.value = json.data
   } catch (err: any) {
     errorMsg.value = err.message || 'Error connecting to API'
   } finally {
@@ -47,6 +41,7 @@ const toggleBookmark = (id: number) => {
     savedIds.value.push(id)
   }
   localStorage.setItem('saved_institutions', JSON.stringify(savedIds.value))
+  window.dispatchEvent(new Event('storage'))
 }
 
 const provinces = computed(() => {
@@ -54,17 +49,14 @@ const provinces = computed(() => {
   return [...new Set(list)].filter(Boolean).sort()
 })
 
-// Filter including Saved state toggle
 const filteredInstitutions = computed(() => {
   return institutions.value.filter((inst) => {
     const matchesSearch = inst.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                           inst.institution_type.toLowerCase().includes(searchQuery.value.toLowerCase())
-    
     const matchesProvince = !selectedProvince.value || inst.province === selectedProvince.value
     const matchesStatus = !selectedStatus.value || inst.application_status === selectedStatus.value
-    const matchesSaved = !showSavedOnly.value || savedIds.value.includes(inst.institution_id)
 
-    return matchesSearch && matchesProvince && matchesStatus && matchesSaved
+    return matchesSearch && matchesProvince && matchesStatus
   })
 })
 
@@ -72,7 +64,6 @@ const resetFilters = () => {
   searchQuery.value = ''
   selectedProvince.value = ''
   selectedStatus.value = ''
-  showSavedOnly.value = false
 }
 
 onMounted(() => {
@@ -82,19 +73,6 @@ onMounted(() => {
 
 <template>
   <div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-      <h2 class="fw-bold m-0">South African Tertiary Institutions</h2>
-      
-      <!-- Saved Filter Toggle Button -->
-      <button 
-        @click="showSavedOnly = !showSavedOnly" 
-        class="btn shadow-sm"
-        :class="showSavedOnly ? 'btn-warning text-dark fw-bold' : 'btn-outline-warning text-dark'"
-      >
-        ★ {{ showSavedOnly ? 'Showing Saved' : 'View Saved' }} ({{ savedIds.length }})
-      </button>
-    </div>
-
     <!-- Search & Filter Bar -->
     <div class="card p-3 mb-4 shadow-sm border-0 bg-light">
       <div class="row g-3">
@@ -109,9 +87,7 @@ onMounted(() => {
         <div class="col-md-3">
           <select v-model="selectedProvince" class="form-select">
             <option value="">All Provinces</option>
-            <option v-for="prov in provinces" :key="prov" :value="prov">
-              {{ prov }}
-            </option>
+            <option v-for="prov in provinces" :key="prov" :value="prov">{{ prov }}</option>
           </select>
         </div>
         <div class="col-md-2">
@@ -122,62 +98,39 @@ onMounted(() => {
           </select>
         </div>
         <div class="col-md-2">
-          <button @click="resetFilters" class="btn btn-outline-secondary w-100">
-            Reset
-          </button>
+          <button @click="resetFilters" class="btn btn-outline-secondary w-100">Reset</button>
         </div>
       </div>
     </div>
 
-    <!-- Loading Spinner -->
+    <!-- Status Displays -->
     <div v-if="loading" class="text-center my-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+      <div class="spinner-border text-primary" role="status"></div>
     </div>
+    <div v-else-if="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
 
-    <!-- Error Alert -->
-    <div v-else-if="errorMsg" class="alert alert-danger">
-      {{ errorMsg }}
-    </div>
-
-    <!-- Dynamic Card Grid -->
+    <!-- Card Grid -->
     <div v-else-if="filteredInstitutions.length > 0" class="row g-4">
-      <div 
-        v-for="item in filteredInstitutions" 
-        :key="item.institution_id" 
-        class="col-md-6 col-lg-4"
-      >
+      <div v-for="item in filteredInstitutions" :key="item.institution_id" class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm border-0">
           <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h5 class="card-title h6 mb-0 fw-bold">{{ item.name }}</h5>
-              <button 
-                @click="toggleBookmark(item.institution_id)"
-                class="btn btn-sm p-0 border-0 ms-2"
-                :title="savedIds.includes(item.institution_id) ? 'Remove Bookmark' : 'Bookmark Institution'"
-              >
-                <span class="fs-4">{{ savedIds.includes(item.institution_id) ? '★' : '☆' }}</span>
+              <button @click="toggleBookmark(item.institution_id)" class="btn btn-sm p-0 border-0 ms-2">
+                <span class="fs-4 text-warning">{{ savedIds.includes(item.institution_id) ? '★' : '☆' }}</span>
               </button>
             </div>
             
-            <p class="text-muted small mb-2">
-              {{ item.institution_type }} • {{ item.province }}
-            </p>
-            
+            <p class="text-muted small mb-2">{{ item.institution_type }} • {{ item.province }}</p>
             <p class="mb-3">
               <strong>Fee:</strong> 
               {{ Number(item.application_fee) === 0 ? 'Free' : `R${item.application_fee}` }}
             </p>
 
-            <a 
-              :href="item.website_url" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              class="btn btn-outline-primary btn-sm mt-auto w-100"
-            >
-              Visit Portal
-            </a>
+            <div class="d-flex gap-2 mt-auto">
+              <button @click="activeModalItem = item" class="btn btn-primary btn-sm flex-grow-1">View Details</button>
+              <a :href="item.website_url" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">Portal</a>
+            </div>
           </div>
         </div>
       </div>
@@ -185,11 +138,46 @@ onMounted(() => {
 
     <!-- Empty State -->
     <div v-else class="text-center my-5 text-muted">
-      <h5 v-if="showSavedOnly">You haven't bookmarked any institutions yet.</h5>
-      <h5 v-else>No institutions match your search criteria.</h5>
-      <button v-if="showSavedOnly" @click="showSavedOnly = false" class="btn btn-link">
-        View all institutions
-      </button>
+      <h5>No institutions match your criteria.</h5>
+    </div>
+
+    <!-- Details Modal Overlay -->
+    <div v-if="activeModalItem" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5)">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">{{ activeModalItem.name }}</h5>
+            <button @click="activeModalItem = null" type="button" class="btn-close"></button>
+          </div>
+          <div class="modal-body">
+             <p>
+
+           <strong>Type:</strong> {{ activeModalItem.institution_type }}
+           <span 
+          class="badge ms-2" 
+         :class="activeModalItem.institution_type.toLowerCase().includes('private') ? 'bg-warning text-dark' : 'bg-info text-dark'"
+                >
+          {{ activeModalItem.institution_type.toLowerCase().includes('private') ? 'Private' : 'Public' }}
+       </span>
+          </p>
+            <p><strong>Province:</strong> {{ activeModalItem.province }}</p>
+            <p>
+              <strong>Status:</strong> 
+              <span class="badge ms-2" :class="activeModalItem.application_status === 'Open' ? 'bg-success' : 'bg-danger'">
+                {{ activeModalItem.application_status }}
+              </span>
+            </p>
+            <p>
+              <strong>Application Fee:</strong> 
+              {{ Number(activeModalItem.application_fee) === 0 ? 'Free' : `R${activeModalItem.application_fee}` }}
+            </p>
+          </div>
+          <div class="modal-footer">
+            <a :href="activeModalItem.website_url" target="_blank" class="btn btn-primary btn-sm">Visit Portal</a>
+            <button @click="activeModalItem = null" class="btn btn-secondary btn-sm">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
