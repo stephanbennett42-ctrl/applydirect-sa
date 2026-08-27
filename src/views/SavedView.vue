@@ -91,7 +91,15 @@ onMounted(() => {
             <button @click="activeModalItem = null" type="button" class="btn-close"></button>
           </div>
           <div class="modal-body">
-            <p><strong>Type:</strong> {{ activeModalItem.institution_type }}</p>
+            <p>
+    <strong>Type:</strong> {{ activeModalItem.institution_type }}
+    <span 
+    class="badge ms-2" 
+    :class="activeModalItem.institution_type.toLowerCase().includes('private') ? 'bg-warning text-dark' : 'bg-info text-dark'"
+    >
+    {{ activeModalItem.institution_type.toLowerCase().includes('private') ? 'Private' : 'Public' }}
+       </span>
+      </p>
             <p><strong>Province:</strong> {{ activeModalItem.province }}</p>
             <p>
               <strong>Status:</strong> 
