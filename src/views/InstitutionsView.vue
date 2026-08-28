@@ -9,6 +9,7 @@ interface Institution {
   application_status: string
   application_fee: string
   website_url: string
+  application_url?: string
 }
 
 const institutions = ref<Institution[]>([])
@@ -129,7 +130,14 @@ onMounted(() => {
 
             <div class="d-flex gap-2 mt-auto">
               <button @click="activeModalItem = item" class="btn btn-primary btn-sm flex-grow-1">View Details</button>
-              <a :href="item.website_url" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">Portal</a>
+              <a 
+                :href="item.application_url || item.website_url" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="btn btn-outline-secondary btn-sm"
+              >
+                Apply Now
+              </a>
             </div>
           </div>
         </div>
@@ -150,16 +158,15 @@ onMounted(() => {
             <button @click="activeModalItem = null" type="button" class="btn-close"></button>
           </div>
           <div class="modal-body">
-             <p>
-
-           <strong>Type:</strong> {{ activeModalItem.institution_type }}
-           <span 
-          class="badge ms-2" 
-         :class="activeModalItem.institution_type.toLowerCase().includes('private') ? 'bg-warning text-dark' : 'bg-info text-dark'"
-                >
-          {{ activeModalItem.institution_type.toLowerCase().includes('private') ? 'Private' : 'Public' }}
-       </span>
-          </p>
+            <p>
+              <strong>Type:</strong> {{ activeModalItem.institution_type }}
+              <span 
+                class="badge ms-2" 
+                :class="activeModalItem.institution_type.toLowerCase().includes('private') ? 'bg-warning text-dark' : 'bg-info text-dark'"
+              >
+                {{ activeModalItem.institution_type.toLowerCase().includes('private') ? 'Private' : 'Public' }}
+              </span>
+            </p>
             <p><strong>Province:</strong> {{ activeModalItem.province }}</p>
             <p>
               <strong>Status:</strong> 
@@ -173,7 +180,14 @@ onMounted(() => {
             </p>
           </div>
           <div class="modal-footer">
-            <a :href="activeModalItem.website_url" target="_blank" class="btn btn-primary btn-sm">Visit Portal</a>
+            <a 
+              :href="activeModalItem.application_url || activeModalItem.website_url" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="btn btn-primary btn-sm"
+            >
+              Apply Now
+            </a>
             <button @click="activeModalItem = null" class="btn btn-secondary btn-sm">Close</button>
           </div>
         </div>
