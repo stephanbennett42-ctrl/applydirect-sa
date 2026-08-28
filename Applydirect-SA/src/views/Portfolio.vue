@@ -7,7 +7,7 @@
 
       <div class="header-right">
         <span>My Profile</span>
-        <div class="profile-icon">OG</div>
+        <div class="profile-icon" :title="profileInitials">{{ profileInitials }}</div>
       </div>
     </header>
 
@@ -250,9 +250,11 @@
               <select v-model="profile.matricYear">
                 <option value="">Select year</option>
                 <option>2026</option>
-                <option>2027</option>
-                <option>2028</option>
-                <option>2029</option>
+                <option>2025</option>
+                <option>2024</option>
+                <option>2023</option>
+                <option>2022</option>
+                <option>2021</option>
               </select>
             </div>
 
@@ -509,6 +511,23 @@ export default {
       activeSubjectIndex: null
 
     };
+
+  },
+
+  computed: {
+
+    profileInitials() {
+
+      const firstName = this.profile.firstName.trim();
+      const surname = this.profile.surname.trim();
+
+      if (!firstName && !surname) {
+        return "--";
+      }
+
+      return `${firstName.charAt(0)}${surname.charAt(0)}`.toUpperCase();
+
+    }
 
   },
 
