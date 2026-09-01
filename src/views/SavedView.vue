@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 
 interface Institution {
   institution_id: number
@@ -11,6 +12,7 @@ interface Institution {
   website_url: string
   application_url?: string
 }
+
 const institutions = ref<Institution[]>([])
 const loading = ref(true)
 const activeModalItem = ref<Institution | null>(null)
@@ -69,12 +71,14 @@ onMounted(() => {
               {{ Number(item.application_fee) === 0 ? 'Free' : `R${item.application_fee}` }}
             </p>
             <div class="d-flex gap-2 mt-auto">
-              <button @click="activeModalItem = item" class="btn btn-primary btn-sm flex-grow-1">View Details</button>
+              <button @click="activeModalItem = item" class="btn btn-sa-primary btn-sm flex-grow-1">
+                View Details
+              </button>
               <a 
                 :href="item.application_url || item.website_url" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                class="btn btn-outline-secondary btn-sm"
+                class="btn btn-sa-green btn-sm"
               >
                 Apply Now
               </a>
@@ -86,7 +90,7 @@ onMounted(() => {
 
     <div v-else class="text-center my-5 text-muted">
       <h5>You haven't saved any institutions yet.</h5>
-      <RouterLink to="/institutions" class="btn btn-primary mt-3">Browse Institutions</RouterLink>
+      <RouterLink to="/institutions" class="btn btn-sa-primary mt-3">Browse Institutions</RouterLink>
     </div>
 
     <!-- Details Modal -->
@@ -124,7 +128,7 @@ onMounted(() => {
               :href="activeModalItem.application_url || activeModalItem.website_url" 
               target="_blank" 
               rel="noopener noreferrer" 
-              class="btn btn-primary btn-sm"
+              class="btn btn-sa-green btn-sm"
             >
               Apply Now
             </a>

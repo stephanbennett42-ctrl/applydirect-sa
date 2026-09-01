@@ -1,61 +1,46 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
-
-const savedCount = ref(0)
-
-const updateCount = () => {
-  const saved = JSON.parse(localStorage.getItem('saved_institutions') || '[]')
-  savedCount.value = saved.length
-}
-
-onMounted(() => {
-  updateCount()
-  window.addEventListener('storage', updateCount)
-})
-</script>
-
 <template>
-  <div class="d-flex flex-column min-vh-100">
-    <!-- Navbar -->
-    <header>
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-        <div class="container">
-          <RouterLink class="navbar-brand fw-bold text-warning fs-4" to="/institutions">
-            ApplyDirect SA
-          </RouterLink>
-          
-          <div class="navbar-nav ms-auto d-flex flex-row gap-3">
-            <RouterLink class="nav-link" active-class="active fw-bold" to="/institutions">
-              Institutions
-            </RouterLink>
-            <RouterLink class="nav-link" active-class="active fw-bold" to="/saved">
-              Saved ★
-            </RouterLink>
-          </div>
-        </div>
-      </nav>
+  <div id="app" class="d-flex flex-column min-vh-100">
+    <!-- Top SA Flag Gradient Line -->
+    <div class="flag-accent-border"></div>
 
-      <!-- Hero Banner -->
-      <section class="bg-primary text-white text-center py-5 shadow-sm">
-        <div class="container">
-          <h1 class="display-5 fw-bold mb-2">South African Tertiary Directory</h1>
-          <p class="lead mb-0">Explore application portals, fee structures, and current admission statuses nationwide.</p>
-        </div>
-      </section>
+    <!-- Main Clean Header -->
+    <header class="bg-white shadow-sm py-3">
+      <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <h1 style="color: var(--sa-blue);" class="fw-bold m-0 fs-2 mb-2 mb-md-0">
+          ApplyDirect SA
+        </h1>
+
+        <nav class="nav nav-pills">
+          <router-link to="/universities" class="nav-link" active-class="active bg-sa-blue">
+            Universities
+          </router-link>
+          <router-link to="/profile" class="nav-link">Profile</router-link>
+          <router-link to="/about" class="nav-link">About</router-link>
+          <router-link to="/contact" class="nav-link">Contact</router-link>
+          <router-link to="/subscription" class="nav-link">Subscription</router-link>
+        </nav>
+      </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-grow-1">
-      <RouterView />
+      <router-view />
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
-      <div class="container text-center">
-        <p class="mb-1 fw-bold">ApplyDirect SA Directory</p>
-        <p class="text-muted small mb-0">&copy; 2026 ApplyDirect SA. All rights reserved.</p>
+    <footer class="bg-dark text-white py-3 text-center small mt-5">
+      <div class="container">
+        &copy; 2026 ApplyDirect SA. All rights reserved.
       </div>
     </footer>
   </div>
 </template>
+
+<style scoped>
+.nav-link {
+  color: var(--sa-black);
+  font-weight: 500;
+}
+.nav-link.active {
+  background-color: var(--sa-blue) !important;
+  color: var(--sa-white) !important;
+}
+</style>

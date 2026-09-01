@@ -1,25 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import InstitutionsView from '../views/InstitutionsView.vue'
-import SavedView from '../views/SavedView.vue'
+
+// Placeholder views for remaining pages
+const ProfileView = { template: '<div class="container my-5"><h2>Profile Page</h2></div>' }
+const AboutView = { template: '<div class="container my-5"><h2>About Page</h2></div>' }
+const ContactView = { template: '<div class="container my-5"><h2>Contact Page</h2></div>' }
+const SubscriptionView = { template: '<div class="container my-5"><h2>Subscription Page</h2></div>' }
+
+const routes = [
+  { path: '/', redirect: '/universities' },
+  { path: '/universities', name: 'Universities', component: InstitutionsView },
+  { path: '/profile', name: 'Profile', component: ProfileView },
+  { path: '/about', name: 'About', component: AboutView },
+  { path: '/contact', name: 'Contact', component: ContactView },
+  { path: '/subscription', name: 'Subscription', component: SubscriptionView }
+]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      redirect: '/institutions'
-    },
-    {
-      path: '/institutions',
-      name: 'institutions',
-      component: InstitutionsView
-    },
-    {
-      path: '/saved',
-      name: 'saved',
-      component: SavedView
-    }
-  ]
+  history: createWebHistory(),
+  routes
 })
 
 export default router
