@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import InstitutionsView from '../views/InstitutionsView.vue'
+import AboutView from '../views/AboutView.vue'
 
 // Placeholder views for remaining pages
 const ProfileView = { template: '<div class="container my-5"><h2>Profile Page</h2></div>' }
-const AboutView = { template: '<div class="container my-5"><h2>About Page</h2></div>' }
 const ContactView = { template: '<div class="container my-5"><h2>Contact Page</h2></div>' }
 const SubscriptionView = { template: '<div class="container my-5"><h2>Subscription Page</h2></div>' }
 
@@ -17,7 +17,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(process.env.BASE_URL),
   routes
 })
 

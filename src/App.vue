@@ -17,7 +17,9 @@
           <router-link to="/profile" class="nav-link">Profile</router-link>
           <router-link to="/about" class="nav-link">About</router-link>
           <router-link to="/contact" class="nav-link">Contact</router-link>
-          <router-link to="/subscription" class="nav-link">Subscription</router-link>
+          <router-link to="/about" class="nav-link">About Us</router-link>
+          <router-link to="/subscription" 
+          class="nav-link">Subscription</router-link>
         </nav>
       </div>
     </header>
