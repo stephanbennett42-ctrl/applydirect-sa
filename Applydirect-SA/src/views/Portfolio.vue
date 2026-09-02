@@ -5,6 +5,15 @@
     <header class="top-header">
       <div class="logo">ApplyDirect-SA</div>
 
+    <nav>
+      <router-link to="/">Home</router-link>
+      <router-link to="/universities">Universities</router-link>
+      <router-link to="/portfolio">My Profile</router-link>
+      <router-link to="/about">About</router-link>
+      <router-link to="/contact" class="active">Contact</router-link>
+    </nav>
+
+
       <div class="header-right">
         <span>My Profile</span>
         <div class="profile-icon" :title="profileInitials">{{ profileInitials }}</div>
