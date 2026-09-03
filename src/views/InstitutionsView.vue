@@ -201,314 +201,51 @@ export default {
       searchQuery: '',
       selectedProvince: '',
       selectedType: '',
-      institutions: [
-        {
-          id: 1,
-          name: 'University of Cape Town (UCT)',
-          province: 'Western Cape',
-          location: 'Rondebosch, Cape Town',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R100.00',
-          openingDate: '2026-04-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.uct.ac.za',
-          description: 'South Africa\'s oldest university and top-ranked research institution located at the foot of Table Mountain.',
-          faculties: ['Commerce', 'Engineering & Built Environment', 'Health Sciences', 'Humanities', 'Law', 'Science'],
-          requirements: 'NSC Degree endorsement with subject minimums and APS requirements specific to each faculty.'
-        },
-        {
-          id: 2,
-          name: 'Stellenbosch University (SU)',
-          province: 'Western Cape',
-          location: 'Stellenbosch',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R100.00',
-          openingDate: '2026-04-01',
-          closingDate: '2026-08-31',
-          image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.sun.ac.za',
-          description: 'Renowned research university situated in the Winelands of the Western Cape.',
-          faculties: ['AgriSciences', 'Arts & Social Sciences', 'Economic & Management Sciences', 'Engineering', 'Medicine'],
-          requirements: 'NSC Bachelors pass with minimum overall average percentage thresholds.'
-        },
-        {
-          id: 3,
-          name: 'Cape Peninsula University of Technology (CPUT)',
-          province: 'Western Cape',
-          location: 'Bellville / District Six, Cape Town',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R150.00',
-          openingDate: '2026-05-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.cput.ac.za',
-          description: 'The largest university of technology in the Western Cape region focusing on vocational career pathways.',
-          faculties: ['Applied Sciences', 'Business & Management Sciences', 'Engineering & Built Environment', 'Informatics & Design'],
-          requirements: 'NSC Diploma or Degree endorsement with minimum subject ratings.'
-        },
-        {
-          id: 4,
-          name: 'False Bay TVET College',
-          province: 'Western Cape',
-          location: 'Muizenberg / Khayelitsha / Westlake',
-          type: 'TVET College',
-          status: 'Open',
-          applicationFee: 'R0.00 (Free)',
-          openingDate: '2026-01-15',
-          closingDate: '2026-10-31',
-          image: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.falsebaycollege.co.za',
-          description: 'Top rated public TVET college providing vocational skills, NATED diplomas, and practical learnerships.',
-          faculties: ['Engineering Studies', 'Business Studies', 'Information Technology', 'Hospitality & Tourism'],
-          requirements: 'Grade 9 pass (NCV) or Grade 12 (NATED / Diploma streams).'
-        },
-        {
-          id: 5,
-          name: 'Eduvos (Tyger Valley Campus)',
-          province: 'Western Cape',
-          location: 'Tyger Valley, Cape Town',
-          type: 'Private College',
-          status: 'Open',
-          applicationFee: 'R0.00 (Free)',
-          openingDate: '2026-01-01',
-          closingDate: '2026-12-31',
-          image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.eduvos.com',
-          description: 'Leading private higher education provider offering flexible degree and diploma programs.',
-          faculties: ['Information Technology', 'Commerce', 'Humanities', 'Applied Science'],
-          requirements: 'NSC Degree / Diploma pass depending on degree path selected.'
-        },
-        {
-          id: 6,
-          name: 'University of the Witwatersrand (Wits)',
-          province: 'Gauteng',
-          location: 'Braamfontein, Johannesburg',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R100.00',
-          openingDate: '2026-03-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.wits.ac.za',
-          description: 'Leading research institution situated in heart of Johannesburg, known for engineering, science, and medicine.',
-          faculties: ['Health Sciences', 'Humanities', 'Science', 'Engineering & Built Environment', 'Commerce & Law'],
-          requirements: 'NSC Degree endorsement with competitive APS scores in core subjects.'
-        },
-        {
-          id: 7,
-          name: 'University of Johannesburg (UJ)',
-          province: 'Gauteng',
-          location: 'Auckland Park, Johannesburg',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R0.00 (Free)',
-          openingDate: '2026-04-01',
-          closingDate: '2026-10-31',
-          image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.uj.ac.za',
-          description: 'Dynamic comprehensive university driving 4IR technology and innovation.',
-          faculties: ['Art, Design & Architecture', 'College of Business & Economics', 'Health Sciences', 'Science'],
-          requirements: 'NSC Degree or Diploma endorsement depending on program track.'
-        },
-        {
-          id: 8,
-          name: 'Tshwane University of Technology (TUT)',
-          province: 'Gauteng',
-          location: 'Pretoria',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R240.00',
-          openingDate: '2026-04-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.tut.ac.za',
-          description: 'Largest residential higher education institution in South Africa providing career-focused technology qualifications.',
-          faculties: ['Engineering & the Built Environment', 'Information & Communication Technology', 'Arts & Design', 'Management Sciences'],
-          requirements: 'NSC Diploma or Degree endorsement with faculty subject minimums.'
-        },
-        {
-          id: 9,
-          name: 'IIE Varsity College (Sandton)',
-          province: 'Gauteng',
-          location: 'Sandton, Johannesburg',
-          type: 'Private College',
-          status: 'Open',
-          applicationFee: 'R400.00',
-          openingDate: '2026-01-01',
-          closingDate: '2026-12-31',
-          image: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.varsitycollege.co.za',
-          description: 'Educational brand of The Independent Institute of Education (The IIE), offering modern industry-aligned qualifications.',
-          faculties: ['Computer Science & IT', 'Law', 'Commerce', 'Humanities'],
-          requirements: 'NSC Degree or Diploma pass as per IIE admission standards.'
-        },
-        {
-          id: 10,
-          name: 'Rhodes University (RU)',
-          province: 'Eastern Cape',
-          location: 'Makhanda (Grahamstown)',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R100.00',
-          openingDate: '2026-04-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.ru.ac.za',
-          description: 'A distinctively small, highly research-intensive university with outstanding academic outcomes.',
-          faculties: ['Humanities', 'Commerce', 'Science', 'Pharmacy', 'Law', 'Education'],
-          requirements: 'NSC Degree pass with strong performance in written English and core subjects.'
-        },
-        {
-          id: 11,
-          name: 'Nelson Mandela University (NMU)',
-          province: 'Eastern Cape',
-          location: 'Gqeberha (Port Elizabeth)',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R0.00 (Free)',
-          openingDate: '2026-04-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.mandela.ac.za',
-          description: 'A comprehensive university offering professional, vocational, and general academic degrees.',
-          faculties: ['Engineering & Built Environment', 'Health Sciences', 'Business & Economic Sciences', 'Law', 'Science'],
-          requirements: 'Applicant score (AS) calculated from NSC subject ratings.'
-        },
-        {
-          id: 12,
-          name: 'University of Fort Hare (UFH)',
-          province: 'Eastern Cape',
-          location: 'Alice / East London',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R0.00 (Free)',
-          openingDate: '2026-04-01',
-          closingDate: '2026-10-31',
-          image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.ufh.ac.za',
-          description: 'A historic public university with rich legacy in South African leadership and academic development.',
-          faculties: ['Management & Commerce', 'Law', 'Science & Agriculture', 'Social Sciences & Humanities', 'Education'],
-          requirements: 'NSC Bachelor degree endorsement meeting program cutoff points.'
-        },
-        {
-          id: 13,
-          name: 'Walter Sisulu University (WSU)',
-          province: 'Eastern Cape',
-          location: 'Mthatha / East London',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R0.00 (Free)',
-          openingDate: '2026-04-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.wsu.ac.za',
-          description: 'A developmental comprehensive university offering urban and rural community transformation programs.',
-          faculties: ['Health Sciences', 'Business Sciences', 'Engineering & Technology', 'Educational Sciences'],
-          requirements: 'NSC Degree or Diploma pass meeting faculty threshold limits.'
-        },
-        {
-          id: 14,
-          name: 'University of KwaZulu-Natal (UKZN)',
-          province: 'KwaZulu-Natal',
-          location: 'Durban & Pietermaritzburg',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R210.00',
-          openingDate: '2026-04-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1525921429624-479b6a26d84d?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.ukzn.ac.za',
-          description: 'Top research institution operating across five main campuses in KZN.',
-          faculties: ['Agriculture, Engineering & Science', 'Health Sciences', 'Humanities', 'Law & Management Studies'],
-          requirements: 'Applied through Central Applications Office (CAO) with NSC degree pass.'
-        },
-        {
-          id: 15,
-          name: 'Durban University of Technology (DUT)',
-          province: 'KwaZulu-Natal',
-          location: 'Durban / Pietermaritzburg',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R220.00',
-          openingDate: '2026-04-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.dut.ac.za',
-          description: 'Leading university of technology prioritizing practical training, entrepreneurship, and innovation.',
-          faculties: ['Accounting & Informatics', 'Applied Sciences', 'Arts & Design', 'Engineering & Built Environment', 'Health Sciences'],
-          requirements: 'NSC Diploma or Degree pass submitted via CAO portal.'
-        },
-        {
-          id: 16,
-          name: 'University of the Free State (UFS)',
-          province: 'Free State',
-          location: 'Bloemfontein',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R0.00 (Free)',
-          openingDate: '2026-04-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.ufs.ac.za',
-          description: 'Multi-campus public university providing diverse undergraduate research and professional pathways.',
-          faculties: ['Economic & Management Sciences', 'Health Sciences', 'Law', 'Natural & Agricultural Sciences', 'Theology'],
-          requirements: 'AP score minimums starting from 28-34 depending on degree track.'
-        },
-        {
-          id: 17,
-          name: 'University of Limpopo (UL)',
-          province: 'Limpopo',
-          location: 'Mankweng, Polokwane',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R200.00',
-          openingDate: '2026-04-01',
-          closingDate: '2026-09-30',
-          image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.ul.ac.za',
-          description: 'A premier rural-based university providing quality higher education tailored to regional development.',
-          faculties: ['Health Sciences', 'Science & Agriculture', 'Humanities', 'Management & Law'],
-          requirements: 'NSC Bachelor degree endorsement meeting specific faculty points.'
-        },
-        {
-          id: 18,
-          name: 'University of Mpumalanga (UMP)',
-          province: 'Mpumalanga',
-          location: 'Mbombela (Nelspruit)',
-          type: 'University',
-          status: 'Open',
-          applicationFee: 'R150.00',
-          openingDate: '2026-04-01',
-          closingDate: '2026-11-30',
-          image: 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&w=1600&q=80',
-          applicationUrl: 'https://www.ump.ac.za',
-          description: 'Modern public university driving socio-economic growth, agriculture, and hospitality in Mpumalanga.',
-          faculties: ['Agriculture & Natural Sciences', 'Development Studies', 'Education'],
-          requirements: 'NSC Degree or Diploma pass meeting departmental score requirements.'
-        }
-      ]
+      institutions: [] // 1. Start with an empty array
     }
   },
   computed: {
     filteredInstitutions() {
       return this.institutions.filter(uni => {
         const matchesSearch = 
-          uni.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          uni.location.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          uni.province.toLowerCase().includes(this.searchQuery.toLowerCase());
+          (uni.name && uni.name.toLowerCase().includes(this.searchQuery.toLowerCase())) ||
+          (uni.province && uni.province.toLowerCase().includes(this.searchQuery.toLowerCase()));
 
         const matchesProvince = this.selectedProvince === '' || uni.province === this.selectedProvince;
-        const matchesType = this.selectedType === '' || uni.type === this.selectedType;
+        const matchesType = this.selectedType === '' || uni.institution_type === this.selectedType;
 
         return matchesSearch && matchesProvince && matchesType;
       });
     }
   },
   methods: {
+    // 2. Add fetch method to get data from Express
+    async fetchInstitutions() {
+      try {
+        const response = await fetch('http://localhost:3000/api/institutions');
+        const result = await response.json();
+        
+        if (result.success) {
+          // Map database column names to match template expectations
+          this.institutions = result.data.map(item => ({
+            id: item.institution_id,
+            name: item.name,
+            province: item.province,
+            location: item.province, 
+            type: item.institution_type,
+            institution_type: item.institution_type,
+            status: item.application_status,
+            applicationFee: item.application_fee ? `R${item.application_fee}` : 'Free',
+            applicationUrl: item.application_url,
+            websiteUrl: item.website_url,
+            image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80', // Fallback cover
+            description: `${item.name} is a higher education institution located in ${item.province}, South Africa.`
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading institutions from backend:', error);
+      }
+    },
     setCardRef(el, index) {
       if (el) this.cardRefs[index] = el;
     },
@@ -544,7 +281,8 @@ export default {
     }
   },
   mounted() {
-    this.initIntersectionObserver();
+    // 3. Call backend when component loads on screen
+    this.fetchInstitutions();
   }
 }
 </script>
