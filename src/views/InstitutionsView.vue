@@ -1,51 +1,5 @@
 <template>
   <div class="uni-scroll-container">
-    <!-- STICKY CONTROL BAR (Search, Filter & Sort) -->
-    <div class="sticky-top-bar position-fixed start-50 translate-middle-x w-90 max-w-lg">
-      <div class="card bg-navy-glass border-gold p-2 shadow-lg backdrop-blur rounded-pill">
-        <div class="row g-2 align-items-center px-2">
-          <!-- SEARCH INPUT -->
-          <div class="col-md-5">
-            <div class="input-group">
-              <span class="input-group-text bg-transparent border-0 text-gold">
-                <i class="bi bi-search"></i>
-              </span>
-              <input 
-                v-model="searchQuery" 
-                type="text" 
-                class="form-control bg-transparent border-0 text-white shadow-none placeholder-light" 
-                placeholder="Search university or city..."
-              />
-            </div>
-          </div>
-
-          <!-- PROVINCE FILTER -->
-          <div class="col-md-3">
-            <select v-model="selectedProvince" class="form-select bg-dark text-white border-secondary rounded-pill text-sm">
-              <option value="">All Provinces</option>
-              <option value="Western Cape">Western Cape</option>
-              <option value="Gauteng">Gauteng</option>
-              <option value="Eastern Cape">Eastern Cape</option>
-              <option value="KwaZulu-Natal">KwaZulu-Natal</option>
-              <option value="Free State">Free State</option>
-              <option value="Limpopo">Limpopo</option>
-              <option value="Mpumalanga">Mpumalanga</option>
-            </select>
-          </div>
-
-          <!-- TYPE FILTER -->
-          <div class="col-md-4">
-            <select v-model="selectedType" class="form-select bg-dark text-white border-secondary rounded-pill text-sm">
-              <option value="">All Types</option>
-              <option value="University">University</option>
-              <option value="TVET College">TVET College</option>
-              <option value="Private College">Private College</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- NO RESULTS NOTICE -->
     <div v-if="filteredInstitutions.length === 0" class="fullscreen-card d-flex align-items-center justify-content-center text-white bg-navy">
       <div class="text-center pt-5">
@@ -66,7 +20,7 @@
       <!-- CAMPUS BACKGROUND IMAGE WITH OVERLAY -->
       <div 
         class="card-bg-image position-absolute top-0 start-0 w-100 h-100"
-        :style="{ backgroundImage: `linear-gradient(rgba(0, 18, 84, 0.8), rgba(0, 12, 50, 0.92)), url(${uni.image})` }"
+        :style="{ backgroundImage: `linear-gradient(rgba(${uni.themeColor}, 0.55), rgba(${uni.themeColor}, 0.92)), url(${uni.image})` }"
       ></div>
 
       <!-- CARD HERO CONTENT -->
@@ -194,6 +148,12 @@
 <script>
 export default {
   name: 'InstitutionsView',
+  props: {
+    searchFilter: {
+      type: Object,
+      default: () => ({ searchQuery: '', selectedProvince: '', selectedType: '' })
+    }
+  },
   data() {
     return {
       cardRefs: [],
@@ -201,46 +161,62 @@ export default {
       searchQuery: '',
       selectedProvince: '',
       selectedType: '',
-      institutions: [] // 1. Start with an empty array
+      institutions: []
     }
   },
   computed: {
     filteredInstitutions() {
+      // Prioritize props from top Navbar/App.vue, fall back to local state
+      const query = (this.searchFilter?.searchQuery || this.searchQuery || '').toLowerCase();
+      const province = this.searchFilter?.selectedProvince || this.selectedProvince || '';
+      const type = this.searchFilter?.selectedType || this.selectedType || '';
+
       return this.institutions.filter(uni => {
         const matchesSearch = 
-          (uni.name && uni.name.toLowerCase().includes(this.searchQuery.toLowerCase())) ||
-          (uni.province && uni.province.toLowerCase().includes(this.searchQuery.toLowerCase()));
+          (uni.name && uni.name.toLowerCase().includes(query)) ||
+          (uni.province && uni.province.toLowerCase().includes(query));
 
-        const matchesProvince = this.selectedProvince === '' || uni.province === this.selectedProvince;
-        const matchesType = this.selectedType === '' || uni.institution_type === this.selectedType;
+        const matchesProvince = province === '' || uni.province === province;
+        const matchesType = type === '' || uni.institution_type === type;
 
         return matchesSearch && matchesProvince && matchesType;
       });
     }
   },
   methods: {
-    // 2. Add fetch method to get data from Express
     async fetchInstitutions() {
       try {
         const response = await fetch('http://localhost:3000/api/institutions');
         const result = await response.json();
         
         if (result.success) {
-          // Map database column names to match template expectations
-          this.institutions = result.data.map(item => ({
-            id: item.institution_id,
-            name: item.name,
-            province: item.province,
-            location: item.province, 
-            type: item.institution_type,
-            institution_type: item.institution_type,
-            status: item.application_status,
-            applicationFee: item.application_fee ? `R${item.application_fee}` : 'Free',
-            applicationUrl: item.application_url,
-            websiteUrl: item.website_url,
-            image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80', // Fallback cover
-            description: `${item.name} is a higher education institution located in ${item.province}, South Africa.`
-          }));
+          const saColors = [
+            '0, 100, 60',   // SA Green
+            '0, 35, 120',   // SA Blue
+            '170, 30, 30',  // SA Red
+            '180, 120, 10', // SA Gold
+            '20, 25, 40'    // SA Dark Slate
+          ];
+
+          this.institutions = result.data.map((item, index) => {
+            const themeColor = saColors[index % saColors.length];
+
+            return {
+              id: item.institution_id,
+              name: item.name,
+              province: item.province,
+              location: item.province,
+              type: item.institution_type,
+              institution_type: item.institution_type,
+              status: item.application_status,
+              applicationFee: item.application_fee ? `R${item.application_fee}` : 'Free',
+              applicationUrl: item.application_url,
+              websiteUrl: item.website_url,
+              themeColor: themeColor,
+              image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80',
+              description: `${item.name} is a higher education institution located in ${item.province}, South Africa.`
+            };
+          });
         }
       } catch (error) {
         console.error('Error loading institutions from backend:', error);
@@ -259,6 +235,7 @@ export default {
       this.searchQuery = '';
       this.selectedProvince = '';
       this.selectedType = '';
+      this.$emit('reset-filters');
     },
     initIntersectionObserver() {
       this.cardRefs = [];
@@ -281,43 +258,34 @@ export default {
     }
   },
   mounted() {
-    // 3. Call backend when component loads on screen
     this.fetchInstitutions();
   }
 }
 </script>
 
 <style scoped>
-/* STICKY CONTROL BAR POSITIONING */
-.sticky-top-bar {
-  top: 95px; /* Sits below top main navigation bar */
-  z-index: 1020;
-}
-
-.w-90 {
-  width: 90%;
+.uni-scroll-container {
+  height: 100vh;
+  overflow-y: auto;
+  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
 }
 
 .max-w-lg {
   max-width: 800px;
 }
 
-.bg-navy-glass {
-  background-color: rgba(0, 18, 66, 0.88);
-}
-
-.placeholder-light::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
 .fullscreen-card {
   height: 100vh;
   width: 100vw;
   scroll-snap-align: start;
+  margin: 0;
 }
 
 .card-content {
-  padding-top: 90px; /* Offset content so floating bar doesn't overlap titles */
+  padding-top: 40px;
 }
 
 .card-bg-image {

@@ -209,3 +209,10 @@ main {
   100% { background-position: 0% 50%; }
 }
 
+.uni-scroll-container {
+  height: 100vh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth; /* Smooths out programmatic scrolls & anchor links */
+  -webkit-overflow-scrolling: touch; /* Smooth inertia scrolling on mobile/iOS */
+}
