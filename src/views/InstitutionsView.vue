@@ -20,17 +20,17 @@
       <!-- CAMPUS BACKGROUND IMAGE WITH OVERLAY -->
       <div 
         class="card-bg-image position-absolute top-0 start-0 w-100 h-100"
-        :style="{ backgroundImage: `linear-gradient(rgba(${uni.themeColor}, 0.55), rgba(${uni.themeColor}, 0.92)), url(${uni.image})` }"
+        :style="{ backgroundImage: `linear-gradient(rgba(${uni.themeColor}, 0.58), rgba(${uni.themeColor}, 0.93)), url(${uni.image})` }"
       ></div>
 
       <!-- CARD HERO CONTENT -->
       <div class="card-content text-center z-1 px-4 max-w-lg">
-        <!-- ANIMATED DRAW SVG EMBLEM -->
-        <div class="emblem-wrapper mx-auto mb-3">
-          <svg class="emblem-svg" viewBox="0 0 100 100">
-            <rect class="draw-path" x="5" y="5" width="90" height="90" rx="18" />
-            <path class="draw-path inner-icon" d="M50 22 L78 38 L78 68 L50 84 L22 68 L22 38 Z" />
-          </svg>
+        
+        <!-- HEXAGON BADGE CONTAINER (ICON ONLY) -->
+        <div class="hexagon-outer mx-auto mb-3">
+          <div class="hexagon-inner d-flex align-items-center justify-content-center">
+            <i :class="getInstitutionIcon(uni.name, uni.type)" class="hexagon-icon text-navy"></i>
+          </div>
         </div>
 
         <span class="badge bg-gold text-dark fw-bold px-3 py-2 mb-2 rounded-pill text-uppercase fs-7">
@@ -68,7 +68,7 @@
       </div>
     </div>
 
-    <!-- FULL DETAILS MODAL / DRAWER -->
+    <!-- FULL DETAILS MODAL -->
     <div 
       v-if="selectedUni" 
       class="modal fade show d-block backdrop-blur modal-overlay" 
@@ -79,7 +79,9 @@
         <div class="modal-content bg-dark text-white border-gold shadow-lg">
           <div class="modal-header border-bottom border-secondary">
             <div class="d-flex align-items-center gap-3">
-              <img :src="selectedUni.image" :alt="selectedUni.name" class="rounded-circle object-fit-cover" width="50" height="50">
+              <div class="hexagon-sm d-flex align-items-center justify-content-center bg-gold text-dark fw-bold">
+                <i :class="getInstitutionIcon(selectedUni.name, selectedUni.type)" class="fs-5"></i>
+              </div>
               <div>
                 <h4 class="modal-title fw-bold mb-0">{{ selectedUni.name }}</h4>
                 <small class="text-gold">{{ selectedUni.location }} • {{ selectedUni.province }}</small>
@@ -89,11 +91,9 @@
           </div>
 
           <div class="modal-body py-4">
-            <!-- DESCRIPTION -->
             <h5 class="fw-bold text-gold mb-2">Overview</h5>
             <p class="text-light mb-4">{{ selectedUni.description }}</p>
 
-            <!-- DETAILS GRID -->
             <div class="row g-3 mb-4">
               <div class="col-md-6">
                 <div class="p-3 rounded bg-navy border border-secondary">
@@ -128,7 +128,6 @@
               </div>
             </div>
 
-            <!-- REQUIREMENTS -->
             <h5 class="fw-bold text-gold mb-2">General Admission Requirements</h5>
             <p class="small text-light mb-0">{{ selectedUni.requirements }}</p>
           </div>
@@ -166,7 +165,6 @@ export default {
   },
   computed: {
     filteredInstitutions() {
-      // Prioritize props from top Navbar/App.vue, fall back to local state
       const query = (this.searchFilter?.searchQuery || this.searchQuery || '').toLowerCase();
       const province = this.searchFilter?.selectedProvince || this.selectedProvince || '';
       const type = this.searchFilter?.selectedType || this.selectedType || '';
@@ -184,6 +182,20 @@ export default {
     }
   },
   methods: {
+    getInstitutionIcon(name = '', type = '') {
+      const lowerName = name.toLowerCase();
+      const lowerType = type.toLowerCase();
+
+      if (lowerName.includes('technology') || lowerType.includes('technology') || lowerName.includes('cput') || lowerName.includes('cut') || lowerName.includes('tut') || lowerName.includes('vut') || lowerName.includes('dut')) {
+        return 'bi bi-cpu-fill';
+      } else if (lowerName.includes('health') || lowerName.includes('medical')) {
+        return 'bi bi-hospital-fill';
+      } else if (lowerName.includes('college') || lowerType.includes('tvet')) {
+        return 'bi bi-journal-bookmark-fill';
+      } else {
+        return 'bi bi-bank2';
+      }
+    },
     async fetchInstitutions() {
       try {
         const response = await fetch('http://localhost:3000/api/institutions');
@@ -302,6 +314,10 @@ export default {
   background-color: #001242;
 }
 
+.text-navy {
+  color: #001242;
+}
+
 .bg-gold {
   background-color: #ffb81c !important;
 }
@@ -329,29 +345,55 @@ export default {
   box-shadow: 0 8px 20px rgba(0,0,0,0.4);
 }
 
-/* DRAW SVG ANIMATION */
-.emblem-wrapper {
-  width: 110px;
-  height: 110px;
+/* ===================================================
+   HEXAGON BADGE STYLES
+   =================================================== */
+.hexagon-outer {
+  width: 105px;
+  height: 115px;
+  background: #ffb81c;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  opacity: 0;
+  transform: scale(0.3) translateY(40px);
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease;
+  filter: drop-shadow(0 0 12px rgba(255, 184, 28, 0.6));
 }
 
-.emblem-svg {
-  width: 100%;
-  height: 100%;
+.hexagon-inner {
+  width: 97px;
+  height: 107px;
+  background: #ffffff;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
-.draw-path {
-  fill: transparent;
-  stroke: #ffb81c;
-  stroke-width: 4;
-  stroke-dasharray: 400;
-  stroke-dashoffset: 400;
-  transition: stroke-dashoffset 2s ease-in-out, fill 0.5s ease 1.8s;
+.hexagon-icon {
+  font-size: 2.5rem;
 }
 
-.fullscreen-card.is-visible .draw-path {
-  stroke-dashoffset: 0;
-  fill: rgba(255, 184, 28, 0.2);
+.hexagon-sm {
+  width: 44px;
+  height: 48px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+/* Scroll Entrance & Floating Animation */
+.fullscreen-card.is-visible .hexagon-outer {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  animation: floatHexagon 4s ease-in-out infinite 0.8s;
+}
+
+@keyframes floatHexagon {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 .backdrop-blur {

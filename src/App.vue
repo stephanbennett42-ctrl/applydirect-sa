@@ -1,64 +1,74 @@
 <template>
   <div id="app">
-    <!-- TOP NAVIGATION BAR -->
-    <nav class="navbar navbar-expand-lg bg-white fixed-top shadow-sm py-2 px-4 border-0">
-      <div class="container-fluid p-0">
-        <!-- LOGO -->
-        <router-link to="/" class="navbar-brand fw-bold fs-4 text-dark m-0">
-          ApplyDirect<span class="text-primary">-SA</span>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm py-2">
+      <div class="container-fluid px-4">
+        <!-- BRAND LOGO -->
+        <router-link to="/institutions" class="navbar-brand fw-bold fs-4 text-dark me-4">
+          ApplyDirect-<span class="text-sa-blue">SA</span>
         </router-link>
 
-        <!-- SEARCH BAR & FILTERS EMBEDDED DIRECTLY IN NAV BAR -->
-        <div class="d-none d-lg-flex align-items-center gap-2 mx-auto nav-search-container">
-          <div class="input-group input-group-sm">
-            <span class="input-group-text bg-light border-0 text-muted">
-              <i class="bi bi-search"></i>
-            </span>
-            <input 
-              v-model="searchQuery" 
-              type="text" 
-              class="form-control bg-light border-0 shadow-none" 
-              placeholder="Search university or city..."
-              @input="onSearchChange"
-            />
-          </div>
-
-          <select v-model="selectedProvince" @change="onSearchChange" class="form-select form-select-sm bg-light border-0 w-auto">
+        <!-- SEARCH & FILTERS -->
+        <div class="d-flex gap-2 flex-grow-1 max-w-lg me-4">
+          <input 
+            type="text" 
+            class="form-control rounded-pill bg-light border-0 px-3" 
+            placeholder="Search university or city..." 
+            v-model="searchFilter.searchQuery"
+          />
+          <select class="form-select rounded-pill bg-light border-0" v-model="searchFilter.selectedProvince">
             <option value="">All Provinces</option>
-            <option value="Western Cape">Western Cape</option>
             <option value="Gauteng">Gauteng</option>
-            <option value="Eastern Cape">Eastern Cape</option>
+            <option value="Western Cape">Western Cape</option>
             <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+            <option value="Eastern Cape">Eastern Cape</option>
             <option value="Free State">Free State</option>
             <option value="Limpopo">Limpopo</option>
             <option value="Mpumalanga">Mpumalanga</option>
+            <option value="North West">North West</option>
+            <option value="Northern Cape">Northern Cape</option>
           </select>
-
-          <select v-model="selectedType" @change="onSearchChange" class="form-select form-select-sm bg-light border-0 w-auto">
+          <select class="form-select rounded-pill bg-light border-0" v-model="searchFilter.selectedType">
             <option value="">All Types</option>
             <option value="University">University</option>
-            <option value="TVET College">TVET College</option>
-            <option value="Private College">Private College</option>
+            <option value="TVET">TVET</option>
           </select>
         </div>
 
-        <!-- MENU LINKS -->
-        <ul class="navbar-nav ms-auto align-items-center gap-2 mb-0">
-          <li class="nav-item">
-            <router-link to="/institutions" class="btn btn-primary rounded-pill px-3 py-1 fw-semibold btn-sm">Universities</router-link>
-          </li>
-          <li class="nav-item"><router-link to="/profile" class="nav-link text-dark fw-medium py-0">Profile</router-link></li>
-          <li class="nav-item"><router-link to="/about" class="nav-link text-dark fw-medium py-0">About Us</router-link></li>
-          <li class="nav-item"><router-link to="/contact" class="nav-link text-dark fw-medium py-0">Contact</router-link></li>
-          <li class="nav-item"><router-link to="/subscription" class="nav-link text-dark fw-medium py-0">Subscription</router-link></li>
-        </ul>
+        <!-- SA FLAG THEMED NAV TABS -->
+        <div class="navbar-nav d-flex align-items-center gap-1">
+          <!-- SA GREEN FOR UNIVERSITIES -->
+          <router-link to="/institutions" class="sa-nav-tab tab-green">
+            Universities
+          </router-link>
+
+          <!-- SA GOLD FOR PROFILE -->
+          <router-link to="/profile" class="sa-nav-tab tab-gold">
+            Profile
+          </router-link>
+
+          <!-- SA RED FOR ABOUT US -->
+          <router-link to="/about" class="sa-nav-tab tab-red">
+            About Us
+          </router-link>
+
+          <!-- SA BLUE FOR CONTACT -->
+          <router-link to="/contact" class="sa-nav-tab tab-blue">
+            Contact
+          </router-link>
+
+          <!-- SA BLACK FOR SUBSCRIPTION -->
+          <router-link to="/subscription" class="sa-nav-tab tab-black">
+            Subscription
+          </router-link>
+        </div>
       </div>
     </nav>
 
-    <!-- MAIN ROUTER VIEW -->
-    <div class="main-content">
-      <router-view :search-filter="{ searchQuery, selectedProvince, selectedType }" />
-    </div>
+    <!-- MAIN CONTENT AREA -->
+    <main>
+      <router-view :search-filter="searchFilter" @reset-filters="resetFilters" />
+    </main>
   </div>
 </template>
 
@@ -67,41 +77,85 @@ export default {
   name: 'App',
   data() {
     return {
-      searchQuery: '',
-      selectedProvince: '',
-      selectedType: ''
+      searchFilter: {
+        searchQuery: '',
+        selectedProvince: '',
+        selectedType: ''
+      }
     }
   },
   methods: {
-    onSearchChange() {
-      // Passes search state down to current route
+    resetFilters() {
+      this.searchFilter = { searchQuery: '', selectedProvince: '', selectedType: '' };
     }
   }
 }
 </script>
 
 <style>
-/* Reset default margins and background to prevent white gaps */
-html, body {
-  margin: 0;
-  padding: 0;
-  background-color: #001242; /* Matches navy theme */
-  overflow-x: hidden;
+.max-w-lg {
+  max-width: 600px;
 }
 
-/* Nav bar fixes */
-.navbar {
-  height: 60px;
-  border-bottom: none !important; /* Removes the light border line */
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important;
+.text-sa-blue {
+  color: #002395;
 }
 
-.nav-search-container {
-  max-width: 520px;
-  width: 100%;
+/* BASE TAB STYLING */
+.sa-nav-tab {
+  padding: 8px 18px;
+  border-radius: 50rem;
+  font-weight: 600;
+  color: #333333;
+  text-decoration: none;
+  transition: all 0.25s ease-in-out;
+  display: inline-block;
 }
 
-.main-content {
-  padding-top: 60px; /* Exactly matches nav height so cards start flush under nav */
+.sa-nav-tab:hover {
+  background-color: #f1f3f5;
+  color: #000000;
+}
+
+/* --- SOUTH AFRICAN FLAG COLOR THEMES WHEN ACTIVE --- */
+
+/* 1. UNIVERSITIES -> SA GREEN */
+.tab-green.router-link-active,
+.tab-green.router-link-exact-active {
+  background-color: #007a3d !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 122, 61, 0.3);
+}
+
+/* 2. PROFILE -> SA GOLD */
+.tab-gold.router-link-active,
+.tab-gold.router-link-exact-active {
+  background-color: #ffb81c !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 12px rgba(255, 184, 28, 0.4);
+}
+
+/* 3. ABOUT US -> SA RED */
+.tab-red.router-link-active,
+.tab-red.router-link-exact-active {
+  background-color: #e03c31 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(224, 60, 49, 0.3);
+}
+
+/* 4. CONTACT -> SA BLUE */
+.tab-blue.router-link-active,
+.tab-blue.router-link-exact-active {
+  background-color: #002395 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 35, 149, 0.3);
+}
+
+/* 5. SUBSCRIPTION -> SA BLACK */
+.tab-black.router-link-active,
+.tab-black.router-link-exact-active {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 </style>

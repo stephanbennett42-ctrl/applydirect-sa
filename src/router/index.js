@@ -14,8 +14,13 @@ const SubscriptionView = {
 };
 
 const routes = [
-  { path: "/", redirect: "/universities" },
-  { path: "/universities", name: "Universities", component: InstitutionsView },
+  { path: "/", redirect: "/institutions" },
+  { 
+    path: "/institutions", 
+    name: "Institutions", 
+    component: InstitutionsView,
+    alias: "/universities" // Supports both /institutions and /universities
+  },
   { path: "/profile", name: "Profile", component: ProfileView },
   { path: "/about", name: "About", component: AboutView },
   { path: "/contact", name: "Contact", component: ContactView },
