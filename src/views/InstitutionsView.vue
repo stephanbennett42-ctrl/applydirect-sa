@@ -1,72 +1,111 @@
 <template>
-  <div class="uni-scroll-container">
-    <!-- NO RESULTS NOTICE -->
-    <div v-if="filteredInstitutions.length === 0" class="fullscreen-card d-flex align-items-center justify-content-center text-white bg-navy">
-      <div class="text-center pt-5">
-        <i class="bi bi-search fs-1 text-gold mb-3 d-block"></i>
-        <h3>No institutions found</h3>
-        <p class="text-light">Try adjusting your search query or filters.</p>
-        <button @click="resetFilters" class="btn btn-gold rounded-pill px-4 fw-bold">Reset Filters</button>
-      </div>
+  <div class="uni-scroll-container" ref="scrollContainer">
+    <!-- FLOATING NEARBY LOCATION BUTTON -->
+    <div class="floating-geo-btn position-fixed top-0 end-0 m-4 z-3">
+      <button 
+        @click="getUserLocation" 
+        class="btn btn-gold rounded-pill px-4 py-2 fw-bold shadow-lg d-flex align-items-center gap-2 hover-lift"
+        :disabled="isLocating"
+      >
+        <i class="bi bi-geo-alt-fill text-dark fs-5"></i>
+        <span>{{ isLocating ? 'Finding Location...' : (userLat ? 'Updated Nearby' : 'Find Near Me') }}</span>
+      </button>
     </div>
 
-    <!-- CARDS CONTAINER -->
-    <div 
-      v-for="(uni, index) in filteredInstitutions" 
-      :key="uni.id"
-      class="fullscreen-card position-relative overflow-hidden d-flex align-items-center justify-content-center text-white"
-      :ref="el => setCardRef(el, index)"
-    >
-      <!-- CAMPUS BACKGROUND IMAGE WITH OVERLAY -->
+    <!-- 1. SEARCHING / GEOLOCATION RADAR LOADING ANIMATION OVERLAY -->
+    <Transition name="overlay-fade">
       <div 
-        class="card-bg-image position-absolute top-0 start-0 w-100 h-100"
-        :style="{ backgroundImage: `linear-gradient(rgba(${uni.themeColor}, 0.58), rgba(${uni.themeColor}, 0.93)), url(${uni.image})` }"
-      ></div>
+        v-if="isLocating" 
+        class="position-fixed top-0 start-0 w-100 h-100 bg-radar-overlay d-flex flex-column align-items-center justify-content-center text-white z-radar"
+      >
+        <div class="radar-box mb-4">
+          <div class="radar-wave"></div>
+          <div class="radar-wave delay-1"></div>
+          <div class="radar-wave delay-2"></div>
+          <i class="bi bi-geo-alt-fill text-gold fs-1 icon-pulse"></i>
+        </div>
+        <h3 class="fw-bold text-gold mb-2">Calculating Proximity...</h3>
+        <p class="text-light opacity-75 fs-5">Finding campuses closest to your live location</p>
+      </div>
+    </Transition>
 
-      <!-- CARD HERO CONTENT -->
-      <div class="card-content text-center z-1 px-4 max-w-lg">
-        
-        <!-- HEXAGON BADGE CONTAINER (ICON ONLY) -->
-        <div class="hexagon-outer mx-auto mb-3">
-          <div class="hexagon-inner d-flex align-items-center justify-content-center">
-            <i :class="getInstitutionIcon(uni.name, uni.type)" class="hexagon-icon text-navy"></i>
+    <!-- NO RESULTS NOTICE -->
+    <Transition name="card-fade">
+      <div v-if="filteredInstitutions.length === 0" class="fullscreen-card d-flex align-items-center justify-content-center text-white bg-navy">
+        <div class="text-center pt-5">
+          <i class="bi bi-search fs-1 text-gold mb-3 d-block"></i>
+          <h3>No institutions found</h3>
+          <p class="text-light">Try adjusting your search query or filters.</p>
+          <button @click="resetFilters" class="btn btn-gold rounded-pill px-4 fw-bold">Reset Filters</button>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- 2. CARDS CONTAINER WITH SPRING POP-IN & RE-ORDER TRANSITION -->
+    <TransitionGroup name="card-fade">
+      <div 
+        v-for="(uni, index) in filteredInstitutions" 
+        :key="uni.id"
+        class="fullscreen-card position-relative overflow-hidden d-flex align-items-center justify-content-center text-white"
+        :ref="el => setCardRef(el, index)"
+      >
+        <!-- CAMPUS BACKGROUND IMAGE WITH OVERLAY -->
+        <div class="position-absolute top-0 start-0 w-100 h-100 overflow-hidden">
+          <img 
+            :src="uni.image" 
+            :alt="uni.name"
+            @error="handleImageError($event, index)"
+            class="card-bg-img position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
+          />
+          <div 
+            class="card-overlay position-absolute top-0 start-0 w-100 h-100"
+            :style="{ background: `linear-gradient(180deg, rgba(${uni.themeColor}, 0.65) 0%, rgba(${uni.themeColor}, 0.92) 100%)` }"
+          ></div>
+        </div>
+
+        <!-- CARD HERO CONTENT -->
+        <div class="card-content text-center z-1 px-4 max-w-lg">
+          <!-- INSTITUTION TYPE BADGE & DISTANCE BADGE -->
+          <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+            <span class="badge bg-gold text-dark fw-bold px-3 py-2 rounded-pill text-uppercase fs-7">
+              {{ uni.type }}
+            </span>
+            <span v-if="uni.distanceKm" class="badge bg-light text-dark fw-bold px-3 py-2 rounded-pill fs-7 shadow-sm distance-pop-badge">
+              <i class="bi bi-pin-map-fill text-danger me-1"></i> {{ uni.distanceKm }} km away
+            </span>
+          </div>
+
+          <h1 class="display-4 fw-bold mb-2">{{ uni.name }}</h1>
+          <p class="lead fs-4 text-light opacity-90 mb-4">
+            <i class="bi bi-geo-alt-fill text-gold me-1"></i> {{ uni.location }}, {{ uni.province }}
+          </p>
+
+          <!-- ACTION BUTTONS -->
+          <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <button 
+              @click="openDetails(uni)" 
+              class="btn btn-outline-light btn-lg px-4 py-2 rounded-pill fw-bold hover-lift"
+            >
+              <i class="bi bi-info-circle me-1"></i> View Institution Details
+            </button>
+            
+            <a 
+              :href="uni.applicationUrl" 
+              target="_blank" 
+              class="btn btn-gold btn-lg px-4 py-2 rounded-pill hover-lift text-dark fw-bold"
+            >
+              Apply Now <i class="bi bi-box-arrow-up-right ms-1"></i>
+            </a>
           </div>
         </div>
 
-        <span class="badge bg-gold text-dark fw-bold px-3 py-2 mb-2 rounded-pill text-uppercase fs-7">
-          {{ uni.type }}
-        </span>
-
-        <h1 class="display-4 fw-bold mb-2">{{ uni.name }}</h1>
-        <p class="lead fs-4 text-light opacity-90 mb-4">
-          <i class="bi bi-geo-alt-fill text-gold me-1"></i> {{ uni.location }}, {{ uni.province }}
-        </p>
-
-        <!-- ACTION BUTTONS -->
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-          <button 
-            @click="openDetails(uni)" 
-            class="btn btn-outline-light btn-lg px-4 py-2 rounded-pill fw-bold hover-lift"
-          >
-            <i class="bi bi-info-circle me-1"></i> View Institution Details
-          </button>
-          
-          <a 
-            :href="uni.applicationUrl" 
-            target="_blank" 
-            class="btn btn-gold btn-lg px-4 py-2 rounded-pill fw-bold hover-lift text-dark"
-          >
-            Apply Now <i class="bi bi-box-arrow-up-right ms-1"></i>
-          </a>
+        <!-- SCROLL INDICATOR -->
+        <div class="scroll-hint position-absolute bottom-0 start-50 translate-middle-x mb-4 text-center text-light opacity-75">
+          <small class="d-block mb-1">Scroll to next institution</small>
+          <i class="bi bi-chevron-down fs-4 bounce"></i>
         </div>
       </div>
-
-      <!-- SCROLL INDICATOR -->
-      <div class="scroll-hint position-absolute bottom-0 start-50 translate-middle-x mb-4 text-center text-light opacity-75">
-        <small class="d-block mb-1">Scroll to next institution</small>
-        <i class="bi bi-chevron-down fs-4 bounce"></i>
-      </div>
-    </div>
+    </TransitionGroup>
 
     <!-- FULL DETAILS MODAL -->
     <div 
@@ -78,14 +117,12 @@
       <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content bg-dark text-white border-gold shadow-lg">
           <div class="modal-header border-bottom border-secondary">
-            <div class="d-flex align-items-center gap-3">
-              <div class="hexagon-sm d-flex align-items-center justify-content-center bg-gold text-dark fw-bold">
-                <i :class="getInstitutionIcon(selectedUni.name, selectedUni.type)" class="fs-5"></i>
-              </div>
-              <div>
-                <h4 class="modal-title fw-bold mb-0">{{ selectedUni.name }}</h4>
-                <small class="text-gold">{{ selectedUni.location }} • {{ selectedUni.province }}</small>
-              </div>
+            <div>
+              <h4 class="modal-title fw-bold mb-0">{{ selectedUni.name }}</h4>
+              <small class="text-gold">
+                {{ selectedUni.location }} • {{ selectedUni.province }}
+                <span v-if="selectedUni.distanceKm"> • {{ selectedUni.distanceKm }} km away</span>
+              </small>
             </div>
             <button type="button" class="btn-close btn-close-white" @click="closeDetails"></button>
           </div>
@@ -160,41 +197,121 @@ export default {
       searchQuery: '',
       selectedProvince: '',
       selectedType: '',
-      institutions: []
+      institutions: [],
+      userLat: null,
+      userLng: null,
+      isLocating: false,
+      fallbackPhotos: [
+        'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1600&q=80'
+      ]
     }
   },
   computed: {
     filteredInstitutions() {
-      const query = (this.searchFilter?.searchQuery || this.searchQuery || '').toLowerCase();
-      const province = this.searchFilter?.selectedProvince || this.selectedProvince || '';
-      const type = this.searchFilter?.selectedType || this.selectedType || '';
+      const query = (this.searchFilter?.searchQuery || this.searchQuery || '').trim().toLowerCase();
+      const province = (this.searchFilter?.selectedProvince || this.selectedProvince || '').trim().toLowerCase();
+      const type = (this.searchFilter?.selectedType || this.selectedType || '').trim().toLowerCase();
 
-      return this.institutions.filter(uni => {
-        const matchesSearch = 
-          (uni.name && uni.name.toLowerCase().includes(query)) ||
-          (uni.province && uni.province.toLowerCase().includes(query));
+      let list = this.institutions.filter(uni => {
+        const uniName = (uni.name || '').toLowerCase();
+        const uniProvince = (uni.province || '').toLowerCase();
+        const uniType = (uni.type || uni.institution_type || '').toLowerCase();
 
-        const matchesProvince = province === '' || uni.province === province;
-        const matchesType = type === '' || uni.institution_type === type;
+        const matchesSearch = !query || 
+          uniName.includes(query) ||
+          uniProvince.includes(query) ||
+          uniType.includes(query);
+
+        const matchesProvince = !province || uniProvince === province;
+
+        const matchesType = !type || 
+          uniType === type || 
+          uniType.includes(type) || 
+          type.includes(uniType);
 
         return matchesSearch && matchesProvince && matchesType;
       });
+
+      // Sort by closest distance if user location is active
+      if (this.userLat && this.userLng) {
+        list = list.slice().sort((a, b) => {
+          if (!a.distanceKm) return 1;
+          if (!b.distanceKm) return -1;
+          return parseFloat(a.distanceKm) - parseFloat(b.distanceKm);
+        });
+      }
+
+      return list;
     }
   },
   methods: {
-    getInstitutionIcon(name = '', type = '') {
-      const lowerName = name.toLowerCase();
-      const lowerType = type.toLowerCase();
+    getDistanceInKm(lat1, lon1, lat2, lon2) {
+      if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+      const R = 6371;
+      const dLat = (lat2 - lat1) * (Math.PI / 180);
+      const dLon = (lon2 - lon1) * (Math.PI / 180);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return (R * c).toFixed(1);
+    },
 
-      if (lowerName.includes('technology') || lowerType.includes('technology') || lowerName.includes('cput') || lowerName.includes('cut') || lowerName.includes('tut') || lowerName.includes('vut') || lowerName.includes('dut')) {
-        return 'bi bi-cpu-fill';
-      } else if (lowerName.includes('health') || lowerName.includes('medical')) {
-        return 'bi bi-hospital-fill';
-      } else if (lowerName.includes('college') || lowerType.includes('tvet')) {
-        return 'bi bi-journal-bookmark-fill';
-      } else {
-        return 'bi bi-bank2';
+    getUserLocation() {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
       }
+
+      this.isLocating = true;
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.userLat = position.coords.latitude;
+          this.userLng = position.coords.longitude;
+          
+          this.calculateDistances();
+
+          // Small delay so the user sees the smooth radar radar completion effect
+          setTimeout(() => {
+            this.isLocating = false;
+          }, 800);
+        },
+        (error) => {
+          this.isLocating = false;
+          alert('Unable to access location. Please check browser GPS permissions.');
+          console.error(error);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    },
+
+    calculateDistances() {
+      if (!this.userLat || !this.userLng) return;
+
+      this.institutions.forEach(uni => {
+        if (uni.latitude && uni.longitude) {
+          uni.distanceKm = this.getDistanceInKm(
+            this.userLat,
+            this.userLng,
+            uni.latitude,
+            uni.longitude
+          );
+        }
+      });
+    },
+
+    handleImageError(event, index) {
+      event.target.onerror = null;
+      event.target.src = this.fallbackPhotos[index % this.fallbackPhotos.length];
     },
     async fetchInstitutions() {
       try {
@@ -210,25 +327,81 @@ export default {
             '20, 25, 40'    // SA Dark Slate
           ];
 
+          const coordinatesMap = {
+            'cput': { lat: -33.9312, lng: 18.4243 },
+            'uct': { lat: -33.9576, lng: 18.4610 },
+            'stellenbosch': { lat: -33.9321, lng: 18.8644 },
+            'wits': { lat: -26.1929, lng: 28.0305 },
+            'pretoria': { lat: -25.7545, lng: 28.2314 },
+            'johannesburg': { lat: -26.1825, lng: 27.9982 },
+            'uwc': { lat: -33.9332, lng: 18.6272 },
+            'tut': { lat: -25.7323, lng: 28.1622 }
+          };
+
+          const campusPhotoMap = [
+            { keywords: ['cape town', 'uct'], url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80' },
+            { keywords: ['cput', 'peninsula', 'college'], url: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1600&q=80' },
+            { keywords: ['stellenbosch', 'maties'], url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=80' },
+            { keywords: ['witwatersrand', 'wits'], url: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=1600&q=80' },
+            { keywords: ['pretoria', 'tuks', 'up'], url: 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&w=1600&q=80' },
+            { keywords: ['johannesburg', 'uj'], url: 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?auto=format&fit=crop&w=1600&q=80' },
+            { keywords: ['western cape', 'uwc'], url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80' },
+            { keywords: ['tshwane', 'tut', 'tvet'], url: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1600&q=80' }
+          ];
+
           this.institutions = result.data.map((item, index) => {
             const themeColor = saColors[index % saColors.length];
+            const nameLower = (item.name || '').toLowerCase();
+
+            let lat = item.latitude || null;
+            let lng = item.longitude || null;
+
+            if (!lat || !lng) {
+              const matchedKey = Object.keys(coordinatesMap).find(key => nameLower.includes(key));
+              if (matchedKey) {
+                lat = coordinatesMap[matchedKey].lat;
+                lng = coordinatesMap[matchedKey].lng;
+              }
+            }
+
+            const validDbUrl = item.image_url && 
+              typeof item.image_url === 'string' && 
+              item.image_url.trim() !== '' && 
+              item.image_url !== 'null' && 
+              item.image_url !== 'undefined' &&
+              (item.image_url.startsWith('http://') || item.image_url.startsWith('https://'));
+
+            const matchedCampus = campusPhotoMap.find(c => 
+              c.keywords.some(kw => nameLower.includes(kw))
+            );
+
+            const campusPhoto = validDbUrl 
+              ? item.image_url 
+              : (matchedCampus ? matchedCampus.url : this.fallbackPhotos[index % this.fallbackPhotos.length]);
 
             return {
-              id: item.institution_id,
+              id: item.institution_id || index,
               name: item.name,
               province: item.province,
               location: item.province,
-              type: item.institution_type,
-              institution_type: item.institution_type,
+              type: item.institution_type || 'TVET College',
+              institution_type: item.institution_type || 'TVET College',
               status: item.application_status,
               applicationFee: item.application_fee ? `R${item.application_fee}` : 'Free',
               applicationUrl: item.application_url,
               websiteUrl: item.website_url,
               themeColor: themeColor,
-              image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80',
+              image: campusPhoto,
+              latitude: lat,
+              longitude: lng,
+              distanceKm: null,
               description: `${item.name} is a higher education institution located in ${item.province}, South Africa.`
             };
           });
+
+          if (this.userLat && this.userLng) {
+            this.calculateDistances();
+          }
         }
       } catch (error) {
         console.error('Error loading institutions from backend:', error);
@@ -266,6 +439,9 @@ export default {
   },
   watch: {
     filteredInstitutions() {
+      if (this.$refs.scrollContainer) {
+        this.$refs.scrollContainer.scrollTop = 0;
+      }
       this.initIntersectionObserver();
     }
   },
@@ -294,28 +470,131 @@ export default {
   width: 100vw;
   scroll-snap-align: start;
   margin: 0;
+  background-color: #001242;
 }
 
+/* -------------------------------------------------------------
+   1. SEARCHING RADAR OVERLAY STYLES & ANIMATION
+   ------------------------------------------------------------- */
+.bg-radar-overlay {
+  background: rgba(0, 18, 66, 0.92);
+  backdrop-filter: blur(14px);
+}
+
+.z-radar {
+  z-index: 2000;
+}
+
+.radar-box {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radar-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid #ffb81c;
+  animation: radar-pulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.radar-wave.delay-1 {
+  animation-delay: 0.5s;
+}
+
+.radar-wave.delay-2 {
+  animation-delay: 1s;
+}
+
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.icon-pulse {
+  animation: icon-bounce 1.5s infinite ease-in-out;
+}
+
+@keyframes icon-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.15); }
+}
+
+.overlay-fade-enter-active,
+.overlay-fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.overlay-fade-enter-from,
+.overlay-fade-leave-to {
+  opacity: 0;
+}
+
+/* -------------------------------------------------------------
+   2. CARDS POP-IN & RE-ORDER TRANSITION STYLES
+   ------------------------------------------------------------- */
+.card-fade-enter-active {
+  transition: opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-fade-leave-active {
+  transition: opacity 0.35s ease-in, transform 0.35s ease-in;
+}
+
+.card-fade-enter-from {
+  opacity: 0;
+  transform: translateY(50px) scale(0.92);
+}
+
+.card-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-50px) scale(0.92);
+}
+
+.card-fade-move {
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.distance-pop-badge {
+  animation: badge-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* GENERAL COMPONENT STYLES */
 .card-content {
   padding-top: 40px;
 }
 
-.card-bg-image {
-  background-size: cover;
-  background-position: center;
+.object-fit-cover {
+  object-fit: cover;
+  object-position: center;
+}
+
+.card-bg-img {
   transition: transform 1.2s ease-out;
 }
 
-.fullscreen-card.is-visible .card-bg-image {
+.fullscreen-card.is-visible .card-bg-img {
   transform: scale(1.03);
 }
 
 .bg-navy {
   background-color: #001242;
-}
-
-.text-navy {
-  color: #001242;
 }
 
 .bg-gold {
@@ -345,63 +624,16 @@ export default {
   box-shadow: 0 8px 20px rgba(0,0,0,0.4);
 }
 
-/* ===================================================
-   HEXAGON BADGE STYLES
-   =================================================== */
-.hexagon-outer {
-  width: 105px;
-  height: 115px;
-  background: #ffb81c;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  opacity: 0;
-  transform: scale(0.3) translateY(40px);
-  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease;
-  filter: drop-shadow(0 0 12px rgba(255, 184, 28, 0.6));
-}
-
-.hexagon-inner {
-  width: 97px;
-  height: 107px;
-  background: #ffffff;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-}
-
-.hexagon-icon {
-  font-size: 2.5rem;
-}
-
-.hexagon-sm {
-  width: 44px;
-  height: 48px;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-}
-
-/* Scroll Entrance & Floating Animation */
-.fullscreen-card.is-visible .hexagon-outer {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  animation: floatHexagon 4s ease-in-out infinite 0.8s;
-}
-
-@keyframes floatHexagon {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
 .backdrop-blur {
   backdrop-filter: blur(10px);
 }
 
 .modal-overlay {
   z-index: 1050;
+}
+
+.floating-geo-btn {
+  margin-top: 80px !important;
 }
 
 @keyframes bounce {
