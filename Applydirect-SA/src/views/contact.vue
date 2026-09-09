@@ -8,7 +8,7 @@
         <router-link to="/universities">Universities</router-link>
         <router-link to="/portfolio">Profile</router-link>
         <router-link to="/about">About</router-link>
-        <router-link to="/contact" class="active">Contact</router-link>
+        <router-link to="/contact" class="active">Contact Us</router-link>
         <router-link to="/subscription">Subscription</router-link>
       </nav>
 
@@ -237,11 +237,9 @@ nav a.active {
 .contact-section {
 
   max-width: 1100px;
-
   margin: 40px auto;
 
   padding: 0 20px;
-
   display: grid;
 
   grid-template-columns: 1.5fr 1fr;
@@ -256,7 +254,7 @@ nav a.active {
 .contact-card,
 .contact-info {
 
-  background: white;
+  background: rgb(128, 228, 222);
 
   border: 1px solid #e0e3e8;
 
