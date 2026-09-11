@@ -704,7 +704,6 @@
   </div>
 </template>
 
-
 <script>
 
 export default {
@@ -776,6 +775,14 @@ export default {
   },
 
 
+  // Runs when the Portfolio page opens
+  mounted() {
+
+    this.getProfile();
+
+  },
+
+
   computed: {
 
     profileInitials() {
@@ -787,7 +794,9 @@ export default {
         this.profile.surname.trim();
 
       if (!firstName && !surname) {
+
         return "--";
+
       }
 
       return (
@@ -800,6 +809,10 @@ export default {
 
 
   methods: {
+
+    // =========================
+    // SUBJECT METHODS
+    // =========================
 
     activateSubject(index) {
 
@@ -825,7 +838,9 @@ export default {
         subjectName.trim().toLowerCase();
 
       if (!searchTerm) {
+
         return [];
+
       }
 
       return this.subjectSuggestions.filter(
@@ -851,8 +866,10 @@ export default {
     addSubject() {
 
       this.profile.subjects.push({
+
         name: "",
         mark: ""
+
       });
 
     },
@@ -869,14 +886,217 @@ export default {
     },
 
 
-    saveProfile() {
+    // =========================
+    // GET PROFILE
+    // =========================
 
-      localStorage.setItem(
-        "applyDirectProfile",
-        JSON.stringify(this.profile)
-      );
+    async getProfile() {
 
-      alert("Profile saved successfully!");
+      try {
+
+        const response = await fetch(
+          "http://localhost:3000/api/portfolio/1"
+        );
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+          console.error(data.message);
+
+          return;
+
+        }
+
+
+        // Personal details
+
+        this.profile.firstName =
+          data.profile.first_name || "";
+
+        this.profile.surname =
+          data.profile.last_name || "";
+
+        this.profile.email =
+          data.profile.email || "";
+
+        this.profile.phone =
+          data.profile.phone || "";
+
+        this.profile.dateOfBirth =
+          data.profile.date_of_birth
+            ? data.profile.date_of_birth.substring(0, 10)
+            : "";
+
+        this.profile.address =
+          data.profile.address || "";
+
+        this.profile.province =
+          data.profile.province || "";
+
+
+        // Academic details
+
+        this.profile.school =
+          data.profile.school_name || "";
+
+        this.profile.matricYear =
+          data.profile.matric_year
+            ? String(data.profile.matric_year)
+            : "";
+
+
+        // Subjects
+
+        if (data.subjects && data.subjects.length > 0) {
+
+          this.profile.subjects =
+            data.subjects.map(subject => ({
+
+              name: subject.subject_name || "",
+
+              mark: subject.mark || ""
+
+            }));
+
+        } else {
+
+          this.profile.subjects = [
+
+            {
+              name: "",
+              mark: ""
+            }
+
+          ];
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Error loading profile:",
+          error
+        );
+
+      }
+
+    },
+
+
+    // =========================
+    // SAVE / UPDATE PROFILE
+    // =========================
+
+    async saveProfile() {
+
+      try {
+
+        const profileData = {
+
+          first_name:
+            this.profile.firstName,
+
+          last_name:
+            this.profile.surname,
+
+          email:
+            this.profile.email,
+
+          phone:
+            this.profile.phone,
+
+          date_of_birth:
+            this.profile.dateOfBirth || null,
+
+          address:
+            this.profile.address,
+
+          province:
+            this.profile.province,
+
+          school_name:
+            this.profile.school,
+
+          matric_year:
+            this.profile.matricYear || null,
+
+
+          // Subjects
+
+          subjects:
+            this.profile.subjects.map(subject => ({
+
+              subject_name:
+                subject.name,
+
+              mark:
+                subject.mark,
+
+              grade:
+                ""
+
+            }))
+
+        };
+
+
+        const response = await fetch(
+
+          "http://localhost:3000/api/portfolio/1",
+
+          {
+
+            method: "PUT",
+
+            headers: {
+
+              "Content-Type":
+                "application/json"
+
+            },
+
+            body:
+              JSON.stringify(profileData)
+
+          }
+
+        );
+
+
+        const data =
+          await response.json();
+
+
+        if (response.ok) {
+
+          alert(
+            "Profile saved successfully!"
+          );
+
+        } else {
+
+          alert(
+            data.message ||
+            "Could not save profile."
+          );
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "Error saving profile:",
+          error
+        );
+
+        alert(
+          "Could not connect to the server."
+        );
+
+      }
 
     }
 
