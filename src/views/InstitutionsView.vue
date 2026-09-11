@@ -1,22 +1,23 @@
 <template>
   <div class="uni-scroll-container" ref="scrollContainer">
-    <!-- FLOATING NEARBY LOCATION BUTTON -->
-    <div class="floating-geo-btn position-fixed top-0 end-0 m-4 z-3">
+    <!-- FLOATING NEARBY LOCATION BUTTON (Mobile-friendly FAB) -->
+    <div class="floating-geo-btn position-fixed end-0 z-3">
       <button 
         @click="getUserLocation" 
-        class="btn btn-gold rounded-pill px-4 py-2 fw-bold shadow-lg d-flex align-items-center gap-2 hover-lift"
+        class="btn btn-gold rounded-pill px-3 py-2 px-md-4 fw-bold shadow-lg d-flex align-items-center gap-2 hover-lift"
         :disabled="isLocating"
       >
         <i class="bi bi-geo-alt-fill text-dark fs-5"></i>
-        <span>{{ isLocating ? 'Finding Location...' : (userLat ? 'Updated Nearby' : 'Find Near Me') }}</span>
+        <span class="d-none d-sm-inline">{{ isLocating ? 'Finding Location...' : (userLat ? 'Updated Nearby' : 'Find Near Me') }}</span>
+        <span class="d-inline d-sm-none">{{ isLocating ? '...' : 'Near Me' }}</span>
       </button>
     </div>
 
-    <!-- 1. SEARCHING / GEOLOCATION RADAR LOADING ANIMATION OVERLAY -->
+    <!-- 1. SEARCHING RADAR OVERLAY -->
     <Transition name="overlay-fade">
       <div 
         v-if="isLocating" 
-        class="position-fixed top-0 start-0 w-100 h-100 bg-radar-overlay d-flex flex-column align-items-center justify-content-center text-white z-radar"
+        class="position-fixed top-0 start-0 w-100 h-100 bg-radar-overlay d-flex flex-column align-items-center justify-content-center text-white text-center p-3 z-radar"
       >
         <div class="radar-box mb-4">
           <div class="radar-wave"></div>
@@ -24,14 +25,14 @@
           <div class="radar-wave delay-2"></div>
           <i class="bi bi-geo-alt-fill text-gold fs-1 icon-pulse"></i>
         </div>
-        <h3 class="fw-bold text-gold mb-2">Calculating Proximity...</h3>
-        <p class="text-light opacity-75 fs-5">Finding campuses closest to your live location</p>
+        <h3 class="fw-bold text-gold mb-2 fs-4 fs-md-3">Calculating Proximity...</h3>
+        <p class="text-light opacity-75 fs-6 fs-md-5">Finding campuses closest to your live location</p>
       </div>
     </Transition>
 
     <!-- NO RESULTS NOTICE -->
     <Transition name="card-fade">
-      <div v-if="filteredInstitutions.length === 0" class="fullscreen-card d-flex align-items-center justify-content-center text-white bg-navy">
+      <div v-if="filteredInstitutions.length === 0" class="fullscreen-card d-flex align-items-center justify-content-center text-white bg-navy p-3">
         <div class="text-center pt-5">
           <i class="bi bi-search fs-1 text-gold mb-3 d-block"></i>
           <h3>No institutions found</h3>
@@ -41,12 +42,12 @@
       </div>
     </Transition>
 
-    <!-- 2. CARDS CONTAINER WITH SPRING POP-IN & RE-ORDER TRANSITION -->
+    <!-- 2. CARDS CONTAINER WITH SPRING POP-IN -->
     <TransitionGroup name="card-fade">
       <div 
         v-for="(uni, index) in filteredInstitutions" 
         :key="uni.id"
-        class="fullscreen-card position-relative overflow-hidden d-flex align-items-center justify-content-center text-white"
+        class="fullscreen-card position-relative overflow-hidden d-flex align-items-center justify-content-center text-white p-3 p-md-5"
         :ref="el => setCardRef(el, index)"
       >
         <!-- CAMPUS BACKGROUND IMAGE WITH OVERLAY -->
@@ -59,40 +60,42 @@
           />
           <div 
             class="card-overlay position-absolute top-0 start-0 w-100 h-100"
-            :style="{ background: `linear-gradient(180deg, rgba(${uni.themeColor}, 0.65) 0%, rgba(${uni.themeColor}, 0.92) 100%)` }"
+            :style="{ background: `linear-gradient(180deg, rgba(${uni.themeColor}, 0.7) 0%, rgba(${uni.themeColor}, 0.95) 100%)` }"
           ></div>
         </div>
 
         <!-- CARD HERO CONTENT -->
-        <div class="card-content text-center z-1 px-4 max-w-lg">
+        <div class="card-content text-center z-1 w-100 max-w-lg">
           <!-- INSTITUTION TYPE BADGE & DISTANCE BADGE -->
-          <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
-            <span class="badge bg-gold text-dark fw-bold px-3 py-2 rounded-pill text-uppercase fs-7">
+          <div class="d-flex justify-content-center gap-2 mb-2 mb-md-3 flex-wrap">
+            <span class="badge bg-gold text-dark fw-bold px-3 py-2 rounded-pill text-uppercase fs-8 fs-md-7">
               {{ uni.type }}
             </span>
-            <span v-if="uni.distanceKm" class="badge bg-light text-dark fw-bold px-3 py-2 rounded-pill fs-7 shadow-sm distance-pop-badge">
+            <span v-if="uni.distanceKm" class="badge bg-light text-dark fw-bold px-3 py-2 rounded-pill fs-8 fs-md-7 shadow-sm distance-pop-badge">
               <i class="bi bi-pin-map-fill text-danger me-1"></i> {{ uni.distanceKm }} km away
             </span>
           </div>
 
-          <h1 class="display-4 fw-bold mb-2">{{ uni.name }}</h1>
-          <p class="lead fs-4 text-light opacity-90 mb-4">
+          <!-- RESPONSIVE HEADING -->
+          <h1 class="responsive-heading fw-bold mb-2">{{ uni.name }}</h1>
+          
+          <p class="fs-6 fs-md-4 text-light opacity-90 mb-3 mb-md-4">
             <i class="bi bi-geo-alt-fill text-gold me-1"></i> {{ uni.location }}, {{ uni.province }}
           </p>
 
-          <!-- ACTION BUTTONS -->
-          <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <!-- ACTION BUTTONS (Stacks on mobile) -->
+          <div class="d-flex flex-column flex-sm-row justify-content-center align-items-stretch align-items-sm-center gap-2 gap-sm-3 max-btn-width mx-auto">
             <button 
               @click="openDetails(uni)" 
-              class="btn btn-outline-light btn-lg px-4 py-2 rounded-pill fw-bold hover-lift"
+              class="btn btn-outline-light btn-md btn-md-lg px-4 py-2 rounded-pill fw-bold hover-lift"
             >
-              <i class="bi bi-info-circle me-1"></i> View Institution Details
+              <i class="bi bi-info-circle me-1"></i> View Details
             </button>
             
             <a 
               :href="uni.applicationUrl" 
               target="_blank" 
-              class="btn btn-gold btn-lg px-4 py-2 rounded-pill hover-lift text-dark fw-bold"
+              class="btn btn-gold btn-md btn-md-lg px-4 py-2 rounded-pill hover-lift text-dark fw-bold"
             >
               Apply Now <i class="bi bi-box-arrow-up-right ms-1"></i>
             </a>
@@ -100,9 +103,9 @@
         </div>
 
         <!-- SCROLL INDICATOR -->
-        <div class="scroll-hint position-absolute bottom-0 start-50 translate-middle-x mb-4 text-center text-light opacity-75">
-          <small class="d-block mb-1">Scroll to next institution</small>
-          <i class="bi bi-chevron-down fs-4 bounce"></i>
+        <div class="scroll-hint position-absolute bottom-0 start-50 translate-middle-x mb-2 mb-md-4 text-center text-light opacity-75">
+          <small class="d-block mb-1 fs-8">Scroll to next</small>
+          <i class="bi bi-chevron-down fs-5 bounce"></i>
         </div>
       </div>
     </TransitionGroup>
@@ -114,12 +117,12 @@
       tabindex="-1" 
       @click.self="closeDetails"
     >
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable p-2 p-sm-0">
         <div class="modal-content bg-dark text-white border-gold shadow-lg">
           <div class="modal-header border-bottom border-secondary">
             <div>
-              <h4 class="modal-title fw-bold mb-0">{{ selectedUni.name }}</h4>
-              <small class="text-gold">
+              <h5 class="modal-title fw-bold mb-0 fs-6 fs-md-4">{{ selectedUni.name }}</h5>
+              <small class="text-gold fs-7">
                 {{ selectedUni.location }} • {{ selectedUni.province }}
                 <span v-if="selectedUni.distanceKm"> • {{ selectedUni.distanceKm }} km away</span>
               </small>
@@ -127,52 +130,52 @@
             <button type="button" class="btn-close btn-close-white" @click="closeDetails"></button>
           </div>
 
-          <div class="modal-body py-4">
-            <h5 class="fw-bold text-gold mb-2">Overview</h5>
-            <p class="text-light mb-4">{{ selectedUni.description }}</p>
+          <div class="modal-body py-3 py-md-4">
+            <h6 class="fw-bold text-gold mb-2">Overview</h6>
+            <p class="text-light fs-7 fs-md-6 mb-4">{{ selectedUni.description }}</p>
 
-            <div class="row g-3 mb-4">
-              <div class="col-md-6">
-                <div class="p-3 rounded bg-navy border border-secondary">
-                  <h6 class="fw-bold text-gold mb-1"><i class="bi bi-book me-2"></i>Key Faculties / Streams</h6>
+            <div class="row g-2 g-md-3 mb-4">
+              <div class="col-12 col-md-6">
+                <div class="p-3 rounded bg-navy border border-secondary h-100">
+                  <h6 class="fw-bold text-gold mb-1 fs-7 fs-md-6"><i class="bi bi-book me-2"></i>Key Faculties</h6>
                   <ul class="mb-0 ps-3 small text-light">
                     <li v-for="(faculty, i) in selectedUni.faculties" :key="i">{{ faculty }}</li>
                   </ul>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="p-3 rounded bg-navy border border-secondary">
-                  <h6 class="fw-bold text-gold mb-1"><i class="bi bi-cash-stack me-2"></i>Application Fee</h6>
-                  <p class="mb-0 fs-5 fw-semibold text-white">{{ selectedUni.applicationFee }}</p>
+              <div class="col-12 col-md-6">
+                <div class="p-3 rounded bg-navy border border-secondary h-100">
+                  <h6 class="fw-bold text-gold mb-1 fs-7 fs-md-6"><i class="bi bi-cash-stack me-2"></i>Application Fee</h6>
+                  <p class="mb-0 fs-6 fw-semibold text-white">{{ selectedUni.applicationFee }}</p>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="p-3 rounded bg-navy border border-secondary">
-                  <h6 class="fw-bold text-gold mb-1"><i class="bi bi-calendar-event me-2"></i>Application Window</h6>
+              <div class="col-12 col-md-6">
+                <div class="p-3 rounded bg-navy border border-secondary h-100">
+                  <h6 class="fw-bold text-gold mb-1 fs-7 fs-md-6"><i class="bi bi-calendar-event me-2"></i>Application Window</h6>
                   <p class="mb-0 small text-light">
                     <strong>Opens:</strong> {{ selectedUni.openingDate }}<br>
                     <strong>Closes:</strong> {{ selectedUni.closingDate }}
                   </p>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="p-3 rounded bg-navy border border-secondary">
-                  <h6 class="fw-bold text-gold mb-1"><i class="bi bi-patch-check me-2"></i>Application Status</h6>
-                  <span class="badge bg-success px-3 py-2 rounded-pill mt-1">
+              <div class="col-12 col-md-6">
+                <div class="p-3 rounded bg-navy border border-secondary h-100">
+                  <h6 class="fw-bold text-gold mb-1 fs-7 fs-md-6"><i class="bi bi-patch-check me-2"></i>Status</h6>
+                  <span class="badge bg-success px-3 py-2 rounded-pill mt-1 fs-8">
                     {{ selectedUni.status }}
                   </span>
                 </div>
               </div>
             </div>
 
-            <h5 class="fw-bold text-gold mb-2">General Admission Requirements</h5>
-            <p class="small text-light mb-0">{{ selectedUni.requirements }}</p>
+            <h6 class="fw-bold text-gold mb-2">General Requirements</h6>
+            <p class="small text-light mb-0 fs-7">{{ selectedUni.requirements }}</p>
           </div>
 
-          <div class="modal-footer border-top border-secondary justify-content-between">
-            <button type="button" class="btn btn-outline-light rounded-pill px-4" @click="closeDetails">Close</button>
-            <a :href="selectedUni.applicationUrl" target="_blank" class="btn btn-gold text-dark fw-bold rounded-pill px-4">
-              Proceed to Application Portal
+          <div class="modal-footer border-top border-secondary flex-column flex-sm-row justify-content-between gap-2">
+            <button type="button" class="btn btn-outline-light rounded-pill px-4 w-100 w-sm-auto" @click="closeDetails">Close</button>
+            <a :href="selectedUni.applicationUrl" target="_blank" class="btn btn-gold text-dark fw-bold rounded-pill px-4 w-100 w-sm-auto text-center">
+              Apply Portal
             </a>
           </div>
         </div>
@@ -239,7 +242,6 @@ export default {
         return matchesSearch && matchesProvince && matchesType;
       });
 
-      // Sort by closest distance if user location is active
       if (this.userLat && this.userLng) {
         list = list.slice().sort((a, b) => {
           if (!a.distanceKm) return 1;
@@ -280,7 +282,6 @@ export default {
           
           this.calculateDistances();
 
-          // Small delay so the user sees the smooth radar radar completion effect
           setTimeout(() => {
             this.isLocating = false;
           }, 800);
@@ -320,11 +321,11 @@ export default {
         
         if (result.success) {
           const saColors = [
-            '0, 100, 60',   // SA Green
-            '0, 35, 120',   // SA Blue
-            '170, 30, 30',  // SA Red
-            '180, 120, 10', // SA Gold
-            '20, 25, 40'    // SA Dark Slate
+            '0, 100, 60',   
+            '0, 35, 120',   
+            '170, 30, 30',  
+            '180, 120, 10', 
+            '20, 25, 40'    
           ];
 
           const coordinatesMap = {
@@ -431,7 +432,7 @@ export default {
               entry.target.classList.add('is-visible');
             }
           });
-        }, { threshold: 0.4 });
+        }, { threshold: 0.3 });
 
         this.cardRefs.forEach(card => card && observer.observe(card));
       });
@@ -454,6 +455,7 @@ export default {
 <style scoped>
 .uni-scroll-container {
   height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
   scroll-snap-type: y proximity;
   scroll-behavior: smooth;
@@ -465,19 +467,43 @@ export default {
   max-width: 800px;
 }
 
+.max-btn-width {
+  max-width: 380px;
+}
+
 .fullscreen-card {
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   scroll-snap-align: start;
   margin: 0;
   background-color: #001242;
 }
 
-/* -------------------------------------------------------------
-   1. SEARCHING RADAR OVERLAY STYLES & ANIMATION
-   ------------------------------------------------------------- */
+/* RESPONSIVE HEADING */
+.responsive-heading {
+  font-size: clamp(1.5rem, 5vw, 3.2rem);
+  line-height: 1.15;
+}
+
+/* FLOATING BUTTON POSITIONING (Prevents nav overlay) */
+.floating-geo-btn {
+  top: auto;
+  bottom: 24px;
+  right: 16px !important;
+}
+
+@media (min-width: 768px) {
+  .floating-geo-btn {
+    top: 90px;
+    bottom: auto;
+    right: 24px !important;
+  }
+}
+
+/* 1. SEARCHING RADAR OVERLAY */
 .bg-radar-overlay {
-  background: rgba(0, 18, 66, 0.92);
+  background: rgba(0, 18, 66, 0.94);
   backdrop-filter: blur(14px);
 }
 
@@ -487,8 +513,8 @@ export default {
 
 .radar-box {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -503,23 +529,12 @@ export default {
   animation: radar-pulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
 
-.radar-wave.delay-1 {
-  animation-delay: 0.5s;
-}
-
-.radar-wave.delay-2 {
-  animation-delay: 1s;
-}
+.radar-wave.delay-1 { animation-delay: 0.5s; }
+.radar-wave.delay-2 { animation-delay: 1s; }
 
 @keyframes radar-pulse {
-  0% {
-    transform: scale(0.2);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
+  0% { transform: scale(0.2); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
 }
 
 .icon-pulse {
@@ -531,118 +546,49 @@ export default {
   50% { transform: translateY(-8px) scale(1.15); }
 }
 
-.overlay-fade-enter-active,
-.overlay-fade-leave-active {
-  transition: opacity 0.4s ease;
-}
+.overlay-fade-enter-active, .overlay-fade-leave-active { transition: opacity 0.4s ease; }
+.overlay-fade-enter-from, .overlay-fade-leave-to { opacity: 0; }
 
-.overlay-fade-enter-from,
-.overlay-fade-leave-to {
-  opacity: 0;
-}
-
-/* -------------------------------------------------------------
-   2. CARDS POP-IN & RE-ORDER TRANSITION STYLES
-   ------------------------------------------------------------- */
+/* 2. CARDS POP-IN STYLES */
 .card-fade-enter-active {
   transition: opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.card-fade-leave-active { transition: opacity 0.35s ease-in, transform 0.35s ease-in; }
+.card-fade-enter-from { opacity: 0; transform: translateY(40px) scale(0.94); }
+.card-fade-leave-to { opacity: 0; transform: translateY(-40px) scale(0.94); }
+.card-fade-move { transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
 
-.card-fade-leave-active {
-  transition: opacity 0.35s ease-in, transform 0.35s ease-in;
-}
-
-.card-fade-enter-from {
-  opacity: 0;
-  transform: translateY(50px) scale(0.92);
-}
-
-.card-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-50px) scale(0.92);
-}
-
-.card-fade-move {
-  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.distance-pop-badge {
-  animation: badge-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
+.distance-pop-badge { animation: badge-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
 @keyframes badge-pop {
   0% { transform: scale(0); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* GENERAL COMPONENT STYLES */
-.card-content {
-  padding-top: 40px;
-}
+/* UTILITY CLASSES */
+.fs-7 { font-size: 0.85rem; }
+.fs-8 { font-size: 0.75rem; }
 
-.object-fit-cover {
-  object-fit: cover;
-  object-position: center;
-}
+.object-fit-cover { object-fit: cover; object-position: center; }
+.card-bg-img { transition: transform 1.2s ease-out; }
+.fullscreen-card.is-visible .card-bg-img { transform: scale(1.03); }
 
-.card-bg-img {
-  transition: transform 1.2s ease-out;
-}
+.bg-navy { background-color: #001242; }
+.bg-gold { background-color: #ffb81c !important; }
+.text-gold { color: #ffb81c !important; }
+.btn-gold { background-color: #ffb81c; color: #000000; border: none; }
+.border-gold { border: 1px solid #ffb81c !important; }
 
-.fullscreen-card.is-visible .card-bg-img {
-  transform: scale(1.03);
-}
+.hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
 
-.bg-navy {
-  background-color: #001242;
-}
-
-.bg-gold {
-  background-color: #ffb81c !important;
-}
-
-.text-gold {
-  color: #ffb81c !important;
-}
-
-.btn-gold {
-  background-color: #ffb81c;
-  color: #000000;
-  border: none;
-}
-
-.border-gold {
-  border: 1px solid #ffb81c !important;
-}
-
-.hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-}
-
-.backdrop-blur {
-  backdrop-filter: blur(10px);
-}
-
-.modal-overlay {
-  z-index: 1050;
-}
-
-.floating-geo-btn {
-  margin-top: 80px !important;
-}
+.backdrop-blur { backdrop-filter: blur(10px); }
+.modal-overlay { z-index: 1050; }
 
 @keyframes bounce {
   0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-8px); }
-  60% { transform: translateY(-4px); }
+  40% { transform: translateY(-6px); }
+  60% { transform: translateY(-3px); }
 }
-
-.bounce {
-  animation: bounce 2s infinite;
-}
+.bounce { animation: bounce 2s infinite; }
 </style>
