@@ -66,3 +66,28 @@ VALUES
   ('Eduvos (Tyger Valley Campus)', 'Private College', 'Western Cape', 'Open', 0.00, '2026-01-01', '2026-11-30', 'https://www.eduvos.com', 'https://www.eduvos.com/apply-now/'),
   ('MANCOSA (Johannesburg Campus)', 'Private College', 'Gauteng', 'Open', 0.00, '2026-01-01', '2026-11-30', 'https://www.mancosa.co.za', 'https://www.mancosa.co.za/apply-now/'),
   ('Rosebank College', 'Private College', 'Gauteng', 'Open', 0.00, '2026-01-01', '2026-11-30', 'https://www.rosebankcollege.co.za', 'https://www.rosebankcollege.co.za/apply');
+  
+  
+  USE sa_tertiary_db;
+
+-- 1. Temporarily disable Safe Update Mode
+SET SQL_SAFE_UPDATES = 0;
+
+-- 2. Update CPUT details
+UPDATE institutions 
+SET 
+    opening_date = '2026-05-14',
+    closing_date = '2026-09-30',
+    application_url = 'https://www.cput.ac.za/study/apply',
+    faculties = 'Applied Sciences, Business & Management Sciences, Education, Engineering, Health & Wellness Sciences, Informatics & Design'
+WHERE name LIKE '%CPUT%' OR name LIKE '%Cape Peninsula%';
+
+-- 3. Set baseline fallback dates for remaining schools
+UPDATE institutions 
+SET 
+    opening_date = COALESCE(opening_date, '2026-04-01'),
+    closing_date = COALESCE(closing_date, '2026-09-30')
+WHERE opening_date IS NULL OR closing_date IS NULL;
+
+-- 4. Re-enable Safe Update Mode
+SET SQL_SAFE_UPDATES = 1;

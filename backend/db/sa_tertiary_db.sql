@@ -63,3 +63,27 @@ VALUES
   -- NORTHERN CAPE
   ('Sol Plaatje University (SPU)', 'University', 'Northern Cape', 'Open', 100.00, '2026-04-01', '2026-11-30', 'https://www.spu.ac.za', 'https://www.spu.ac.za/index.php/how-to-apply/'),
   ('Northern Cape Urban TVET College', 'TVET College', 'Northern Cape', 'Open', 0.00, '2026-01-15', '2026-10-31', 'https://www.ncucollege.edu.za', 'https://www.ncucollege.edu.za/apply/');
+
+  USE sa_tertiary_db;
+
+-- 1. Temporarily disable Safe Update Mode
+SET SQL_SAFE_UPDATES = 0;
+
+-- 2. Update CPUT details
+UPDATE institutions 
+SET 
+    opening_date = '2026-05-14',
+    closing_date = '2026-09-30',
+    application_url = 'https://www.cput.ac.za/study/apply',
+    faculties = 'Applied Sciences, Business & Management Sciences, Education, Engineering, Health & Wellness Sciences, Informatics & Design'
+WHERE name LIKE '%CPUT%' OR name LIKE '%Cape Peninsula%';
+
+-- 3. Set baseline fallback dates for remaining schools
+UPDATE institutions 
+SET 
+    opening_date = COALESCE(opening_date, '2026-04-01'),
+    closing_date = COALESCE(closing_date, '2026-09-30')
+WHERE opening_date IS NULL OR closing_date IS NULL;
+
+-- 4. Re-enable Safe Update Mode
+SET SQL_SAFE_UPDATES = 1;
