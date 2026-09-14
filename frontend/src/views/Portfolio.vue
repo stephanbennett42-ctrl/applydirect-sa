@@ -104,29 +104,29 @@
 
       </aside>
 
-      <!-- HERO SECTION -->
-<section class="portfolio-hero">
-  <div class="hero-overlay">
-    <div class="hero-content">
-      <p class="hero-small-title">APPLYDIRECT-SA</p>
+      <div class="content-shell">
 
-      <h1>My Application Profile</h1>
+        <!-- HERO SECTION -->
+        <section class="portfolio-hero">
+          <div class="hero-overlay">
+            <div class="hero-content">
+              <p class="hero-small-title">APPLYDIRECT-SA</p>
 
-      <p class="hero-description">
-        Keep your personal and academic information in one place
-        and make your university application journey easier.
-      </p>
+              <p class="hero-description">
+                Keep your personal and academic information in one place
+                and make your university application journey easier.
+              </p>
 
-      <button class="hero-btn" @click="scrollToProfile">
-        View My Profile
-      </button>
-    </div>
-  </div>
-</section>
+              <button class="hero-btn" @click="scrollToProfile">
+                View My Profile
+              </button>
+            </div>
+          </div>
+        </section>
 
-      <!-- ================= MAIN CONTENT ================= -->
+        <!-- ================= MAIN CONTENT ================= -->
 
-      <main class="main-content">
+        <main class="main-content">
 
         <div class="page-title">
 
@@ -918,7 +918,9 @@
 
         </div>
 
-      </main>
+        </main>
+
+      </div>
 
     </div>
 
@@ -2065,6 +2067,13 @@ nav a.active {
 
 }
 
+.content-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
 
 /* =========================================
    SIDEBAR
@@ -2214,9 +2223,9 @@ nav a.active {
   position: relative;
 
   width: 100%;
-  height: 420px;
+  min-height: 300px;
+  height: 300px;
 
-  /* Temporary image placeholder */
   background:
     linear-gradient(
       rgba(0, 35, 85, 0.65),
