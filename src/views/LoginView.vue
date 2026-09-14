@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import {
   login,
@@ -8,6 +8,7 @@ import {
 } from '../services/authService'
 
 const router = useRouter()
+const route = useRoute()
 
 const email = ref('')
 const password = ref('')
@@ -15,6 +16,18 @@ const password = ref('')
 const loading = ref(false)
 const googleLoading = ref(false)
 const errorMessage = ref('')
+
+onMounted(() => {
+  if (route.query.google === 'error') {
+    if (route.query.reason === 'config') {
+      errorMessage.value =
+        'Google sign-in is not set up yet. Please log in with your email.'
+    } else {
+      errorMessage.value =
+        'Google sign-in failed. Please try again or use your email to log in.'
+    }
+  }
+})
 
 async function handleLogin() {
   errorMessage.value = ''

@@ -1,4 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const GOOGLE_DEMO = import.meta.env.VITE_GOOGLE_DEMO === 'true'
 
 async function request(endpoint, options = {}) {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -66,5 +67,7 @@ export async function getCurrentUser() {
 }
 
 export function loginWithGoogle() {
-  window.location.href = `${API_BASE_URL}/auth/google`
+  window.location.href = GOOGLE_DEMO
+    ? `${API_BASE_URL}/auth/google/demo`
+    : `${API_BASE_URL}/auth/google`
 }

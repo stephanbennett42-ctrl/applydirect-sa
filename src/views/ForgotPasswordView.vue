@@ -2,13 +2,16 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { forgotPassword } from '../services/authService'
+
 const router = useRouter()
 
 const email = ref('')
 const submitted = ref(false)
+const loading = ref(false)
 const errorMessage = ref('')
 
-function handleSubmit() {
+async function handleSubmit() {
   errorMessage.value = ''
 
   if (!email.value) {
@@ -16,17 +19,25 @@ function handleSubmit() {
     return
   }
 
-  submitted.value = true
+  loading.value = true
 
-  /*
-   * BACKEND INTEGRATION POINT
-   *
-   * Later this will call something like:
-   *
-   * POST /api/auth/forgot-password
-   *
-   * The backend will send the actual reset email.
-   */
+  try {
+    await forgotPassword(email.value)
+    submitted.value = true
+  } catch (error) {
+    console.error('Forgot password error:', error)
+
+    if (error.message === 'Failed to fetch') {
+      errorMessage.value =
+        'Unable to connect to the server. Please try again later.'
+    } else {
+      errorMessage.value =
+        error.message ||
+        'Something went wrong. Please try again.'
+    }
+  } finally {
+    loading.value = false
+  }
 }
 
 function goToLogin() {
@@ -110,9 +121,19 @@ function goToLogin() {
           <button
             type="submit"
             class="submit-button"
+            :disabled="loading"
           >
-            Send reset link
-            <span>→</span>
+            <span v-if="!loading">
+              Send reset link
+              <span>→</span>
+            </span>
+            <span
+              v-else
+              class="loading-content"
+            >
+              <span class="spinner"></span>
+              Sending…
+            </span>
           </button>
 
         </form>
@@ -428,6 +449,45 @@ function goToLogin() {
 .submit-button:hover,
 .login-button:hover {
   background: #3d1f91;
+}
+
+.submit-button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+
+.loading-content {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+}
+
+
+.spinner {
+  width: 14px;
+  height: 14px;
+
+  border-radius: 50%;
+
+  border:
+    2px solid
+    rgba(255, 255, 255, 0.35);
+
+  border-top-color: #ffffff;
+
+  animation: spin 0.7s linear infinite;
+}
+
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 
