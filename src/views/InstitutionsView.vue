@@ -79,12 +79,60 @@
           <!-- RESPONSIVE HEADING -->
           <h1 class="responsive-heading fw-bold mb-2">{{ uni.name }}</h1>
           
-          <p class="fs-6 fs-md-4 text-light opacity-90 mb-3 mb-md-4">
+          <p class="fs-6 fs-md-4 text-light opacity-90 mb-3">
             <i class="bi bi-geo-alt-fill text-gold me-1"></i> {{ uni.location }}, {{ uni.province }}
           </p>
 
-          <!-- ACTION BUTTONS (Stacks on mobile) -->
-          <div class="d-flex flex-column flex-sm-row justify-content-center align-items-stretch align-items-sm-center gap-2 gap-sm-3 max-btn-width mx-auto">
+          <!-- APPLICATION WINDOW & STATUS SECTION -->
+          <div class="row g-3 my-2 text-start">
+            <!-- Key Faculties -->
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded bg-navy-card h-100">
+                <h6 class="text-gold fw-bold mb-2">Key Faculties</h6>
+                <p class="small text-light mb-0">
+                  {{ uni.facultiesRaw || 'Consult official prospectus for full list.' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Application Fee -->
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded bg-navy-card h-100">
+                <h6 class="text-gold fw-bold mb-1">Application Fee</h6>
+                <p class="fs-5 fw-bold text-white mb-0">
+                  {{ uni.applicationFee }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Application Window -->
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded bg-navy-card h-100">
+                <h6 class="text-gold fw-bold mb-2">Application Window</h6>
+                <p class="small mb-1 text-light">
+                  <strong>Opens:</strong> {{ formatDate(uni.opening_date) }}
+                </p>
+                <p class="small mb-0 text-light">
+                  <strong>Closes:</strong> {{ formatDate(uni.closing_date) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Dynamic Status -->
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded bg-navy-card h-100 d-flex flex-column justify-content-between">
+                <h6 class="text-gold fw-bold mb-1">Status</h6>
+                <div>
+                  <span :class="getStatusBadgeClass(uni)">
+                    {{ getApplicationStatus(uni) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTION BUTTONS -->
+          <div class="d-flex flex-column flex-sm-row justify-content-center align-items-stretch align-items-sm-center gap-2 gap-sm-3 max-btn-width mx-auto mt-3">
             <button 
               @click="openDetails(uni)" 
               class="btn btn-outline-light btn-md btn-md-lg px-4 py-2 rounded-pill fw-bold hover-lift"
@@ -95,9 +143,11 @@
             <a 
               :href="uni.applicationUrl" 
               target="_blank" 
-              class="btn btn-gold btn-md btn-md-lg px-4 py-2 rounded-pill hover-lift text-dark fw-bold"
+              rel="noopener noreferrer"
+              class="btn btn-gold btn-md btn-md-lg px-4 py-2 rounded-pill hover-lift text-dark fw-bold d-flex align-items-center justify-content-center"
+              :class="{ disabled: !uni.applicationUrl || uni.applicationUrl === '#' }"
             >
-              Apply Now <i class="bi bi-box-arrow-up-right ms-1"></i>
+              Apply Portal <i class="bi bi-box-arrow-up-right ms-1"></i>
             </a>
           </div>
         </div>
@@ -161,8 +211,8 @@
               <div class="col-12 col-md-6">
                 <div class="p-3 rounded bg-navy border border-secondary h-100">
                   <h6 class="fw-bold text-gold mb-1 fs-7 fs-md-6"><i class="bi bi-patch-check me-2"></i>Status</h6>
-                  <span class="badge bg-success px-3 py-2 rounded-pill mt-1 fs-8">
-                    {{ selectedUni.status }}
+                  <span :class="getStatusBadgeClass(selectedUni)">
+                    {{ getApplicationStatus(selectedUni) }}
                   </span>
                 </div>
               </div>
@@ -174,7 +224,7 @@
 
           <div class="modal-footer border-top border-secondary flex-column flex-sm-row justify-content-between gap-2">
             <button type="button" class="btn btn-outline-light rounded-pill px-4 w-100 w-sm-auto" @click="closeDetails">Close</button>
-            <a :href="selectedUni.applicationUrl" target="_blank" class="btn btn-gold text-dark fw-bold rounded-pill px-4 w-100 w-sm-auto text-center">
+            <a :href="selectedUni.applicationUrl" target="_blank" rel="noopener noreferrer" class="btn btn-gold text-dark fw-bold rounded-pill px-4 w-100 w-sm-auto text-center">
               Apply Portal
             </a>
           </div>
@@ -253,7 +303,34 @@ export default {
       return list;
     }
   },
+
   methods: {
+    formatDate(dateString) {
+      if (!dateString) return 'Dates TBA';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      return date.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
+    },
+
+    getApplicationStatus(institution) {
+      if (!institution || !institution.opening_date || !institution.closing_date) return 'Check Portal';
+      
+      const today = new Date();
+      const openDate = new Date(institution.opening_date);
+      const closeDate = new Date(institution.closing_date);
+
+      if (today < openDate) return 'Opening Soon';
+      if (today >= openDate && today <= closeDate) return 'Open Now';
+      return 'Closed';
+    },
+
+    getStatusBadgeClass(institution) {
+      const status = this.getApplicationStatus(institution);
+      if (status === 'Open Now') return 'badge bg-success px-3 py-2 fs-7';
+      if (status === 'Opening Soon') return 'badge bg-warning text-dark px-3 py-2 fs-7';
+      return 'badge bg-danger px-3 py-2 fs-7';
+    },
+
     getDistanceInKm(lat1, lon1, lat2, lon2) {
       if (!lat1 || !lon1 || !lat2 || !lon2) return null;
       const R = 6371;
@@ -314,6 +391,7 @@ export default {
       event.target.onerror = null;
       event.target.src = this.fallbackPhotos[index % this.fallbackPhotos.length];
     },
+
     async fetchInstitutions() {
       try {
         const response = await fetch('http://localhost:3000/api/institutions');
@@ -380,23 +458,37 @@ export default {
               ? item.image_url 
               : (matchedCampus ? matchedCampus.url : this.fallbackPhotos[index % this.fallbackPhotos.length]);
 
+            // Parse faculties string into an array for v-for modal rendering
+            let parsedFaculties = ['Consult official prospectus for full list.'];
+            if (item.faculties) {
+              parsedFaculties = typeof item.faculties === 'string' 
+                ? item.faculties.split(',').map(f => f.trim()) 
+                : item.faculties;
+            }
+
             return {
-              id: item.institution_id || index,
+              id: item.institution_id || item.id || index,
               name: item.name,
               province: item.province,
               location: item.province,
               type: item.institution_type || 'TVET College',
               institution_type: item.institution_type || 'TVET College',
-              status: item.application_status,
-              applicationFee: item.application_fee ? `R${item.application_fee}` : 'Free',
-              applicationUrl: item.application_url,
+              opening_date: item.opening_date,
+              closing_date: item.closing_date,
+              openingDate: this.formatDate(item.opening_date),
+              closingDate: this.formatDate(item.closing_date),
+              applicationFee: item.application_fee ? `R${item.application_fee}` : 'Free / R0',
+              applicationUrl: item.application_url || item.website_url || '#',
               websiteUrl: item.website_url,
+              facultiesRaw: item.faculties || '',
+              faculties: parsedFaculties,
+              requirements: item.requirements || 'National Senior Certificate (NSC) or equivalent with minimum required APS points for selected program.',
               themeColor: themeColor,
               image: campusPhoto,
               latitude: lat,
               longitude: lng,
               distanceKm: null,
-              description: `${item.name} is a higher education institution located in ${item.province}, South Africa.`
+              description: item.description || `${item.name} is a higher education institution located in ${item.province}, South Africa.`
             };
           });
 
@@ -408,6 +500,7 @@ export default {
         console.error('Error loading institutions from backend:', error);
       }
     },
+
     setCardRef(el, index) {
       if (el) this.cardRefs[index] = el;
     },
@@ -438,6 +531,7 @@ export default {
       });
     }
   },
+
   watch: {
     filteredInstitutions() {
       if (this.$refs.scrollContainer) {
@@ -446,6 +540,7 @@ export default {
       this.initIntersectionObserver();
     }
   },
+
   mounted() {
     this.fetchInstitutions();
   }
@@ -480,13 +575,19 @@ export default {
   background-color: #001242;
 }
 
+.bg-navy-card {
+  background-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* RESPONSIVE HEADING */
 .responsive-heading {
   font-size: clamp(1.5rem, 5vw, 3.2rem);
   line-height: 1.15;
 }
 
-/* FLOATING BUTTON POSITIONING (Prevents nav overlay) */
+/* FLOATING BUTTON POSITIONING */
 .floating-geo-btn {
   top: auto;
   bottom: 24px;

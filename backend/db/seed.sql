@@ -91,3 +91,17 @@ WHERE opening_date IS NULL OR closing_date IS NULL;
 
 -- 4. Re-enable Safe Update Mode
 SET SQL_SAFE_UPDATES = 1;
+
+
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE institutions SET application_url = 'https://www.eduvos.com/' WHERE name LIKE '%Eduvos%';
+UPDATE institutions SET application_url = 'https://www.tut.ac.za/' WHERE name LIKE '%Tshwane%';
+UPDATE institutions SET application_url = 'https://www.varsitycollege.co.za/' WHERE name LIKE '%Varsity College%';
+UPDATE institutions SET application_url = 'https://www.cut.ac.za/application-process' WHERE name LIKE '%Central University of Technology%';
+UPDATE institutions SET application_url = 'https://studies.nwu.ac.za/' WHERE name LIKE '%North-West%';
+UPDATE institutions SET application_url = 'https://www.ul.ac.za/' WHERE name LIKE '%Limpopo%';
+UPDATE institutions SET application_url = 'https://www.ump.ac.za/' WHERE name LIKE '%Mpumalanga%';
+
+SET SQL_SAFE_UPDATES = 1;
