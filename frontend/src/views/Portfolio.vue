@@ -104,6 +104,25 @@
 
       </aside>
 
+      <!-- HERO SECTION -->
+<section class="portfolio-hero">
+  <div class="hero-overlay">
+    <div class="hero-content">
+      <p class="hero-small-title">APPLYDIRECT-SA</p>
+
+      <h1>My Application Profile</h1>
+
+      <p class="hero-description">
+        Keep your personal and academic information in one place
+        and make your university application journey easier.
+      </p>
+
+      <button class="hero-btn" @click="scrollToProfile">
+        View My Profile
+      </button>
+    </div>
+  </div>
+</section>
 
       <!-- ================= MAIN CONTENT ================= -->
 
@@ -1064,6 +1083,16 @@ export default {
   // =========================
 
   methods: {
+
+    scrollToProfile() {
+      const profileSection = document.querySelector(".main-content");
+
+      if (profileSection) {
+        profileSection.scrollIntoView({
+          behavior: "smooth"
+        });
+      }
+    },
 
     setFormMessage(message) {
       this.formMessage = message;
@@ -2177,6 +2206,157 @@ nav a.active {
 
 }
 
+/* ============================= */
+/* PORTFOLIO HERO */
+/* ============================= */
+
+.portfolio-hero {
+  position: relative;
+
+  width: 100%;
+  height: 420px;
+
+  /* Temporary image placeholder */
+  background:
+    linear-gradient(
+      rgba(0, 35, 85, 0.65),
+      rgba(0, 35, 85, 0.65)
+    ),
+    url("https://placehold.co/1600x700/e8eef7/0637A6?text=Tertiary+Student+Image")
+    center / cover no-repeat;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+
+/* Dark overlay */
+
+.hero-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(3, 35, 90, 0.85) 0%,
+      rgba(3, 35, 90, 0.65) 45%,
+      rgba(3, 35, 90, 0.35) 100%
+    );
+
+  display: flex;
+  align-items: center;
+}
+
+
+/* Hero content */
+
+.hero-content {
+  width: 1100px;
+  max-width: 90%;
+
+  margin: auto;
+
+  color: white;
+}
+
+
+/* Small title */
+
+.hero-small-title {
+  font-size: 14px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+
+  color: #F4C20D;
+
+  margin-bottom: 12px;
+}
+
+
+/* Main heading */
+
+.hero-content h1 {
+  font-size: 48px;
+
+  margin: 0 0 15px;
+
+  font-weight: 700;
+
+  line-height: 1.15;
+}
+
+
+/* Description */
+
+.hero-description {
+  max-width: 580px;
+
+  font-size: 17px;
+
+  line-height: 1.6;
+
+  color: #f1f5f9;
+
+  margin-bottom: 25px;
+}
+
+
+/* Button */
+
+.hero-btn {
+  padding: 13px 24px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: #0f8f4d;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+
+.hero-btn:hover {
+  background: #0b7d42;
+
+  transform: translateY(-2px);
+}
+
+
+/* ============================= */
+/* MOBILE */
+/* ============================= */
+
+@media (max-width: 800px) {
+
+  .portfolio-hero {
+    height: 360px;
+  }
+
+  .hero-content h1 {
+    font-size: 34px;
+  }
+
+  .hero-description {
+    font-size: 15px;
+  }
+
+}
 
 /* =========================================
    MAIN CONTENT
