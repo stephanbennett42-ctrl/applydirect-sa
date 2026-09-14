@@ -13,15 +13,7 @@ app.use(express.json());
 app.get('/api/institutions', async (req, res) => {
   try {
     const [rows] = await db.query(`
-      SELECT 
-        institution_id, 
-        name, 
-        institution_type, 
-        province, 
-        application_status, 
-        application_fee, 
-        website_url, 
-        application_url 
+      SELECT * 
       FROM institutions
       ORDER BY name ASC
     `);
@@ -32,6 +24,7 @@ app.get('/api/institutions', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error retrieving institutions' });
   }
 });
+
 // GET: Fetch single institution details by ID
 app.get("/api/institutions/:id", async (req, res) => {
   try {

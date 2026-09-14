@@ -105,3 +105,53 @@ UPDATE institutions SET application_url = 'https://www.ul.ac.za/' WHERE name LIK
 UPDATE institutions SET application_url = 'https://www.ump.ac.za/' WHERE name LIKE '%Mpumalanga%';
 
 SET SQL_SAFE_UPDATES = 1;
+
+
+-- Disable Safe Updates temporarily for bulk execution
+SET SQL_SAFE_UPDATES = 0;
+
+-- 1. Western Cape Institutions
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-07-31' WHERE name LIKE '%Cape Town%' AND name NOT LIKE '%Technology%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-07-31' WHERE name LIKE '%Stellenbosch%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Western Cape%';
+UPDATE institutions SET opening_date = '2026-05-11', closing_date = '2026-09-30' WHERE name LIKE '%Cape Peninsula%';
+
+-- 2. Gauteng Institutions
+UPDATE institutions SET opening_date = '2026-03-01', closing_date = '2026-09-30' WHERE name LIKE '%Witwatersrand%' OR name LIKE '%Wits%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-10-31' WHERE name LIKE '%Johannesburg%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Pretoria%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Tshwane%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Vaal%';
+
+-- 3. KwaZulu-Natal Institutions
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%KwaZulu-Natal%' OR name LIKE '%UKZN%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Durban University%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Zululand%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Mangosuthu%';
+
+-- 4. Eastern Cape & Free State Institutions
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Rhodes%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Nelson Mandela%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Fort Hare%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Walter Sisulu%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Free State%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Central University of Technology%';
+
+-- 5. Limpopo, Mpumalanga, North-West, Northern Cape & Distance Learning
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%North-West%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Limpopo%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Venda%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Sol Plaatje%';
+UPDATE institutions SET opening_date = '2026-04-01', closing_date = '2026-09-30' WHERE name LIKE '%Mpumalanga%';
+UPDATE institutions SET opening_date = '2026-09-01', closing_date = '2026-11-30' WHERE name LIKE '%South Africa%' OR name LIKE '%UNISA%';
+
+-- 6. TVET Colleges (General Standard Cycle)
+UPDATE institutions SET opening_date = '2026-09-01', closing_date = '2026-10-31' WHERE institution_type = 'TVET College' OR name LIKE '%College%' OR name LIKE '%TVET%';
+
+-- 7. Fallback for any remaining unassigned records
+UPDATE institutions 
+SET opening_date = '2026-04-01', closing_date = '2026-09-30' 
+WHERE opening_date IS NULL;
+
+-- Re-enable Safe Updates
+SET SQL_SAFE_UPDATES = 1;
