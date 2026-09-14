@@ -47,7 +47,8 @@
           class="sidebar-item"
           :class="{ active: activeSection === 'personal' }"
           type="button"
-          @click="activeSection = 'personal'"
+          @click="goToSection('personal')"
+          :disabled="false"
         >
           <span class="number">1</span>
           Personal Details
@@ -58,7 +59,8 @@
           class="sidebar-item"
           :class="{ active: activeSection === 'academic' }"
           type="button"
-          @click="activeSection = 'academic'"
+          @click="goToSection('academic')"
+          :disabled="!canAccessSection('academic')"
         >
           <span class="number">2</span>
           Academic Details
@@ -69,7 +71,8 @@
           class="sidebar-item"
           :class="{ active: activeSection === 'preferences' }"
           type="button"
-          @click="activeSection = 'preferences'"
+          @click="goToSection('preferences')"
+          :disabled="!canAccessSection('preferences')"
         >
           <span class="number">3</span>
           Study Preferences
@@ -80,7 +83,8 @@
           class="sidebar-item"
           :class="{ active: activeSection === 'documents' }"
           type="button"
-          @click="activeSection = 'documents'"
+          @click="goToSection('documents')"
+          :disabled="!canAccessSection('documents')"
         >
           <span class="number">4</span>
           Documents
@@ -91,7 +95,8 @@
           class="sidebar-item"
           :class="{ active: activeSection === 'status' }"
           type="button"
-          @click="activeSection = 'status'"
+          @click="goToSection('status')"
+          :disabled="!canAccessSection('status')"
         >
           <span class="number">5</span>
           Application Status
@@ -110,6 +115,10 @@
 
           <p>
             Keep your personal and academic information up to date.
+          </p>
+
+          <p class="required-note">
+            <span class="required-mark">*</span> indicates required fields
           </p>
 
         </div>
@@ -141,11 +150,13 @@
 
             <div class="form-group">
 
-              <label>First Name</label>
+              <label>First Name <span class="required-mark">*</span></label>
 
               <input
                 type="text"
                 v-model="profile.firstName"
+                @blur="validateField('firstName')"
+                @input="validateField('firstName')"
                 placeholder="Enter your first name"
               />
 
@@ -154,11 +165,13 @@
 
             <div class="form-group">
 
-              <label>Surname</label>
+              <label>Surname <span class="required-mark">*</span></label>
 
               <input
                 type="text"
                 v-model="profile.surname"
+                @blur="validateField('surname')"
+                @input="validateField('surname')"
                 placeholder="Enter your surname"
               />
 
@@ -167,12 +180,18 @@
 
             <div class="form-group">
 
-              <label>ID / Passport Number</label>
+              <label>ID / Passport Number <span class="required-mark">*</span></label>
 
               <input
                 type="text"
                 v-model="profile.idNumber"
+                @input="sanitizeIdNumber(); validateField('idNumber')"
+                @blur="validateField('idNumber')"
                 placeholder="Enter your ID or passport number"
+                inputmode="numeric"
+                maxlength="13"
+                pattern="[0-9]*"
+                required
               />
 
             </div>
@@ -180,11 +199,13 @@
 
             <div class="form-group">
 
-              <label>Date of Birth</label>
+              <label>Date of Birth <span class="required-mark">*</span></label>
 
               <input
                 type="date"
                 v-model="profile.dateOfBirth"
+                @blur="validateField('dateOfBirth')"
+                @input="validateField('dateOfBirth')"
               />
 
             </div>
@@ -192,9 +213,12 @@
 
             <div class="form-group">
 
-              <label>Gender</label>
+              <label>Gender <span class="required-mark">*</span></label>
 
-              <select v-model="profile.gender">
+              <select
+                v-model="profile.gender"
+                @change="validateField('gender')"
+              >
 
                 <option value="">
                   Select gender
@@ -211,9 +235,12 @@
 
             <div class="form-group">
 
-              <label>Nationality</label>
+              <label>Nationality <span class="required-mark">*</span></label>
 
-              <select v-model="profile.nationality">
+              <select
+                v-model="profile.nationality"
+                @change="validateField('nationality')"
+              >
 
                 <option value="">
                   Select nationality
@@ -229,11 +256,13 @@
 
             <div class="form-group">
 
-              <label>Email Address</label>
+              <label>Email Address <span class="required-mark">*</span></label>
 
               <input
                 type="email"
                 v-model="profile.email"
+                @blur="validateField('email')"
+                @input="validateField('email')"
                 placeholder="example@email.com"
               />
 
@@ -242,12 +271,18 @@
 
             <div class="form-group">
 
-              <label>Phone Number</label>
+              <label>Phone Number <span class="required-mark">*</span></label>
 
               <input
                 type="tel"
                 v-model="profile.phone"
+                @input="sanitizePhoneNumber(); validateField('phone')"
+                @blur="validateField('phone')"
                 placeholder="Enter your phone number"
+                inputmode="numeric"
+                maxlength="10"
+                pattern="[0-9]*"
+                required
               />
 
             </div>
@@ -257,10 +292,12 @@
 
           <div class="form-group full-width">
 
-            <label>Residential Address</label>
+            <label>Residential Address <span class="required-mark">*</span></label>
 
             <textarea
               v-model="profile.address"
+              @blur="validateField('address')"
+              @input="validateField('address')"
               placeholder="Enter your residential address"
               rows="3"
             ></textarea>
@@ -272,9 +309,12 @@
 
             <div class="form-group">
 
-              <label>Province</label>
+              <label>Province <span class="required-mark">*</span></label>
 
-              <select v-model="profile.province">
+              <select
+                v-model="profile.province"
+                @change="validateField('province')"
+              >
 
                 <option value="">
                   Select province
@@ -297,11 +337,13 @@
 
             <div class="form-group">
 
-              <label>City / Town</label>
+              <label>City / Town <span class="required-mark">*</span></label>
 
               <input
                 type="text"
                 v-model="profile.city"
+                @blur="validateField('city')"
+                @input="validateField('city')"
                 placeholder="Enter your city or town"
               />
 
@@ -351,11 +393,13 @@
 
             <div class="form-group">
 
-              <label>High School</label>
+              <label>High School <span class="required-mark">*</span></label>
 
               <input
                 type="text"
                 v-model="profile.school"
+                @blur="validateField('school')"
+                @input="validateField('school')"
                 placeholder="Enter your high school"
               />
 
@@ -364,9 +408,12 @@
 
             <div class="form-group">
 
-              <label>Matric Year</label>
+              <label>Matric Year <span class="required-mark">*</span></label>
 
-              <select v-model="profile.matricYear">
+              <select
+                v-model="profile.matricYear"
+                @change="validateField('matricYear')"
+              >
 
                 <option value="">
                   Select year
@@ -386,9 +433,12 @@
 
             <div class="form-group">
 
-              <label>Qualification</label>
+              <label>Qualification <span class="required-mark">*</span></label>
 
-              <select v-model="profile.qualification">
+              <select
+                v-model="profile.qualification"
+                @change="validateField('qualification')"
+              >
 
                 <option value="">
                   Select qualification
@@ -528,10 +578,13 @@
             <div class="form-group">
 
               <label>
-                Preferred Field of Study
+                Preferred Field of Study <span class="required-mark">*</span>
               </label>
 
-              <select v-model="profile.field">
+              <select
+                v-model="profile.field"
+                @change="validateField('field')"
+              >
 
                 <option value="">
                   Select field
@@ -554,10 +607,13 @@
             <div class="form-group">
 
               <label>
-                Preferred Province
+                Preferred Province <span class="required-mark">*</span>
               </label>
 
-              <select v-model="profile.preferredProvince">
+              <select
+                v-model="profile.preferredProvince"
+                @change="validateField('preferredProvince')"
+              >
 
                 <option value="">
                   Select province
@@ -864,6 +920,25 @@ export default {
     return {
       profileId: null,
       activeSection: "personal",
+      formMessage: "",
+      formErrors: {
+        firstName: "",
+        surname: "",
+        idNumber: "",
+        dateOfBirth: "",
+        gender: "",
+        nationality: "",
+        email: "",
+        phone: "",
+        address: "",
+        province: "",
+        city: "",
+        school: "",
+        matricYear: "",
+        qualification: "",
+        field: "",
+        preferredProvince: ""
+      },
 
 
       profile: {
@@ -985,10 +1060,217 @@ export default {
 
 
   // =========================
-  // METHODS
+  // VALIDATION
   // =========================
 
   methods: {
+
+    setFormMessage(message) {
+      this.formMessage = message;
+    },
+
+    sanitizeIdNumber() {
+      this.profile.idNumber = String(this.profile.idNumber || "").replace(/\D/g, "").slice(0, 13);
+    },
+
+    sanitizePhoneNumber() {
+      let digits = String(this.profile.phone || "").replace(/\D/g, "");
+
+      if (digits && !digits.startsWith("0")) {
+        digits = "0" + digits.replace(/^0+/, "");
+      }
+
+      this.profile.phone = digits.slice(0, 10);
+    },
+
+    setFieldError(field, message) {
+      this.formErrors[field] = message;
+    },
+
+    validateField(field) {
+      const value = this.profile[field];
+
+      if (field === "firstName" || field === "surname" || field === "address" || field === "city" || field === "school") {
+        if (!String(value || "").trim()) {
+          this.setFieldError(field, "This field is required.");
+          return false;
+        }
+        this.setFieldError(field, "");
+        return true;
+      }
+
+      if (field === "idNumber") {
+        if (!String(value || "").trim()) {
+          this.setFieldError(field, "ID number is required.");
+          return false;
+        }
+        if (!/^\d{13}$/.test(String(value).trim())) {
+          this.setFieldError(field, "ID number must be exactly 13 digits.");
+          return false;
+        }
+        this.setFieldError(field, "");
+        return true;
+      }
+
+      if (field === "phone") {
+        if (!String(value || "").trim()) {
+          this.setFieldError(field, "Phone number is required.");
+          return false;
+        }
+        if (!/^0\d{9}$/.test(String(value).trim())) {
+          this.setFieldError(field, "Cell number must have 10 digits and start with 0.");
+          return false;
+        }
+        this.setFieldError(field, "");
+        return true;
+      }
+
+      if (field === "email") {
+        if (!String(value || "").trim()) {
+          this.setFieldError(field, "Email is required.");
+          return false;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim())) {
+          this.setFieldError(field, "Enter a valid email address.");
+          return false;
+        }
+        this.setFieldError(field, "");
+        return true;
+      }
+
+      if (field === "dateOfBirth" || field === "gender" || field === "nationality" || field === "province" || field === "matricYear" || field === "qualification" || field === "field" || field === "preferredProvince") {
+        if (!value || !String(value).trim()) {
+          this.setFieldError(field, "Please select an option.");
+          return false;
+        }
+        this.setFieldError(field, "");
+        return true;
+      }
+
+      this.setFieldError(field, "");
+      return true;
+    },
+
+    validateIdNumber() {
+      return /^\d{13}$/.test(this.profile.idNumber.trim());
+    },
+
+    validatePhoneNumber() {
+      return /^0\d{9}$/.test(this.profile.phone.trim());
+    },
+
+    validateEmail() {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.profile.email.trim());
+    },
+
+    validatePersonalDetails() {
+      const requiredFields = [
+        { key: "firstName", label: "First name" },
+        { key: "surname", label: "Surname" },
+        { key: "idNumber", label: "ID number" },
+        { key: "dateOfBirth", label: "Date of birth" },
+        { key: "gender", label: "Gender" },
+        { key: "nationality", label: "Nationality" },
+        { key: "email", label: "Email" },
+        { key: "phone", label: "Phone number" },
+        { key: "address", label: "Address" },
+        { key: "province", label: "Province" },
+        { key: "city", label: "City" }
+      ];
+
+      let valid = true;
+
+      requiredFields.forEach(field => {
+        if (!this.validateField(field.key)) {
+          valid = false;
+        }
+      });
+
+      if (valid) {
+        this.setFormMessage("");
+      }
+
+      return valid;
+    },
+
+    validateAcademicDetails() {
+      let valid = true;
+
+      if (!this.validateField("school")) valid = false;
+      if (!this.validateField("matricYear")) valid = false;
+      if (!this.validateField("qualification")) valid = false;
+
+      if (!this.profile.subjects.length || this.profile.subjects.some(subject => !subject.name.trim() || !String(subject.mark).trim())) {
+        this.setFormMessage("Please complete all subject names and marks before continuing.");
+        valid = false;
+      }
+
+      if (valid) {
+        this.setFormMessage("");
+      }
+
+      return valid;
+    },
+
+    validatePreferences() {
+      let valid = true;
+
+      if (!this.validateField("field")) valid = false;
+      if (!this.validateField("preferredProvince")) valid = false;
+
+      if (valid) {
+        this.setFormMessage("");
+      }
+
+      return valid;
+    },
+
+    canAccessSection(section) {
+      const sectionOrder = ["personal", "academic", "preferences", "documents", "status"];
+      const currentIndex = sectionOrder.indexOf(this.activeSection);
+      const targetIndex = sectionOrder.indexOf(section);
+
+      if (targetIndex <= currentIndex) {
+        return true;
+      }
+
+      if (section === "academic") {
+        return this.validatePersonalDetails();
+      }
+
+      if (section === "preferences") {
+        return this.validatePersonalDetails() && this.validateAcademicDetails();
+      }
+
+      if (section === "documents") {
+        return this.validatePersonalDetails() && this.validateAcademicDetails() && this.validatePreferences();
+      }
+
+      if (section === "status") {
+        return this.validatePersonalDetails() && this.validateAcademicDetails() && this.validatePreferences();
+      }
+
+      return true;
+    },
+
+    goToSection(section) {
+      const sectionOrder = ["personal", "academic", "preferences", "documents", "status"];
+      const currentIndex = sectionOrder.indexOf(this.activeSection);
+      const targetIndex = sectionOrder.indexOf(section);
+
+      if (targetIndex > currentIndex && !this.canAccessSection(section)) {
+        return;
+      }
+
+      this.activeSection = section;
+    },
+
+    validateBeforeSave() {
+      if (!this.validatePersonalDetails()) return false;
+      if (!this.validateAcademicDetails()) return false;
+      if (!this.validatePreferences()) return false;
+      return true;
+    },
 
 
     // =========================
@@ -1425,6 +1707,10 @@ export default {
     // =========================
 
     async saveProfile() {
+      if (!this.validateBeforeSave()) {
+        return;
+      }
+
       try {
         const profileData = {
           student_id: 1,
@@ -1510,6 +1796,18 @@ export default {
   box-sizing: border-box;
 }
 
+.required-note {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.required-mark {
+  color: #d9433f;
+  font-weight: 700;
+  margin-right: 4px;
+}
 
 .profile-page {
 
