@@ -6,18 +6,42 @@
 
     <header class="top-header">
 
-      <div class="logo">
-        ApplyDirect SA
-      </div>
+       <nav class="navbar navbar-expand-lg navbar-dark bg-navy sticky-top py-2">
+    <div class="container-fluid px-3 px-md-4">
+      
+      <!-- BRAND LOGO -->
+      <a href="#" class="navbar-brand fw-bold fs-4 text-white me-lg-4">
+        ApplyDirect-<span class="text-gold">SA</span>
+      </a>
 
-      <nav>
-        <router-link to="/">Home</router-link>
-        <router-link to="/universities">Universities</router-link>
-        <router-link to="/portfolio" class="active">Profile</router-link>
-        <router-link to="/about">About</router-link>
-        <router-link to="/contact">Contact</router-link>
-        <router-link to="/subscription">Subscription</router-link>
-      </nav>
+      <!-- MOBILE HAMBURGER TOGGLER -->
+      <button 
+        class="navbar-toggler border-0" 
+        type="button" 
+        data-bs-toggle="collapse" 
+        data-bs-target="#navbarContent"
+        aria-controls="navbarContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- COLLAPSIBLE CONTENT -->
+      <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarContent">
+        
+        <!-- NAV LINKS -->
+        <div class="navbar-nav d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 ms-auto pt-2 pt-lg-0">
+          <a href="#" class="sa-nav-tab tab-green text-center active">Universities</a>
+          <a href="#" class="sa-nav-tab tab-gold text-center">Profile</a>
+          <a href="#" class="sa-nav-tab tab-red text-center">About Us</a>
+          <a href="#" class="sa-nav-tab tab-blue text-center">Contact</a>
+          <a href="#" class="sa-nav-tab tab-black text-center">Subscription</a>
+        </div>
+
+      </div>
+    </div>
+  </nav>
 
       <div class="header-right">
         <span>My Profile</span>
@@ -34,69 +58,57 @@
 
     <div class="page-layout">
 
-      <!-- SIDEBAR -->
-
       <aside class="sidebar">
 
         <div class="sidebar-title">
           My Application
         </div>
 
-
         <button
           class="sidebar-item"
           :class="{ active: activeSection === 'personal' }"
           type="button"
           @click="goToSection('personal')"
-          :disabled="false"
         >
           <span class="number">1</span>
           Personal Details
         </button>
-
 
         <button
           class="sidebar-item"
           :class="{ active: activeSection === 'academic' }"
           type="button"
           @click="goToSection('academic')"
-          :disabled="!canAccessSection('academic')"
         >
           <span class="number">2</span>
           Academic Details
         </button>
-
 
         <button
           class="sidebar-item"
           :class="{ active: activeSection === 'preferences' }"
           type="button"
           @click="goToSection('preferences')"
-          :disabled="!canAccessSection('preferences')"
         >
           <span class="number">3</span>
           Study Preferences
         </button>
-
 
         <button
           class="sidebar-item"
           :class="{ active: activeSection === 'documents' }"
           type="button"
           @click="goToSection('documents')"
-          :disabled="!canAccessSection('documents')"
         >
           <span class="number">4</span>
           Documents
         </button>
-
 
         <button
           class="sidebar-item"
           :class="{ active: activeSection === 'status' }"
           type="button"
           @click="goToSection('status')"
-          :disabled="!canAccessSection('status')"
         >
           <span class="number">5</span>
           Application Status
@@ -138,6 +150,10 @@
 
           <p class="required-note">
             <span class="required-mark">*</span> indicates required fields
+          </p>
+
+          <p v-if="formMessage" class="form-message">
+            {{ formMessage }}
           </p>
 
         </div>
@@ -1043,8 +1059,7 @@ export default {
   // =========================
 
   mounted() {
-
-
+    this.getProfile();
   },
 
 
@@ -1257,49 +1272,26 @@ export default {
     },
 
     canAccessSection(section) {
-      const sectionOrder = ["personal", "academic", "preferences", "documents", "status"];
-      const currentIndex = sectionOrder.indexOf(this.activeSection);
-      const targetIndex = sectionOrder.indexOf(section);
-
-      if (targetIndex <= currentIndex) {
-        return true;
-      }
-
-      if (section === "academic") {
-        return this.validatePersonalDetails();
-      }
-
-      if (section === "preferences") {
-        return this.validatePersonalDetails() && this.validateAcademicDetails();
-      }
-
-      if (section === "documents") {
-        return this.validatePersonalDetails() && this.validateAcademicDetails() && this.validatePreferences();
-      }
-
-      if (section === "status") {
-        return this.validatePersonalDetails() && this.validateAcademicDetails() && this.validatePreferences();
-      }
-
       return true;
     },
 
     goToSection(section) {
-      const sectionOrder = ["personal", "academic", "preferences", "documents", "status"];
-      const currentIndex = sectionOrder.indexOf(this.activeSection);
-      const targetIndex = sectionOrder.indexOf(section);
-
-      if (targetIndex > currentIndex && !this.canAccessSection(section)) {
-        return;
-      }
-
       this.activeSection = section;
     },
 
     validateBeforeSave() {
-      if (!this.validatePersonalDetails()) return false;
-      if (!this.validateAcademicDetails()) return false;
-      if (!this.validatePreferences()) return false;
+      if (this.activeSection === "personal") {
+        return this.validatePersonalDetails();
+      }
+
+      if (this.activeSection === "academic") {
+        return this.validateAcademicDetails();
+      }
+
+      if (this.activeSection === "preferences") {
+        return this.validatePreferences();
+      }
+
       return true;
     },
 
@@ -1639,6 +1631,8 @@ export default {
 
         }
 
+        this.profileId = data.profile.profile_id;
+
 
         // =========================
         // PERSONAL DETAILS
@@ -1834,6 +1828,13 @@ export default {
   font-weight: 600;
 }
 
+.form-message {
+  margin-top: 12px;
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .required-mark {
   color: #d9433f;
   font-weight: 700;
@@ -1876,15 +1877,13 @@ export default {
 
   z-index: 20;
 
-  height: 78px;
+  min-height: 78px;
 
-  display: flex;
+  width: 100%;
 
-  align-items: center;
+  display: block;
 
-  justify-content: space-between;
-
-  padding: 0 clamp(20px, 5vw, 70px);
+  padding: 0;
 
   background: rgba(255, 255, 255, 0.96);
 
@@ -1897,6 +1896,34 @@ export default {
 
   backdrop-filter: blur(10px);
 
+}
+
+.top-header > .navbar {
+  width: 100%;
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+}
+
+.top-header .container-fluid {
+  width: 100%;
+  max-width: none;
+  display: flex;
+  align-items: center;
+}
+
+.top-header .navbar-collapse {
+  flex-grow: 1;
+  margin-left: auto;
+}
+
+.top-header .navbar-nav {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.top-header .header-right {
+  display: none;
 }
 
 
@@ -1947,112 +1974,32 @@ export default {
    NAVIGATION
 ========================================= */
 
-nav {
+/* UTILITIES & BRAND COLORS */
+.bg-navy { background-color: #001242 !important; }
+.text-gold { color: #ffb81c !important; }
 
-  display: flex;
-
-  align-items: center;
-
-  gap: 4px;
-
-}
-
-
-nav a {
-
-  position: relative;
-
-  padding: 10px 15px;
-
-  border-radius: 999px;
-
-  color: #53615b;
-
-  text-decoration: none;
-
-  font-size: 14px;
-
+/* BASE NAV TAB STYLING */
+.sa-nav-tab {
+  padding: 8px 18px;
+  border-radius: 50rem;
   font-weight: 600;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
-
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.25s ease-in-out;
+  display: inline-block;
 }
 
-
-nav a:hover {
-
-  background: #eef8f2;
-
-  color: var(--green-dark);
-
-  transform: translateY(-1px);
-
+.sa-nav-tab:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 
-
-nav a.active {
-
-  background: var(--green);
-
-  color: white;
-
-  box-shadow:
-    0 5px 12px rgba(8, 127, 78, 0.18);
-
-}
-
-
-/* =========================================
-   HEADER PROFILE
-========================================= */
-
-.header-right {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-  color: var(--muted);
-
-  font-size: 14px;
-
-  font-weight: 500;
-
-}
-
-
-.profile-icon {
-
-  width: 40px;
-
-  height: 40px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: var(--gold);
-
-  color: var(--ink);
-
-  font-size: 12px;
-
-  font-weight: 800;
-
-  box-shadow:
-    3px 3px 0 var(--red);
-
-}
-
+/* SOUTH AFRICAN FLAG THEMED ACTIVE TABS */
+.tab-green.active { background-color: #007a3d !important; box-shadow: 0 4px 12px rgba(0, 122, 61, 0.4); }
+.tab-gold.active { background-color: #ffb81c !important; color: #000000 !important; box-shadow: 0 4px 12px rgba(255, 184, 28, 0.4); }
+.tab-red.active { background-color: #e03c31 !important; box-shadow: 0 4px 12px rgba(224, 60, 49, 0.4); }
+.tab-blue.active { background-color: #002395 !important; box-shadow: 0 4px 12px rgba(0, 35, 149, 0.4); }
+.tab-black.active { background-color: #1a1a1a !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); }
 
 /* =========================================
    MAIN LAYOUT
@@ -2062,8 +2009,7 @@ nav a.active {
 
   display: flex;
 
-  min-height:
-    calc(100vh - 78px);
+  min-height: calc(100vh - 78px);
 
 }
 
@@ -2084,6 +2030,8 @@ nav a.active {
   width: 255px;
 
   flex-shrink: 0;
+
+  min-height: calc(100vh - 78px);
 
   padding: 35px 18px;
 
@@ -2228,10 +2176,10 @@ nav a.active {
 
   background:
     linear-gradient(
-      rgba(0, 35, 85, 0.65),
-      rgba(0, 35, 85, 0.65)
+      rgba(0, 35, 85, 0.28),
+      rgba(0, 35, 85, 0.28)
     ),
-    url("https://placehold.co/1600x700/e8eef7/0637A6?text=Tertiary+Student+Image")
+    url("https://i.ibb.co/7dd2SKdH/OIP-2.jpg")
     center / cover no-repeat;
 
   display: flex;
@@ -2252,9 +2200,9 @@ nav a.active {
   background:
     linear-gradient(
       90deg,
-      rgba(3, 35, 90, 0.85) 0%,
-      rgba(3, 35, 90, 0.65) 45%,
-      rgba(3, 35, 90, 0.35) 100%
+      rgba(3, 35, 90, 0.48) 0%,
+      rgba(3, 35, 90, 0.28) 45%,
+      rgba(3, 35, 90, 0.10) 100%
     );
 
   display: flex;
@@ -3350,6 +3298,11 @@ nav a.active {
 
   }
 
+  .main-content {
+    grid-template-columns: 215px minmax(0, 1fr);
+    gap: 20px;
+  }
+
 
   .form-grid {
 
@@ -3387,14 +3340,16 @@ nav a.active {
 
   .top-header {
 
-    height: auto;
+    min-height: 0;
 
-    padding: 14px 18px;
+  }
 
-    flex-direction: column;
+  .top-header .navbar-collapse {
+    margin-left: 0;
+  }
 
-    gap: 12px;
-
+  .top-header .navbar-nav {
+    margin-left: 0;
   }
 
 
@@ -3424,6 +3379,10 @@ nav a.active {
 
     display: none;
 
+  }
+
+  .main-content {
+    display: block;
   }
 
 
