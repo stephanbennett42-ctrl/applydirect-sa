@@ -6,12 +6,16 @@ const db = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 3307
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
+// Test initial database connection
 db.getConnection((err, connection) => {
   if (err) {
-    console.error("MySQL Error Details:", err.code, "-", err.message);
+    console.error("MySQL Connection Error:", err.code, "-", err.message);
   } else {
     console.log("Successfully connected to sa_tertiary_db pool.");
     connection.release();

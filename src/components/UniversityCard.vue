@@ -20,12 +20,17 @@
         </p>
 
         <!-- Fee Display -->
-        <p class="fw-semibold mb-3">
+        <p class="fw-semibold mb-2">
           Fee: 
           <span v-if="Number(university.application_fee) > 0">
             R{{ Number(university.application_fee).toFixed(2) }}
           </span>
           <span v-else class="text-success fw-bold">Free</span>
+        </p>
+
+        <!-- Application Window Dates -->
+        <p class="small text-muted mb-3">
+          <strong>Window:</strong> {{ formatDate(university.opening_date) }} – {{ formatDate(university.closing_date) }}
         </p>
       </div>
 
@@ -66,6 +71,17 @@ export default {
       default: false
     }
   },
-  emits: ['view-details', 'toggle-save']
+  emits: ['view-details', 'toggle-save'],
+  methods: {
+    formatDate(dateString) {
+      if (!dateString) return 'Dates TBA';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+  }
 }
 </script>

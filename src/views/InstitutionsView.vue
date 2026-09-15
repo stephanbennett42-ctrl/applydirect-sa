@@ -108,13 +108,17 @@
             <!-- Application Window -->
             <div class="col-12 col-md-6">
               <div class="p-3 rounded bg-navy-card h-100">
-                <h6 class="text-gold fw-bold mb-2">Application Window</h6>
-                <p class="small mb-1 text-light">
-                  <strong>Opens:</strong> {{ formatDate(uni.opening_date) }}
-                </p>
-                <p class="small mb-0 text-light">
-                  <strong>Closes:</strong> {{ formatDate(uni.closing_date) }}
-                </p>
+                <h6 class="text-gold fw-bold mb-1 fs-7 fs-md-6">
+                  <i class="bi bi-calendar-event me-2"></i>Application Window
+                </h6>
+                <div class="application-window">
+                  <p class="mb-1 small text-light">
+                    <strong>Opens:</strong> {{ formatDate(uni.opening_date) }}
+                  </p>
+                  <p class="mb-0 small text-light">
+                    <strong>Closes:</strong> {{ formatDate(uni.closing_date) }}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -135,16 +139,23 @@
           <div class="d-flex flex-column flex-sm-row justify-content-center align-items-stretch align-items-sm-center gap-2 gap-sm-3 max-btn-width mx-auto mt-3">
             <button 
               @click="openDetails(uni)" 
-              class="btn btn-outline-light btn-md btn-md-lg px-4 py-2 rounded-pill fw-bold hover-lift"
+              class="btn btn-outline-light btn-md btn-md-lg px-3 py-2 rounded-pill fw-bold hover-lift"
             >
-              <i class="bi bi-info-circle me-1"></i> View Details
+              <i class="bi bi-info-circle me-1"></i> Details
+            </button>
+
+            <button 
+              @click="openReminderModal(uni)" 
+              class="btn btn-outline-warning text-gold border-gold btn-md btn-md-lg px-3 py-2 rounded-pill fw-bold hover-lift"
+            >
+              <i class="bi bi-bell me-1"></i> Remind Me
             </button>
             
             <a 
               :href="uni.applicationUrl" 
               target="_blank" 
               rel="noopener noreferrer"
-              class="btn btn-gold btn-md btn-md-lg px-4 py-2 rounded-pill hover-lift text-dark fw-bold d-flex align-items-center justify-content-center"
+              class="btn btn-gold btn-md btn-md-lg px-3 py-2 rounded-pill hover-lift text-dark fw-bold d-flex align-items-center justify-content-center"
               :class="{ disabled: !uni.applicationUrl || uni.applicationUrl === '#' }"
             >
               Apply Portal <i class="bi bi-box-arrow-up-right ms-1"></i>
@@ -203,8 +214,8 @@
                 <div class="p-3 rounded bg-navy border border-secondary h-100">
                   <h6 class="fw-bold text-gold mb-1 fs-7 fs-md-6"><i class="bi bi-calendar-event me-2"></i>Application Window</h6>
                   <p class="mb-0 small text-light">
-                    <strong>Opens:</strong> {{ selectedUni.openingDate }}<br>
-                    <strong>Closes:</strong> {{ selectedUni.closingDate }}
+                    <strong>Opens:</strong> {{ formatDate(selectedUni.opening_date) }}<br>
+                    <strong>Closes:</strong> {{ formatDate(selectedUni.closing_date) }}
                   </p>
                 </div>
               </div>
@@ -224,6 +235,9 @@
 
           <div class="modal-footer border-top border-secondary flex-column flex-sm-row justify-content-between gap-2">
             <button type="button" class="btn btn-outline-light rounded-pill px-4 w-100 w-sm-auto" @click="closeDetails">Close</button>
+            <button type="button" class="btn btn-outline-warning text-gold border-gold rounded-pill px-4 w-100 w-sm-auto" @click="openReminderModal(selectedUni)">
+              <i class="bi bi-bell me-1"></i> Remind Me
+            </button>
             <a :href="selectedUni.applicationUrl" target="_blank" rel="noopener noreferrer" class="btn btn-gold text-dark fw-bold rounded-pill px-4 w-100 w-sm-auto text-center">
               Apply Portal
             </a>
@@ -231,10 +245,56 @@
         </div>
       </div>
     </div>
+
+    <!-- APPLICATION REMINDER MODAL -->
+    <div 
+      v-if="showReminderModal" 
+      class="modal fade show d-block backdrop-blur modal-overlay" 
+      tabindex="-1"
+      @click.self="closeReminderModal"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-gold shadow-lg">
+          <div class="modal-header border-bottom border-secondary">
+            <h5 class="modal-title fw-bold text-gold fs-6 fs-md-5">Set Application Reminder</h5>
+            <button type="button" class="btn-close btn-close-white" @click="closeReminderModal"></button>
+          </div>
+
+          <form @submit.prevent="submitReminder">
+            <div class="modal-body">
+              <div class="mb-3 text-start">
+                <label class="form-label text-light small fw-bold">Full Name</label>
+                <input v-model="reminderForm.name" type="text" class="form-control bg-navy text-white border-secondary" placeholder="John Doe" required />
+              </div>
+              <div class="mb-3 text-start">
+                <label class="form-label text-light small fw-bold">Phone Number</label>
+                <input v-model="reminderForm.phoneNumber" type="tel" class="form-control bg-navy text-white border-secondary" placeholder="+27..." required />
+              </div>
+              <div class="mb-3 text-start">
+                <label class="form-label text-light small fw-bold">Notification Channel</label>
+                <select v-model="reminderForm.channel" class="form-select bg-navy text-white border-secondary">
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="sms">SMS</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="modal-footer border-top border-secondary flex-row justify-content-end gap-2">
+              <button type="button" class="btn btn-outline-light rounded-pill px-4" @click="closeReminderModal">Cancel</button>
+              <button type="submit" class="btn btn-gold text-dark fw-bold rounded-pill px-4" :disabled="isSubmittingReminder">
+                {{ isSubmittingReminder ? 'Saving...' : 'Set Reminder' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import api from '@/services/api';
+
 export default {
   name: 'InstitutionsView',
   props: {
@@ -247,6 +307,14 @@ export default {
     return {
       cardRefs: [],
       selectedUni: null,
+      showReminderModal: false,
+      selectedInstitutionId: null,
+      isSubmittingReminder: false,
+      reminderForm: {
+        name: '',
+        phoneNumber: '',
+        channel: 'whatsapp'
+      },
       searchQuery: '',
       selectedProvince: '',
       selectedType: '',
@@ -309,7 +377,11 @@ export default {
       if (!dateString) return 'Dates TBA';
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return dateString;
-      return date.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
     },
 
     getApplicationStatus(institution) {
@@ -329,6 +401,34 @@ export default {
       if (status === 'Open Now') return 'badge bg-success px-3 py-2 fs-7';
       if (status === 'Opening Soon') return 'badge bg-warning text-dark px-3 py-2 fs-7';
       return 'badge bg-danger px-3 py-2 fs-7';
+    },
+
+    openReminderModal(uni) {
+      this.selectedInstitutionId = uni.id;
+      this.showReminderModal = true;
+    },
+
+    closeReminderModal() {
+      this.showReminderModal = false;
+      this.reminderForm = { name: '', phoneNumber: '', channel: 'whatsapp' };
+    },
+
+    async submitReminder() {
+      this.isSubmittingReminder = true;
+      try {
+        const response = await api.subscribeReminder({
+          name: this.reminderForm.name,
+          phone_number: this.reminderForm.phoneNumber,
+          channel: this.reminderForm.channel,
+          institution_id: this.selectedInstitutionId,
+        });
+        alert(response.data?.message || 'Reminder set successfully!');
+        this.closeReminderModal();
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to register reminder.');
+      } finally {
+        this.isSubmittingReminder = false;
+      }
     },
 
     getDistanceInKm(lat1, lon1, lat2, lon2) {
@@ -394,8 +494,8 @@ export default {
 
     async fetchInstitutions() {
       try {
-        const response = await fetch('http://localhost:3000/api/institutions');
-        const result = await response.json();
+        const response = await api.getInstitutions();
+        const result = response.data;
         
         if (result.success) {
           const saColors = [
@@ -458,7 +558,6 @@ export default {
               ? item.image_url 
               : (matchedCampus ? matchedCampus.url : this.fallbackPhotos[index % this.fallbackPhotos.length]);
 
-            // Parse faculties string into an array for v-for modal rendering
             let parsedFaculties = ['Consult official prospectus for full list.'];
             if (item.faculties) {
               parsedFaculties = typeof item.faculties === 'string' 
@@ -563,7 +662,7 @@ export default {
 }
 
 .max-btn-width {
-  max-width: 380px;
+  max-width: 520px;
 }
 
 .fullscreen-card {
