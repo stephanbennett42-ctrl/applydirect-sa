@@ -1,43 +1,44 @@
+/**
+ * Vue Router Configuration — Login module
+ *
+ * Routes:
+ *   /          : login page
+ *   /dashboard : post-login landing (requires auth)
+ */
 import { createRouter, createWebHistory } from 'vue-router'
+import { isLoggedIn } from '../store/auth.js'
 
-import LoginView from '../views/LoginView.vue'
-import RegisterView from '../views/RegisterView.vue'
-import PaymentView from '../views/PaymentView.vue'
-import ForgotPasswordView from '../views/ForgotPasswordView.vue'
+import Login from '../views/Login.vue'
+import Dashboard from '../views/Dashboard.vue'
+
+const routes = [
+  { path: '/', name: 'Login', component: Login },
+  { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
+
+  // Catch-all
+  { path: '/:pathMatch(.*)*', redirect: '/' }
+]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
+  routes,
+  scrollBehavior() {
+    return { top: 0 }
+  }
+})
 
-  routes: [
-    {
-      path: '/',
-      redirect: '/login',
-    },
-
-    {
-      path: '/login',
-      name: 'login',
-      component: LoginView,
-    },
-
-    {
-      path: '/register',
-      name: 'register',
-      component: RegisterView,
-    },
-
-    {
-      path: '/forgot-password',
-      name: 'forgot-password',
-      component: ForgotPasswordView,
-    },
-
-    {
-      path: '/payment',
-      name: 'payment',
-      component: PaymentView,
-    },
-  ],
+/**
+ * Global navigation guard.
+ * Dashboard requires a logged-in user; logged-in users skip the login page.
+ */
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isLoggedIn()) {
+    next({ name: 'Login', query: { redirect: to.fullPath } })
+  } else if (to.name === 'Login' && isLoggedIn()) {
+    next({ name: 'Dashboard' })
+  } else {
+    next()
+  }
 })
 
 export default router

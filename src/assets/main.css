@@ -1,51 +1,132 @@
-/* ApplyDirect SA - Global Styles */
+/**
+ * UniApply Login — Global Stylesheet
+ * Shares the same design tokens as the rest of the project.
+ * South African flag palette, Harvard-inspired clean academic design.
+ */
 
-* {
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-html,
-body,
-#app {
-  width: 100%;
-  min-width: 100%;
-  min-height: 100%;
-  margin: 0;
-  padding: 0;
+:root {
+  /* South African flag palette */
+  --flag-red: #E03C31;
+  --flag-red-dark: #C22B21;
+  --flag-blue: #001489;
+  --flag-blue-dark: #000A52;
+  --flag-green: #007749;
+  --flag-green-light: #00A96F;
+  --flag-gold: #FFB81C;
+  --flag-gold-light: #FFD35C;
+  --flag-black: #000000;
+  --flag-white: #ffffff;
+
+  --primary: var(--flag-blue);
+  --primary-light: #3B4DCD;
+  --primary-dark: var(--flag-blue-dark);
+  --primary-50: #E9EDFC;
+  --primary-100: #C9D3F7;
+
+  --accent: var(--flag-red);
+  --accent-hover: var(--flag-red-dark);
+  --accent-50: #FBE9E7;
+
+  --gold: var(--flag-gold);
+  --gold-light: var(--flag-gold-light);
+
+  --success: var(--flag-green);
+  --success-light: #D9F0E6;
+
+  --bg: #ffffff;
+  --bg-subtle: #f7f8fa;
+
+  --text: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-light: #6b7280;
+  --text-muted: #9ca3af;
+  --text-white: #ffffff;
+
+  --border: #e5e7eb;
+  --border-light: #f3f4f6;
+
+  /* Horizontal SA flag strip (hoist -> fly) used for accent borders */
+  --flag-stripe: linear-gradient(90deg,
+    var(--flag-black) 0%, var(--flag-black) 13%,
+    var(--flag-gold) 13%, var(--flag-gold) 26%,
+    var(--flag-green) 26%, var(--flag-green) 39%,
+    var(--flag-white) 39%, var(--flag-white) 47%,
+    var(--flag-red) 47%, var(--flag-red) 74%,
+    var(--flag-white) 74%, var(--flag-white) 86%,
+    var(--flag-blue) 86%, var(--flag-blue) 100%);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.02);
+
+  --radius: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  --transition: all 0.2s ease;
 }
 
 html {
-  min-height: 100vh;
+  scroll-behavior: smooth;
 }
 
 body {
-  min-height: 100vh;
-  margin: 0;
-  background: #ffffff;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 a {
+  text-decoration: none;
   color: inherit;
 }
 
-#app {
+::selection {
+  background: var(--primary-100);
+  color: var(--primary-dark);
+}
+
+input {
   width: 100%;
-  min-height: 100vh;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: var(--transition);
+  background: var(--bg);
+  color: var(--text);
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.08);
+}
+
+@media (max-width: 768px) {
+  .container { padding: 0 20px; }
 }

@@ -1,20 +1,21 @@
-import { fileURLToPath, URL } from 'node:url'
-
+/**
+ * Vite Configuration — Login frontend
+ * - Serves on port 3007 and auto-opens the browser on startup.
+ * - API calls are proxied to the login backend on port 3006.
+ */
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-    vueDevTools(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
+  plugins: [vue()],
+  server: {
+    port: 3007,
+    open: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3006',
+        changeOrigin: true
+      }
+    }
+  }
 })
