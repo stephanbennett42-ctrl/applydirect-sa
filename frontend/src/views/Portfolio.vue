@@ -32,11 +32,11 @@
         
         <!-- NAV LINKS -->
         <div class="navbar-nav d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 ms-auto pt-2 pt-lg-0">
-          <a href="#" class="sa-nav-tab tab-green text-center active">Universities</a>
-          <a href="#" class="sa-nav-tab tab-gold text-center">Profile</a>
-          <a href="#" class="sa-nav-tab tab-red text-center">About Us</a>
-          <a href="#" class="sa-nav-tab tab-blue text-center">Contact</a>
-          <a href="#" class="sa-nav-tab tab-black text-center">Subscription</a>
+          <router-link to="/" class="sa-nav-tab tab-green text-center">Universities</router-link>
+          <router-link to="/portfolio" class="sa-nav-tab tab-gold text-center">Profile</router-link>
+          <router-link to="/about" class="sa-nav-tab tab-red text-center">About Us</router-link>
+          <router-link to="/contact" class="sa-nav-tab tab-blue text-center">Contact</router-link>
+          <router-link to="/subscription" class="sa-nav-tab tab-black text-center">Subscription</router-link>
         </div>
 
       </div>
@@ -761,118 +761,140 @@
 
         </section>
 
-
         <!-- ================= DOCUMENTS ================= -->
 
-        <section
-          v-if="activeSection === 'documents'"
-          class="card"
+<section
+  v-if="activeSection === 'documents'"
+  class="card"
+>
+
+  <div class="section-header">
+    <div>
+      <h2>Documents</h2>
+
+      <p>
+        Upload the documents required for your applications.
+        All documents must be in PDF format.
+      </p>
+    </div>
+  </div>
+
+
+  <div class="document-notice">
+    <span class="notice-icon">i</span>
+
+    <p>
+      Please upload clear PDF documents only.
+      JPG, PNG, DOC and DOCX files are not accepted.
+      The maximum file size is 5 MB.
+    </p>
+  </div>
+
+
+  <div class="document-list">
+
+    <!-- ID / PASSPORT -->
+    <div class="document-item">
+
+      <div class="document-information">
+        <strong>ID / Passport</strong>
+
+        <p>PDF only · Maximum size: 5 MB</p>
+
+        <p
+          v-if="documentMessages.id"
+          :class="[
+            'document-message',
+            documentMessages.id.type
+          ]"
         >
+          {{ documentMessages.id.message }}
+        </p>
+      </div>
 
-          <div class="section-header">
+      <label class="upload-btn">
+        <span>Upload PDF</span>
 
-            <div>
+        <input
+          type="file"
+          accept=".pdf,application/pdf"
+          hidden
+          @change="validateDocument($event, 'id')"
+        />
+      </label>
 
-              <h2>Documents</h2>
-
-              <p>
-                Upload the documents required for your applications.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <div class="document-list">
-
-            <div class="document-item">
-
-              <div>
-
-                <strong>ID / Passport</strong>
-
-                <p>
-                  PDF, JPG or PNG
-                </p>
-
-              </div>
+    </div>
 
 
-              <label class="upload-btn">
+    <!-- MATRIC RESULTS -->
+    <div class="document-item">
 
-                Upload
+      <div class="document-information">
+        <strong>Matric Results</strong>
 
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  hidden
-                />
+        <p>PDF only · Maximum size: 5 MB</p>
 
-              </label>
+        <p
+          v-if="documentMessages.matric"
+          :class="[
+            'document-message',
+            documentMessages.matric.type
+          ]"
+        >
+          {{ documentMessages.matric.message }}
+        </p>
+      </div>
 
-            </div>
+      <label class="upload-btn">
+        <span>Upload PDF</span>
 
+        <input
+          type="file"
+          accept=".pdf,application/pdf"
+          hidden
+          @change="validateDocument($event, 'matric')"
+        />
+      </label>
 
-            <div class="document-item">
-
-              <div>
-
-                <strong>Matric Results</strong>
-
-                <p>
-                  PDF, JPG or PNG
-                </p>
-
-              </div>
-
-
-              <label class="upload-btn">
-
-                Upload
-
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  hidden
-                />
-
-              </label>
-
-            </div>
+    </div>
 
 
-            <div class="document-item">
+    <!-- PROOF OF ADDRESS -->
+    <div class="document-item">
 
-              <div>
+      <div class="document-information">
+        <strong>Proof of Address</strong>
 
-                <strong>Proof of Address</strong>
+        <p>PDF only · Maximum size: 5 MB</p>
 
-                <p>
-                  PDF, JPG or PNG
-                </p>
+        <p
+          v-if="documentMessages.address"
+          :class="[
+            'document-message',
+            documentMessages.address.type
+          ]"
+        >
+          {{ documentMessages.address.message }}
+        </p>
+      </div>
 
-              </div>
+      <label class="upload-btn">
+        <span>Upload PDF</span>
 
+        <input
+          type="file"
+          accept=".pdf,application/pdf"
+          hidden
+          @change="validateDocument($event, 'address')"
+        />
+      </label>
 
-              <label class="upload-btn">
+      </div>
 
-                Upload
+     </div>
 
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  hidden
-                />
-
-              </label>
-
-            </div>
-
-          </div>
-
-        </section>
-
+    </section>
+        
 
         <!-- ================= STATUS ================= -->
 
@@ -1037,6 +1059,20 @@ export default {
 
 
       activeSubjectIndex: null,
+
+     documents: {
+
+      id: null,
+      matric: null,
+      address: null
+     },
+
+     documentMessages: {
+
+      id: null,
+      matric: null,
+      address: null
+    },
 
 
       // Stores the suggested courses
@@ -1376,6 +1412,60 @@ export default {
       }
 
     },
+
+
+    validateDocument(event, documentType) {
+    const file = event.target.files[0];
+
+    if (!file) {
+     return;
+    }
+
+  // Maximum file size: 5 MB
+    const maxFileSize = 5 * 1024 * 1024;
+
+  // Check whether the file is a PDF
+    const isPDF =
+     file.type === "application/pdf" ||
+     file.name.toLowerCase().endsWith(".pdf");
+
+  // Reject files that are not PDF
+  if (!isPDF) {
+    this.documents[documentType] = null;
+
+    this.documentMessages[documentType] = {
+      type: "error-message",
+      message: "Invalid file. Please upload a PDF document only."
+    };
+
+    // Clear the selected file
+    event.target.value = "";
+
+    return;
+  }
+
+  // Check file size
+  if (file.size > maxFileSize) {
+    this.documents[documentType] = null;
+
+    this.documentMessages[documentType] = {
+      type: "error-message",
+      message: "File is too large. Please upload a PDF smaller than 5 MB."
+    };
+
+    event.target.value = "";
+
+    return;
+  }
+
+  // Save the valid file
+  this.documents[documentType] = file;
+
+  this.documentMessages[documentType] = {
+    type: "success-message",
+    message: `${file.name} uploaded successfully.`
+  };
+},
 
 
     // =========================
@@ -3067,108 +3157,163 @@ export default {
 
 }
 
-
 /* =========================================
-   DOCUMENTS
+   DOCUMENT UPLOADS
 ========================================= */
 
-.document-list {
-
+.document-notice {
   display: flex;
-
-  flex-direction: column;
-
+  align-items: flex-start;
   gap: 12px;
 
+  margin-bottom: 25px;
+  padding: 15px 18px;
+
+  border-left: 4px solid #ffb81c;
+  border-radius: 8px;
+
+  background: #fff9e6;
 }
 
-
-.document-item {
-
+.notice-icon {
   display: flex;
-
   align-items: center;
+  justify-content: center;
 
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+
+  border-radius: 50%;
+
+  background: #ffb81c;
+  color: #17211b;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.document-notice p {
+  margin: 0;
+
+  color: #5f563c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Document list */
+.document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Individual document */
+.document-item {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 20px;
 
-  padding: 17px;
+  padding: 22px 24px;
 
   border: 1px solid #e1e8e3;
-
-  border-radius: 10px;
+  border-radius: 13px;
 
   background: #fbfcfb;
 
   transition:
-    border 0.2s ease,
-    transform 0.2s ease;
-
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
 }
-
 
 .document-item:hover {
-
-  border-color:
-    rgba(8, 127, 78, 0.3);
-
+  border-color: #087f4e;
+  box-shadow: 0 5px 15px rgba(0, 35, 85, 0.06);
   transform: translateY(-2px);
-
 }
 
-
-.document-item strong {
-
-  color: #26332c;
-
-  font-size: 14px;
-
+.document-information {
+  min-width: 0;
 }
 
+.document-information strong {
+  display: block;
+  margin-bottom: 6px;
 
-.document-item p {
-
-  margin: 5px 0 0;
-
-  color: #7a8580;
-
-  font-size: 12px;
-
+  color: #075c3a;
+  font-size: 16px;
+  font-weight: 800;
 }
 
+.document-information > p:not(.document-message) {
+  margin: 0;
 
-/* =========================================
-   UPLOAD
-========================================= */
+  color: #68756f;
+  font-size: 13px;
+}
 
+/* Upload button */
 .upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  padding: 9px 18px;
+  flex-shrink: 0;
 
-  border-radius: 999px;
+  padding: 11px 18px;
 
-  background: var(--green);
+  border-radius: 8px;
 
-  color: white;
+  background: #087f4e;
+  color: #ffffff;
 
   font-size: 13px;
-
   font-weight: 700;
 
   cursor: pointer;
 
-  transition: 0.2s ease;
-
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
-
 
 .upload-btn:hover {
-
-  background: var(--green-dark);
-
-  transform: translateY(-1px);
-
+  background: #075c3a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(8, 127, 78, 0.2);
 }
 
+/* Validation messages */
+.document-message {
+  margin-top: 8px !important;
+  font-size: 13px !important;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.error-message {
+  color: #de3831 !important;
+}
+
+.success-message {
+  color: #087f4e !important;
+}
+
+/* Responsive document layout */
+@media (max-width: 600px) {
+  .document-item {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .upload-btn {
+    width: 100%;
+  }
+}
 
 /* =========================================
    APPLICATION STATUS

@@ -1,3 +1,4 @@
+```vue
 <template>
   <div class="page-shell">
     <header class="top-header">
@@ -27,25 +28,60 @@
 
         <div class="form-group">
           <label for="fullName">Full Name</label>
-          <input id="fullName" type="text" placeholder="Enter your full name" />
+          <input
+            id="fullName"
+            type="text"
+            v-model="form.full_name"
+            placeholder="Enter your full name"
+          />
         </div>
 
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input id="email" type="email" placeholder="example@email.com" />
+          <input
+            id="email"
+            type="email"
+            v-model="form.email"
+            placeholder="example@email.com"
+          />
         </div>
 
         <div class="form-group">
           <label for="subject">Subject</label>
-          <input id="subject" type="text" placeholder="How can we help?" />
+          <input
+            id="subject"
+            type="text"
+            v-model="form.subject"
+            placeholder="How can we help?"
+          />
         </div>
 
         <div class="form-group">
           <label for="message">Message</label>
-          <textarea id="message" rows="5" placeholder="Write your message here..."></textarea>
+          <textarea
+            id="message"
+            rows="5"
+            v-model="form.message"
+            placeholder="Write your message here..."
+          ></textarea>
         </div>
 
-        <button class="send-btn" type="button">Send Message</button>
+        <button
+          class="send-btn"
+          type="button"
+          @click="sendMessage"
+          :disabled="sending"
+        >
+          {{ sending ? 'Sending...' : 'Send Message' }}
+        </button>
+
+        <p v-if="successMessage" class="success-message">
+          {{ successMessage }}
+        </p>
+
+        <p v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </p>
       </div>
 
       <div class="contact-info">
@@ -70,6 +106,110 @@
     </section>
   </div>
 </template>
+
+<script>
+export default {
+  name: 'ContactView',
+
+  data() {
+    return {
+      sending: false,
+
+      successMessage: '',
+      errorMessage: '',
+
+      form: {
+        student_id: 1,
+        full_name: '',
+        email: '',
+        subject: '',
+        message: ''
+      }
+    };
+  },
+
+  methods: {
+    async sendMessage() {
+      this.successMessage = '';
+      this.errorMessage = '';
+
+      // Check that all fields are completed
+      if (
+        !this.form.full_name ||
+        !this.form.email ||
+        !this.form.subject ||
+        !this.form.message
+      ) {
+        this.errorMessage = 'Please complete all fields.';
+        return;
+      }
+
+      this.sending = true;
+
+      try {
+        console.log('Sending contact form:', this.form);
+
+        const response = await fetch('http://localhost:3000/api/contact', {
+          method: 'POST',
+
+          headers: {
+            'Content-Type': 'application/json'
+          },
+
+          body: JSON.stringify(this.form)
+        });
+
+        // Get the response as text first
+        const responseText = await response.text();
+
+        console.log('Server status:', response.status);
+        console.log('Server response:', responseText);
+
+        let data = {};
+
+        // Only try to parse JSON if the server actually returned something
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (error) {
+            console.error('Invalid JSON from server:', error);
+
+            throw new Error(
+              `Server returned an invalid response. Status: ${response.status}`
+            );
+          }
+        }
+
+        // Handle server errors
+        if (!response.ok) {
+          throw new Error(
+            data.message || `Failed to send message. Status: ${response.status}`
+          );
+        }
+
+        // Success
+        this.successMessage =
+          data.message || 'Message sent successfully!';
+
+        // Clear form
+        this.form.full_name = '';
+        this.form.email = '';
+        this.form.subject = '';
+        this.form.message = '';
+
+      } catch (error) {
+        console.error('Contact form error:', error);
+
+        this.errorMessage =
+          error.message || 'Something went wrong. Please try again.';
+
+      } finally {
+        this.sending = false;
+      }
+    }
+  }
+};
+</script>
 
 <style scoped>
 
