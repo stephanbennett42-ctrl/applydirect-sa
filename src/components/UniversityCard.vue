@@ -36,7 +36,7 @@
 
       <!-- Action Buttons -->
       <div class="d-flex gap-2 mt-3">
-        <!-- View Details (Triggers Modal in Parent) -->
+        <!-- View Details -->
         <button 
           @click="$emit('view-details', university)" 
           class="btn btn-sa-primary flex-grow-1"
@@ -44,15 +44,30 @@
           View Details
         </button>
 
-        <!-- Direct Portal Link -->
-        <a 
-          :href="university.application_url || university.website_url" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="btn btn-sa-green"
+        <!-- Locked Premium Button -->
+        <button 
+          @click="handlePremiumAction" 
+          class="btn btn-outline-warning fw-bold text-dark"
         >
-          Apply Now
-        </a>
+          🔒 Remind Me
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Premium Notice Modal -->
+  <div v-if="showPremiumModal" class="modal-backdrop show d-flex justify-content-center align-items-center" style="background: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1050;">
+    <div class="card p-4 shadow bg-white text-center" style="max-width: 380px; width: 100%;">
+      <div class="fs-1 mb-2">⭐</div>
+      <h5 class="fw-bold mb-3 text-dark">Premium Feature</h5>
+      <p class="text-muted small mb-4">This is for premium users only. Unlock instant reminders, fast-track applications, and exclusive concierge features!</p>
+      <div class="d-flex flex-column gap-2">
+        <button @click="redirectToSubscription" class="btn btn-warning fw-bold text-dark py-2">
+          Go to Subscription Page
+        </button>
+        <button @click="showPremiumModal = false" class="btn btn-light text-muted py-1">
+          Cancel
+        </button>
       </div>
     </div>
   </div>
@@ -72,6 +87,11 @@ export default {
     }
   },
   emits: ['view-details', 'toggle-save'],
+  data() {
+    return {
+      showPremiumModal: false
+    };
+  },
   methods: {
     formatDate(dateString) {
       if (!dateString) return 'Dates TBA';
@@ -80,6 +100,19 @@ export default {
         day: '2-digit',
         month: 'short',
         year: 'numeric'
+      });
+    },
+    handlePremiumAction() {
+      // Always trigger the premium modal when clicked
+      this.showPremiumModal = true;
+    },
+    redirectToSubscription() {
+      this.showPremiumModal = false;
+      
+      // Option A: If you have a router path named 'subscription' or 'pricing'
+      this.$router.push('/subscription').catch(() => {
+        // Option B: Fallback alert if route isn't built yet
+        alert('Redirecting to the ApplyDirect-SA Subscription & Pricing Portal...');
       });
     }
   }

@@ -3,13 +3,13 @@
     <!-- FLOATING NEARBY LOCATION BUTTON (Mobile-friendly FAB) -->
     <div class="floating-geo-btn position-fixed end-0 z-3">
       <button 
-        @click="getUserLocation" 
+        @click="openPremiumModal" 
         class="btn btn-gold rounded-pill px-3 py-2 px-md-4 fw-bold shadow-lg d-flex align-items-center gap-2 hover-lift"
         :disabled="isLocating"
       >
         <i class="bi bi-geo-alt-fill text-dark fs-5"></i>
-        <span class="d-none d-sm-inline">{{ isLocating ? 'Finding Location...' : (userLat ? 'Updated Nearby' : 'Find Near Me') }}</span>
-        <span class="d-inline d-sm-none">{{ isLocating ? '...' : 'Near Me' }}</span>
+        <span class="d-none d-sm-inline"> {{ userLat ? 'Updated Nearby' : 'Find Near Me' }}</span>
+        <span class="d-inline d-sm-none"> Near Me</span>
       </button>
     </div>
 
@@ -144,11 +144,12 @@
               <i class="bi bi-info-circle me-1"></i> Details
             </button>
 
+            <!-- LOCKED REMIND ME BUTTON -->
             <button 
               @click="openReminderModal(uni)" 
               class="btn btn-outline-warning text-gold border-gold btn-md btn-md-lg px-3 py-2 rounded-pill fw-bold hover-lift"
             >
-              <i class="bi bi-bell me-1"></i> Remind Me
+              <i class="bi bi-bell me-1"></i>  Remind Me
             </button>
             
             <a 
@@ -246,46 +247,27 @@
       </div>
     </div>
 
-    <!-- APPLICATION REMINDER MODAL -->
+    <!-- PREMIUM USER RESTRICTION MODAL -->
     <div 
-      v-if="showReminderModal" 
+      v-if="showPremiumModal" 
       class="modal fade show d-block backdrop-blur modal-overlay" 
       tabindex="-1"
-      @click.self="closeReminderModal"
+      @click.self="showPremiumModal = false"
     >
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-gold shadow-lg">
-          <div class="modal-header border-bottom border-secondary">
-            <h5 class="modal-title fw-bold text-gold fs-6 fs-md-5">Set Application Reminder</h5>
-            <button type="button" class="btn-close btn-close-white" @click="closeReminderModal"></button>
+        <div class="modal-content bg-dark text-white border-gold shadow-lg text-center p-3">
+          <div class="modal-header border-bottom border-secondary justify-content-center">
+            <h5 class="modal-title fw-bold text-gold"> Premium Feature Only</h5>
           </div>
-
-          <form @submit.prevent="submitReminder">
-            <div class="modal-body">
-              <div class="mb-3 text-start">
-                <label class="form-label text-light small fw-bold">Full Name</label>
-                <input v-model="reminderForm.name" type="text" class="form-control bg-navy text-white border-secondary" placeholder="John Doe" required />
-              </div>
-              <div class="mb-3 text-start">
-                <label class="form-label text-light small fw-bold">Phone Number</label>
-                <input v-model="reminderForm.phoneNumber" type="tel" class="form-control bg-navy text-white border-secondary" placeholder="+27..." required />
-              </div>
-              <div class="mb-3 text-start">
-                <label class="form-label text-light small fw-bold">Notification Channel</label>
-                <select v-model="reminderForm.channel" class="form-select bg-navy text-white border-secondary">
-                  <option value="whatsapp">WhatsApp</option>
-                  <option value="sms">SMS</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="modal-footer border-top border-secondary flex-row justify-content-end gap-2">
-              <button type="button" class="btn btn-outline-light rounded-pill px-4" @click="closeReminderModal">Cancel</button>
-              <button type="submit" class="btn btn-gold text-dark fw-bold rounded-pill px-4" :disabled="isSubmittingReminder">
-                {{ isSubmittingReminder ? 'Saving...' : 'Set Reminder' }}
-              </button>
-            </div>
-          </form>
+          <div class="modal-body py-4">
+            <p class="text-light mb-3">This is for premium users only. Unlock instant reminders, fast-track applications, and exclusive concierge features!</p>
+          </div>
+          <div class="modal-footer border-top border-secondary justify-content-center gap-2">
+            <button type="button" class="btn btn-outline-light rounded-pill px-4" @click="showPremiumModal = false">Cancel</button>
+            <button type="button" class="btn btn-gold text-dark fw-bold rounded-pill px-4" @click="goToSubscription">
+              Go to Subscription Page
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -305,6 +287,7 @@ export default {
   },
   data() {
     return {
+      showPremiumModal: false,
       cardRefs: [],
       selectedUni: null,
       showReminderModal: false,
@@ -405,7 +388,19 @@ export default {
 
     openReminderModal(uni) {
       this.selectedInstitutionId = uni.id;
-      this.showReminderModal = true;
+      this.showPremiumModal = true;
+    },
+
+    openPremiumModal() {
+      // Triggers the premium restriction modal when "Find Near Me" is clicked
+      this.showPremiumModal = true;
+    },
+
+    goToSubscription() {
+      this.showPremiumModal = false;
+      this.$router.push('/subscription').catch(() => {
+        alert('Redirecting to the Subscription Page...');
+      });
     },
 
     closeReminderModal() {

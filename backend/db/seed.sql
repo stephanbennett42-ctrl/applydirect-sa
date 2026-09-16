@@ -4,12 +4,17 @@ USE sa_tertiary_db;
 ALTER TABLE institutions MODIFY COLUMN institution_type VARCHAR(50);
 ALTER TABLE institutions MODIFY COLUMN application_url VARCHAR(255);
 ALTER TABLE institutions ADD COLUMN faculties TEXT;
--- 2. Clear existing entries
+
+-- 2. Drop dependent tables first, then clear institutions
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS application_reminders;
+DROP TABLE IF EXISTS institution_reminders;
+DROP TABLE IF EXISTS users;
 TRUNCATE TABLE institutions;
 SET FOREIGN_KEY_CHECKS = 1;
 
--- 3. Insert All 34 Institutions
+
+-- 4. Insert All 34 Institutions
 INSERT INTO institutions 
   (name, institution_type, province, application_status, application_fee, opening_date, closing_date, website_url, application_url)
 VALUES 
@@ -67,7 +72,7 @@ VALUES
   ('MANCOSA (Johannesburg Campus)', 'Private College', 'Gauteng', 'Open', 0.00, '2026-01-01', '2026-11-30', 'https://www.mancosa.co.za', 'https://www.mancosa.co.za/apply-now/'),
   ('Rosebank College', 'Private College', 'Gauteng', 'Open', 0.00, '2026-01-01', '2026-11-30', 'https://www.rosebankcollege.co.za', 'https://www.rosebankcollege.co.za/apply');
 
--- 4. Apply Faculty updates
+-- 5. Apply Faculty updates
 SET SQL_SAFE_UPDATES = 0;
 
 UPDATE institutions 
@@ -76,10 +81,7 @@ WHERE name LIKE '%CPUT%' OR name LIKE '%Cape Peninsula%';
 
 SET SQL_SAFE_UPDATES = 1;
 
--- 5. User & Reminder Tables Setup
-DROP TABLE IF EXISTS institution_reminders;
-DROP TABLE IF EXISTS users;
-
+-- 6. User & Reminder Tables Setup
 CREATE TABLE users (
   user_id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),
@@ -98,4 +100,17 @@ CREATE TABLE institution_reminders (
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY (institution_id) REFERENCES institutions(institution_id) ON DELETE CASCADE,
   UNIQUE(user_id, institution_id)
+);
+
+CREATE TABLE application_reminders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  phone_number VARCHAR(20) NOT NULL,
+  channel ENUM('sms', 'whatsapp', 'both') DEFAULT 'whatsapp',
+  institution_id INT NOT NULL,
+  reminder_days_before INT DEFAULT 7,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (institution_id) REFERENCES institutions(institution_id) ON DELETE CASCADE
 );
