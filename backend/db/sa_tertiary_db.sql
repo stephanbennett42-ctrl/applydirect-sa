@@ -1,5 +1,25 @@
 USE sa_tertiary_db;
 
+
+-- Create institutions table if it does not exist yet
+CREATE TABLE IF NOT EXISTS institutions (
+  institution_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  institution_type VARCHAR(50),
+  province VARCHAR(50),
+  application_status VARCHAR(50) DEFAULT 'Closed',
+  application_fee DECIMAL(10, 2) DEFAULT 0.00,
+  opening_date DATE,
+  closing_date DATE,
+  website_url VARCHAR(255),
+  application_url VARCHAR(255),
+  faculties TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1. Ensure schema supports all fields
+ALTER TABLE institutions MODIFY COLUMN institution_type VARCHAR(50);
+ALTER TABLE institutions MODIFY COLUMN application_url VARCHAR(255);
 -- 1. Expand column size for flexible type values
 ALTER TABLE institutions MODIFY COLUMN institution_type VARCHAR(50);
 
