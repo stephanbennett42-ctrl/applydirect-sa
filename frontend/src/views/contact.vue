@@ -149,7 +149,7 @@ export default {
       try {
         console.log('Sending contact form:', this.form);
 
-        const response = await fetch('http://localhost:3000/api/contact', {
+        const response = await fetch('http://127.0.0.1:3000/api/contact', {
           method: 'POST',
 
           headers: {
