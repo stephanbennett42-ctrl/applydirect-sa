@@ -1,0 +1,17 @@
+{
+  "name": "applydirect-sa",
+  "version": "1.0.0",
+  "description": "ApplyDirect SA — Subscription + Admin modules. One-click cross-platform launcher.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node start.js",
+    "start:sub": "node start.js --sub",
+    "start:admin": "node start.js --admin",
+    "stop": "node stop.js",
+    "db:setup": "node start.js --db-only"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
