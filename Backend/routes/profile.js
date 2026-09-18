@@ -9,16 +9,16 @@ const {
 
 const router = express.Router();
 
-// READ
+// Return one portfolio profile using its profile ID.
 router.get('/:profile_id', getPortfolio);
 
-// CREATE
+// Create a new portfolio profile.
 router.post('/', createPortfolio);
 
-// UPDATE
+// Update an existing portfolio profile using its profile ID.
 router.put('/:profile_id', updatePortfolio);
 
-// DELETE
+// Delete an existing portfolio profile using its profile ID.
 router.delete('/:profile_id', deletePortfolio);
 
 module.exports = router;

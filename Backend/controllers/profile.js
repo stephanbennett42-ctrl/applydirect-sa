@@ -8,6 +8,7 @@ const db = require('../config/db');
 const getPortfolio = (req, res) => {
     const profileId = req.params.profile_id;
 
+    // Load the main profile record first so a missing profile can be reported clearly.
     const profileQuery = `
         SELECT *
         FROM student_profiles
@@ -28,6 +29,7 @@ const getPortfolio = (req, res) => {
             });
         }
 
+        // Subjects are stored separately and are returned with the profile response.
         const subjectsQuery = `
             SELECT subject_id, subject_name, mark, grade
             FROM student_subjects
@@ -118,6 +120,7 @@ const createPortfolio = (req, res) => {
                 });
             }
 
+            // Use the new profile ID as the foreign key for submitted subjects.
             const profileId = result.insertId;
 
             if (!subjects || subjects.length === 0) {
@@ -127,6 +130,7 @@ const createPortfolio = (req, res) => {
                 });
             }
 
+            // Insert all subjects in one database query instead of one query per subject.
             const subjectValues = subjects.map(subject => [
                 profileId,
                 subject.subject_name,
@@ -237,7 +241,7 @@ const updatePortfolio = (req, res) => {
                 });
             }
 
-            // Delete old subjects
+            // Replace the previous subject list with the latest submitted values.
             const deleteSubjectsQuery = `
                 DELETE FROM student_subjects
                 WHERE profile_id = ?
@@ -256,13 +260,14 @@ const updatePortfolio = (req, res) => {
                         });
                     }
 
-                    // Add the updated subjects
+                    // If no subjects were submitted, the cleared list is the intended result.
                     if (!subjects || subjects.length === 0) {
                         return res.json({
                             message: 'Profile updated successfully'
                         });
                     }
 
+                    // Insert the replacement subjects in one bulk operation.
                     const subjectValues = subjects.map(subject => [
                         profileId,
                         subject.subject_name,

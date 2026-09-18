@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const nodemailer = require('nodemailer');
 
+// Use the configured Gmail account to forward submitted contact messages.
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -18,14 +19,14 @@ const sendMessage = (req, res) => {
         message
     } = req.body;
 
-    // Validate required fields
+    // Reject incomplete submissions before writing anything to the database.
     if (!student_id || !full_name || !email || !subject || !message) {
         return res.status(400).json({
             message: 'All fields are required'
         });
     }
 
-    // Save the contact message to the database
+    // Save first so the message is retained even if email delivery fails.
     const sql = `
         INSERT INTO contact_messages
         (student_id, full_name, email, subject, message)
@@ -44,7 +45,7 @@ const sendMessage = (req, res) => {
                 });
             }
 
-            // Send the message to ApplyDirect-SA Gmail
+            // Forward the saved message to the configured ApplyDirect-SA inbox.
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: process.env.EMAIL_USER,
@@ -66,6 +67,7 @@ ${message}
                 if (emailError) {
                     console.error('Error sending email:', emailError);
 
+                    // The database insert succeeded, so return its ID for tracking.
                     return res.status(500).json({
                         message: 'Message saved, but email could not be sent',
                         message_id: result.insertId
@@ -84,6 +86,7 @@ ${message}
 };
 
 const getMessages = (req, res) => {
+    // Return newest contact messages first for the admin message list.
     const sql = `
         SELECT
             message_id,
@@ -115,6 +118,7 @@ const updateMessage = (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
+    // Keep message status values consistent with the database workflow.
     const allowedStatuses = ['unread', 'read', 'replied', 'closed'];
 
     if (!allowedStatuses.includes(status)) {
@@ -138,6 +142,7 @@ const updateMessage = (req, res) => {
             });
         }
 
+        // No affected rows means the requested message ID does not exist.
         if (result.affectedRows === 0) {
             return res.status(404).json({
                 message: 'Contact message not found'
@@ -167,6 +172,7 @@ const deleteMessage = (req, res) => {
             });
         }
 
+        // Report a missing message instead of claiming deletion succeeded.
         if (result.affectedRows === 0) {
             return res.status(404).json({
                 message: 'Contact message not found'
