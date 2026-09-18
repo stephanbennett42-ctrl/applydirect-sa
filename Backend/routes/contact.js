@@ -6,14 +6,16 @@ const contact = require('../controllers/contact');
 
 console.log('CONTACT ROUTES LOADED');
 
-// Test route
-router.get('/', (req, res) => {
-    res.json({
-        message: 'Contact route is working'
-    });
-});
-
 // Contact form
 router.post('/', contact.sendMessage);
+ 
+// Get all messages
+router.get('/', contact.getMessages);
+
+// Update message status
+router.put('/:id', contact.updateMessage);
+
+// Delete contact message
+router.delete('/:id', contact.deleteMessage);
 
 module.exports = router;

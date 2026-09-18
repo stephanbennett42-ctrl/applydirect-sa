@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+console.log('SERVER.JS IS RUNNING');
+
 const express = require('express');
 const cors = require('cors');
 
@@ -21,7 +23,8 @@ app.use('/api/portfolio', portfolioRoutes);
 
 app.get('/', (req, res) => {
     res.json({
-        message: 'ApplyDirect-SA Backend is running'
+        message: 'ApplyDirect-SA Backend is running',
+        test: 'THIS IS MY BACKEND'
     });
 });
 
