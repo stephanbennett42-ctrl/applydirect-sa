@@ -26,10 +26,12 @@ const PID_FILE = path.join(ROOT, 'uniapply.pids.json')
 const LOG_DIR = path.join(ROOT, 'logs')
 
 const APPS = [
-  { name: 'Subscription API', port: 3002, dir: 'sections/subscription/backend', type: 'backend' },
-  { name: 'Admin API',        port: 3003, dir: 'sections/admin/backend',        type: 'backend' },
-  { name: 'Subscription Site',port: 3004, dir: 'sections/subscription/frontend',type: 'frontend' },
-  { name: 'Admin Site',       port: 3005, dir: 'sections/admin/frontend',        type: 'frontend' }
+  { name: 'Student API',      port: 3000, dir: 'backend',                         type: 'backend' },
+  { name: 'Student Site',     port: 5173, dir: 'frontend',                        type: 'frontend' },
+  { name: 'Subscription API', port: 3002, dir: 'sections/subscription/backend',   type: 'backend' },
+  { name: 'Admin API',        port: 3003, dir: 'sections/admin/backend',          type: 'backend' },
+  { name: 'Subscription Site',port: 3004, dir: 'sections/subscription/frontend',  type: 'frontend' },
+  { name: 'Admin Site',       port: 3005, dir: 'sections/admin/frontend',         type: 'frontend' }
 ]
 
 const args = process.argv.slice(2)
@@ -147,7 +149,7 @@ function ensureDeps(app) {
 }
 
 function runDbSetup() {
-  for (const backend of ['sections/subscription/backend', 'sections/admin/backend']) {
+  for (const backend of ['backend', 'sections/subscription/backend', 'sections/admin/backend']) {
     log(`Setting up database (${backend})...`)
     const res = runNpm(backend, ['run', 'db:setup'])
     if (res.status !== 0) {
@@ -196,11 +198,13 @@ function printSummary(lanIP) {
   log('  (Give Vite a few seconds to compile the first page.)')
   log('')
   log('  On THIS computer:')
+  log('    Student site      : http://localhost:5173')
   log('    Subscription site : http://localhost:3004')
   log('    Admin site        : http://localhost:3005')
   if (lanIP) {
     log('')
     log('  On OTHER devices (phones/tablets on the same Wi-Fi):')
+    log(`    Student site      : http://${lanIP}:5173`)
     log(`    Subscription site : http://${lanIP}:3004`)
     log(`    Admin site        : http://${lanIP}:3005`)
     log('  (The API is proxied automatically — no config needed.)')
@@ -226,7 +230,7 @@ async function main() {
   const apps = dbOnly ? [] : activeApps()
 
   if (dbOnly) {
-    const backends = ['sections/subscription/backend', 'sections/admin/backend']
+    const backends = ['backend', 'sections/subscription/backend', 'sections/admin/backend']
     for (const b of backends) {
       if (!ensureDeps({ name: b, dir: b })) process.exit(1)
     }
