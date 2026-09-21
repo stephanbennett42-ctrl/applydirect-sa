@@ -529,6 +529,7 @@ export default {
   min-height: 74px;
   display: flex;
   align-items: center;
+  width: 100%;
   padding: 10px 24px;
 }
 
@@ -572,6 +573,7 @@ export default {
 
 .navbar-nav {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
