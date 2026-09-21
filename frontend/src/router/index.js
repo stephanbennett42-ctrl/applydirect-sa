@@ -5,9 +5,12 @@ import Portfolio from "../views/Portfolio.vue";
 import ContactView from "../views/contact.vue";
 import SavedView from "../views/SavedView.vue";
 
-// Temporary placeholder until the team's real Subscription page is added
-const SubscriptionView = {
-  template: '<div class="container my-5"><h2>Subscription Page</h2></div>',
+// Subscription/payment lives in the separate subscription app (port 3004)
+const SubscriptionRedirect = {
+  template: '<div class="container my-5"><p>Opening the subscription &amp; payment page&hellip;</p></div>',
+  mounted() {
+    window.location.href = "http://localhost:3004";
+  },
 };
 
 const routes = [
@@ -56,7 +59,7 @@ const routes = [
   {
     path: "/subscription",
     name: "Subscription",
-    component: SubscriptionView,
+    component: SubscriptionRedirect,
   },
 ];
 
