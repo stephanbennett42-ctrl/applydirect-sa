@@ -6,13 +6,15 @@
  *   /dashboard : post-login landing (requires auth)
  */
 import { createRouter, createWebHistory } from "vue-router";
-import { isLoggedIn } from "../store/auth.js";
+import { isLoggedIn, logout } from "../store/auth.js";
 
 import Login from "../views/Login.vue";
 import Dashboard from "../views/Dashboard.vue";
+import Register from "../views/Register.vue";
 
 const routes = [
   { path: "/", name: "Login", component: Login },
+  { path: "/register", name: "Register", component: Register },
   {
     path: "/dashboard",
     name: "Dashboard",
@@ -57,6 +59,9 @@ router.beforeEach((to, from, next) => {
     const query = { ...to.query };
     delete query.logout;
     next({ name: "Login", query });
+  } else if (to.name === "Login" && to.query.forceLogin === "1") {
+    logout();
+    next();
   } else if (to.meta.requiresAuth && !isLoggedIn()) {
     next({ name: "Login", query: { redirect: to.fullPath } });
   } else if (to.name === "Login" && isLoggedIn()) {

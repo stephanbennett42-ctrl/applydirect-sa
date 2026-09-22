@@ -10,11 +10,11 @@
         <svg class="success-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 8 12 16 9 12"/></svg>
         <h2>Payment Successful</h2>
         <p>Your {{ planName }} subscription has been activated. A confirmation will be sent shortly.</p>
-        <div class="success-details">
-          <div class="success-row"><span>Amount Paid</span><strong>{{ displayPrice(success.amount) }}</strong></div>
-          <div class="success-row"><span>Transaction Ref</span><strong>{{ success.transactionRef }}</strong></div>
-          <div v-if="success.cardLastFour" class="success-row"><span>Card ending in</span><strong>•••• {{ success.cardLastFour }}</strong></div>
-        </div>
+<div class="success-details">
+            <div class="success-row"><span>Amount Paid</span><strong>{{ success.amount === 0 ? 'Free' : displayPrice(success.amount) }}</strong></div>
+            <div class="success-row"><span>Transaction Ref</span><strong>{{ success.transactionRef }}</strong></div>
+            <div v-if="success.cardLastFour" class="success-row"><span>Card ending in</span><strong>•••• {{ success.cardLastFour }}</strong></div>
+          </div>
         <button class="btn btn-primary" @click="$router.push('/payment-plan')">Back to Plans</button>
       </div>
 
@@ -272,21 +272,20 @@ export default {
       return Number(this.$route.query.id) || null
     },
     planName() {
-      return this.$route.query.plan || 'Standard'
+      return this.$route.query.plan || 'Premium'
     },
     planPrice() {
-      return Number(this.$route.query.price) || 380
+      return Number(this.$route.query.price) || 500
     },
     planDescription() {
-      return this.$route.query.description || 'Application to up to 3 universities'
+      return this.$route.query.description || 'Application to up to 5 universities + career guidance'
     },
     planFeatures() {
       const plans = {
         'Basic': ['Application to 1 university', 'Document verification', 'Application submission', 'Status tracking', 'Email support'],
-        'Standard': ['Application to up to 3 universities', 'Document verification', 'Application submission', 'Status tracking', 'Priority email & phone support', 'Program matching assistance'],
         'Premium': ['Application to up to 5 universities', 'Document verification & optimization', 'Application submission', 'Real-time status tracking', 'Dedicated advisor', 'Career guidance session', 'Job placement assistance after graduation']
       }
-      return plans[this.planName] || plans['Standard']
+      return plans[this.planName] || plans['Premium']
     },
     referenceCode() {
       return 'UA-' + Math.random().toString(36).substring(2, 8).toUpperCase()
@@ -310,30 +309,71 @@ export default {
 
       this.processing = true
       try {
+        // Free plan (price 0)? The backend marks the order as paid on creation —
+        // there is nothing to pay, so activate it right away.
+        if (Number(this.planPrice) === 0) {
+          const order = await ordersAPI.create(this.planId)
+          this.success = {
+            amount: 0,
+            transactionRef: order.status === 'paid' ? ('FREE-' + order.id) : 'FREE'
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          return
+        }
+
         // 1. Create the order for the selected package
         const order = await ordersAPI.create(this.planId)
 
-        // 2. Process the payment
-        const methodMap = {
-          card: 'credit_card',
-          eft: 'bank_transfer',
-          instant: 'instant_eft'
-        }
-        const payment = await ordersAPI.pay(order.id, {
-          cardNumber: this.form.cardNumber,
-          cardHolder: this.form.cardName,
-          expiry: this.form.expiry,
-          cvv: this.form.cvv,
-          paymentMethod: methodMap[this.paymentMethod]
-        })
-
-        this.success = payment
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+        // 2. Redirect to PayFast to complete the payment securely
+        const redirect = await ordersAPI.payfastInit(order.id)
+        this.sendToPayFast(redirect)
+        return
       } catch (err) {
-        this.error = err.error || 'Payment failed. Please try again.'
+        // PayFast not configured? Fall back to the simulated gateway
+        // so the checkout still works in demo environments.
+        if (err.code === 'PAYFAST_NOT_CONFIGURED') {
+          try {
+            const order = await ordersAPI.create(this.planId)
+            const methodMap = {
+              card: 'credit_card',
+              eft: 'bank_transfer',
+              instant: 'instant_eft'
+            }
+            const payment = await ordersAPI.pay(order.id, {
+              cardNumber: this.form.cardNumber,
+              cardHolder: this.form.cardName,
+              expiry: this.form.expiry,
+              cvv: this.form.cvv,
+              paymentMethod: methodMap[this.paymentMethod]
+            })
+            this.success = payment
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+            return
+          } catch (payErr) {
+            this.error = payErr.error || 'Payment failed. Please try again.'
+          }
+        } else {
+          this.error = err.error || 'Payment failed. Please try again.'
+        }
       } finally {
         this.processing = false
       }
+    },
+
+    sendToPayFast(redirect) {
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = redirect.processUrl
+      form.style.display = 'none'
+      for (const [name, value] of Object.entries(redirect.fields)) {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = name
+        input.value = value
+        form.appendChild(input)
+      }
+      document.body.appendChild(form)
+      form.submit()
     },
 
     formatCardNumber() {

@@ -9,6 +9,7 @@ import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import PaymentPlan from "../views/PaymentPlan.vue";
 import Payment from "../views/Payment.vue";
+import PaymentReturn from "../views/PaymentReturn.vue";
 import GraduateJobs from "../views/GraduateJobs.vue";
 
 // Subscription/payment lives in the separate subscription app (port 3004)
@@ -85,6 +86,12 @@ const routes = [
     name: "Payment",
     component: Payment,
     meta: { requiresAuth: true },
+  },
+
+  {
+    path: "/payment/return",
+    name: "PaymentReturn",
+    component: PaymentReturn,
   },
 
   {

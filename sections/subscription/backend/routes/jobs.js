@@ -1,10 +1,14 @@
 /**
  * Graduate Jobs Routes (Subscription module)
- * GET /api/jobs            — List active jobs (public), optional ?field=, ?type=, ?q=
- * GET /api/jobs/fields     — List distinct fields with job counts
- * GET /api/jobs/applications — Current user's job applications (auth)
- * POST /api/jobs/:id/apply — Apply to a job (auth)
- * GET /api/jobs/:id        — Get a single active job
+ * All job listings, details and applications are PREMIUM-only: the user must
+ * hold at least one PAID order for a priced package (only the Premium R500
+ * plan qualifies — the free Basic plan does not unlock this section).
+ * GET /api/jobs/access        — Premium status for the current user (auth)
+ * GET /api/jobs               — List active jobs (premium), optional ?field=, ?type=, ?q=
+ * GET /api/jobs/fields        — List distinct fields with job counts (premium)
+ * GET /api/jobs/applications  — Current user's job applications (premium)
+ * POST /api/jobs/:id/apply    — Apply to a job (premium)
+ * GET /api/jobs/:id           — Get a single active job (premium)
  */
 import { Router } from 'express'
 import db from '../db.js'
@@ -13,11 +17,59 @@ import { requireAuth } from '../middleware/auth.js'
 const router = Router()
 
 /**
+ * requirePremium — middleware used after requireAuth.
+ * Checks the current user has a PAID order for a priced package (price > 0),
+ * i.e. a paid Premium order. Rejects with 403 PREMIUM_REQUIRED otherwise.
+ */
+async function requirePremium(req, res, next) {
+  try {
+    const [rows] = await db.query(
+      `SELECT o.id FROM orders o
+       JOIN packages p ON o.package_id = p.id
+       WHERE o.user_id = ? AND o.status = 'paid' AND p.price > 0
+       LIMIT 1`,
+      [req.user.id]
+    )
+    if (rows.length === 0) {
+      return res.status(403).json({
+        error: 'Premium plan required to access graduate jobs',
+        code: 'PREMIUM_REQUIRED'
+      })
+    }
+    next()
+  } catch (err) {
+    console.error('Premium check error:', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+}
+
+/**
+ * GET /api/jobs/access
+ * Returns { premium: boolean } so the frontend knows whether to show the
+ * Graduate Jobs section or the locked screen. Must be defined before /:id.
+ */
+router.get('/access', requireAuth, async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT o.id FROM orders o
+       JOIN packages p ON o.package_id = p.id
+       WHERE o.user_id = ? AND o.status = 'paid' AND p.price > 0
+       LIMIT 1`,
+      [req.user.id]
+    )
+    res.json({ premium: rows.length > 0 })
+  } catch (err) {
+    console.error('Premium access check error:', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+/**
  * GET /api/jobs/fields
  * Returns an array of { field, count } for all active jobs.
- * Must be defined before /:id to avoid catching 'fields' as an id.
+ * Premium-only. Must be defined before /:id to avoid catching 'fields' as an id.
  */
-router.get('/fields', async (req, res) => {
+router.get('/fields', requireAuth, requirePremium, async (req, res) => {
   try {
     const [rows] = await db.query(
       'SELECT field, COUNT(*) AS count FROM jobs WHERE active = TRUE GROUP BY field ORDER BY field'
@@ -31,9 +83,9 @@ router.get('/fields', async (req, res) => {
 
 /**
  * GET /api/jobs
- * List active jobs. Query params: field, type, q (search title/company/description).
+ * List active jobs. Premium-only. Query params: field, type, q.
  */
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, requirePremium, async (req, res) => {
   try {
     const conditions = ['active = TRUE']
     const params = []
@@ -82,9 +134,9 @@ router.get('/', async (req, res) => {
 /**
  * GET /api/jobs/applications
  * Returns the current user's job applications with job details.
- * Must be defined before /:id to avoid catching 'applications' as an id.
+ * Premium-only. Must be defined before /:id to avoid catching 'applications' as an id.
  */
-router.get('/applications', requireAuth, async (req, res) => {
+router.get('/applications', requireAuth, requirePremium, async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT a.id, a.job_id, a.full_name, a.email, a.phone, a.university, a.field_of_study,
@@ -128,10 +180,11 @@ router.get('/applications', requireAuth, async (req, res) => {
 /**
  * POST /api/jobs/:id/apply
  * Submit a job application for the current user.
+ * Premium-only.
  * Body: { fullName, email, phone, university, fieldOfStudy, coverLetter, experience }
  * fullName, email and coverLetter are required.
  */
-router.post('/:id/apply', requireAuth, async (req, res) => {
+router.post('/:id/apply', requireAuth, requirePremium, async (req, res) => {
   try {
     const jobId = req.params.id
     const {
@@ -198,9 +251,9 @@ router.post('/:id/apply', requireAuth, async (req, res) => {
 
 /**
  * GET /api/jobs/:id
- * Returns a single active job.
+ * Returns a single active job. Premium-only.
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAuth, requirePremium, async (req, res) => {
   try {
     const [rows] = await db.query(
       'SELECT * FROM jobs WHERE id = ? AND active = TRUE',

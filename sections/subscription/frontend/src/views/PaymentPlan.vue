@@ -86,7 +86,7 @@ import { packagesAPI } from '../store/api.js'
 // Only these plans are shown on the Payment Plans page (2 cards).
 const VISIBLE_PLAN_NAMES = ['Basic', 'Premium']
 
-const formatPrice = n => 'R ' + Number(n).toLocaleString('en-ZA')
+const formatPrice = n => (Number(n) === 0 ? 'Free' : 'R ' + Number(n).toLocaleString('en-ZA'))
 
 export default {
   name: 'PaymentPlan',
@@ -101,7 +101,7 @@ export default {
         { question: 'Can I upgrade my plan later?', answer: "Yes! You can upgrade to a higher plan at any time. You'll only pay the difference between your current plan and the new one." },
         { question: 'What if my application is rejected?', answer: 'If your application is rejected due to our error, we will refund your payment in full. If rejected due to not meeting requirements, we offer a partial refund or a free reapplication to another institution.' },
         { question: 'How long does the application process take?', answer: 'Once we submit your application, the university typically takes 4-8 weeks to respond. We keep you updated throughout the entire process via email and your dashboard.' },
-        { question: 'Do you help with student accommodation?', answer: 'Our Premium plan includes accommodation assistance. For Basic and Standard plans, we can recommend accommodation options at an additional fee.' },
+        { question: 'Do you help with student accommodation?', answer: 'Our Premium plan includes accommodation assistance. For the Basic plan, we can recommend accommodation options at an additional fee.' },
         { question: 'Can I pay in installments?', answer: 'We currently offer full upfront payment only. However, our prices are kept affordable to ensure access for all students.' }
       ]
     }

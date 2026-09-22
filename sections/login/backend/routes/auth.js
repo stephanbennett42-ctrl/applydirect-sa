@@ -11,6 +11,35 @@ import { JWT_SECRET, requireAuth } from '../middleware/auth.js'
 
 const router = Router()
 
+router.post('/register', async (req, res) => {
+  try {
+    const { firstName, lastName, email, phone, university, password } = req.body
+
+    if (!firstName || !lastName || !email || !password) {
+      return res.status(400).json({ error: 'First name, surname, email, and password are required' })
+    }
+
+    if (String(password).length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' })
+    }
+
+    const passwordHash = await bcrypt.hash(String(password), 10)
+    await db.query(
+      'INSERT INTO users (first_name, last_name, email, password, phone, university, status, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [firstName.trim(), lastName.trim(), email.trim().toLowerCase(), passwordHash, phone?.trim() || null, university?.trim() || null, 'pending', 'student']
+    )
+
+    res.status(201).json({ message: 'Account created and submitted for admin approval', email: email.trim().toLowerCase() })
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ error: 'An account with that email already exists' })
+    }
+
+    console.error('Registration error:', err)
+    res.status(500).json({ error: 'Server error during registration' })
+  }
+})
+
 /**
  * POST /api/auth/login
  * Authenticate a user with email and password.
@@ -35,6 +64,10 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password' })
+    }
+
+    if (user.role === 'admin') {
+      return res.status(403).json({ error: 'Administrators must use the admin login page.', status: 'admin_login_required' })
     }
 
     if (user.status === 'pending') {

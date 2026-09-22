@@ -6,6 +6,26 @@
     </div>
 
     <div class="container">
+      <!-- Access check in progress -->
+      <p v-if="accessLoading" class="jobs-note">Checking access...</p>
+
+      <!-- Locked: whole page hidden until Premium is paid -->
+      <div v-else-if="!hasAccess" class="locked-panel">
+        <div class="locked-icon">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h2>Graduate Jobs is a Premium feature</h2>
+        <p>
+          The Graduate Jobs section is available on the <strong>Premium plan (R 500)</strong>.
+          Choose the Premium plan and complete your payment to unlock this page.
+        </p>
+        <div class="locked-actions">
+          <button class="btn btn-accent btn-lg" @click="$router.push('/payment-plan')">Unlock with Premium</button>
+        </div>
+      </div>
+
+      <!-- Unlocked: full jobs experience -->
+      <template v-else>
       <!-- Match banner for logged-in users -->
       <div v-if="currentUser && currentUser.fieldOfStudy" class="match-banner">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -229,6 +249,7 @@
           </form>
         </div>
       </div>
+      </template>
     </div>
   </div>
 </template>
@@ -242,6 +263,8 @@ export default {
   data() {
     return {
       currentUser: getCurrentUser(),
+      accessLoading: true,
+      hasAccess: false,
       jobs: [],
       fields: [],
       filterField: '',
@@ -279,14 +302,29 @@ export default {
     }
   },
   mounted() {
-    this.loadJobs()
-    this.loadFields()
-    this.loadMyApplications()
+    this.checkAccess()
   },
   beforeUnmount() {
     clearTimeout(this.searchTimer)
   },
   methods: {
+    async checkAccess() {
+      this.accessLoading = true
+      try {
+        const data = await jobsAPI.getAccess()
+        this.hasAccess = !!data.premium
+      } catch {
+        // Not logged in or not premium — stay locked.
+        this.hasAccess = false
+      } finally {
+        this.accessLoading = false
+      }
+      if (this.hasAccess) {
+        this.loadJobs()
+        this.loadFields()
+        this.loadMyApplications()
+      }
+    },
     async loadJobs() {
       this.loading = true
       this.loadError = ''
@@ -564,6 +602,53 @@ export default {
   color: var(--text-muted);
   font-size: 0.9rem;
   padding: 60px 0;
+}
+
+/* Premium lock screen */
+.locked-panel {
+  max-width: 520px;
+  margin: 40px auto 80px;
+  text-align: center;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 56px 40px;
+  background: var(--bg);
+  box-shadow: var(--shadow-md);
+}
+
+.locked-icon {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: var(--gold-light);
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.locked-panel h2 {
+  font-size: 1.45rem;
+  color: var(--primary-dark);
+  margin-bottom: 14px;
+}
+
+.locked-panel p {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.locked-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.locked-actions .btn-lg {
+  padding: 14px 36px;
+  font-size: 1rem;
 }
 
 .jobs-error {
