@@ -1,1437 +1,728 @@
 <template>
-
   <div class="profile-page">
-
-    <!-- ================= HEADER ================= -->
-
-    <header class="top-header">
-
-       <nav class="navbar navbar-expand-lg navbar-dark bg-navy sticky-top py-2">
-
-    <div class="container-fluid px-3 px-md-4">
-
-      <!-- The mobile toggle controls the navigation links on smaller screens. -->
-
-      <button 
-
-        class="navbar-toggler border-0" 
-
-        type="button" 
-
-        data-bs-toggle="collapse" 
-
-        data-bs-target="#navbarContent"
-
-        aria-controls="navbarContent"
-
-        aria-expanded="false"
-
-        aria-label="Toggle navigation"
-
-      >
-
-        <span class="navbar-toggler-icon"></span>
-
-      </button>
-
-      <!-- Logo, route links, and the logged-in account share one right-aligned row. -->
-
-      <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarContent">
-
-        <!-- NAV LINKS -->
-
-        <div class="navbar-nav d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 ms-auto pt-2 pt-lg-0">
-
-          <router-link to="/" class="navbar-brand logo-nav-item fw-bold fs-4 text-white">
-
-            ApplyDirect-<span class="text-gold">SA</span>
-
-          </router-link>
-
-          <router-link to="/" class="sa-nav-tab tab-green text-center">Universities</router-link>
-
-          <router-link to="/portfolio" class="sa-nav-tab tab-gold text-center">Profile</router-link>
-
-          <router-link to="/about" class="sa-nav-tab tab-red text-center">About Us</router-link>
-
-          <router-link to="/contact" class="sa-nav-tab tab-blue text-center">Contact</router-link>
-
-          <router-link to="/subscription" class="sa-nav-tab tab-black text-center">Subscription</router-link>
-
-          <!-- The yellow badge displays the logged-in user's initials. -->
-          <div class="profile-account">
-            <span>{{ profileDisplayName }}</span>
-            <div class="profile-icon" :title="profileInitials">
-              {{ profileInitials }}
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </nav>
-
-    </header>
-
-
-
     <!-- ================= PAGE LAYOUT ================= -->
 
     <div class="page-layout">
-
       <aside class="sidebar">
-
-        <div class="sidebar-title">
-
-          My Application
-
-        </div>
+        <div class="sidebar-title">My Application</div>
 
         <button
-
           class="sidebar-item"
-
           :class="{ active: activeSection === 'personal' }"
-
           type="button"
-
           @click="goToSection('personal')"
-
         >
-
           <span class="number">1</span>
 
           Personal Details
-
         </button>
 
         <button
-
           class="sidebar-item"
-
           :class="{ active: activeSection === 'academic' }"
-
           type="button"
-
           @click="goToSection('academic')"
-
         >
-
           <span class="number">2</span>
 
           Academic Details
-
         </button>
 
         <button
-
           class="sidebar-item"
-
           :class="{ active: activeSection === 'preferences' }"
-
           type="button"
-
           @click="goToSection('preferences')"
-
         >
-
           <span class="number">3</span>
 
           Study Preferences
-
         </button>
 
         <button
-
           class="sidebar-item"
-
           :class="{ active: activeSection === 'documents' }"
-
           type="button"
-
           @click="goToSection('documents')"
-
         >
-
           <span class="number">4</span>
 
           Documents
-
         </button>
 
         <button
-
           class="sidebar-item"
-
           :class="{ active: activeSection === 'status' }"
-
           type="button"
-
           @click="goToSection('status')"
-
         >
-
           <span class="number">5</span>
 
           Application Status
-
         </button>
-
       </aside>
 
       <div class="content-shell">
-
         <!-- HERO SECTION -->
 
         <section class="portfolio-hero">
-
           <div class="hero-overlay">
-
             <div class="hero-content">
-
               <p class="hero-small-title">🇿🇦 YOUR APPLICATION JOURNEY</p>
 
               <h1>Build your future, one step at a time.</h1>
 
               <p class="hero-description">
-
                 Keep your personal and academic information in one place,
-
-                discover study options, and make your university application journey easier.
-
+                discover study options, and make your university application
+                journey easier.
               </p>
 
               <button class="hero-btn" @click="scrollToProfile">
-
                 View My Profile
-
               </button>
-
             </div>
-
           </div>
-
         </section>
 
         <!-- ================= MAIN CONTENT ================= -->
 
         <main class="main-content">
-
-        <div class="page-title">
-
-          <h1>My Application Profile</h1>
-
-          <p>
-
-            Your profile is your starting point. Keep your details, results and study preferences up to date so you're ready for your next application step.
-
-          </p>
-
-          <p class="required-note">
-
-            <span class="required-mark">*</span> indicates required fields
-
-          </p>
-
-          <p v-if="formMessage" class="form-message">
-
-            {{ formMessage }}
-
-          </p>
-
-        </div>
-
-
-
-        <!-- ================= PERSONAL ================= -->
-
-        <section
-
-          v-if="activeSection === 'personal'"
-
-          class="card"
-
-        >
-
-          <div class="section-header">
-
-            <div>
-
-              <h2>Personal Details</h2>
-
-              <p>
-
-                Tell us about yourself.
-
-              </p>
-
-            </div>
-
-          </div>
-
-
-
-          <div class="form-grid">
-
-            <div class="form-group">
-
-              <label>First Name <span class="required-mark">*</span></label>
-
-              <input
-
-                type="text"
-
-                v-model="profile.firstName"
-
-                @blur="validateField('firstName')"
-
-                @input="validateField('firstName')"
-
-                placeholder="Enter your first name"
-
-              />
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>Surname <span class="required-mark">*</span></label>
-
-              <input
-
-                type="text"
-
-                v-model="profile.surname"
-
-                @blur="validateField('surname')"
-
-                @input="validateField('surname')"
-
-                placeholder="Enter your surname"
-
-              />
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>ID / Passport Number <span class="required-mark">*</span></label>
-
-              <input
-
-                type="text"
-
-                v-model="profile.idNumber"
-
-                @input="sanitizeIdNumber(); validateField('idNumber')"
-
-                @blur="validateField('idNumber')"
-
-                placeholder="Enter your ID or passport number"
-
-                inputmode="numeric"
-
-                maxlength="13"
-
-                pattern="[0-9]*"
-
-                required
-
-              />
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>Date of Birth <span class="required-mark">*</span></label>
-
-              <input
-
-                type="date"
-
-                v-model="profile.dateOfBirth"
-
-                @blur="validateField('dateOfBirth')"
-
-                @input="validateField('dateOfBirth')"
-
-              />
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>Gender <span class="required-mark">*</span></label>
-
-              <select
-
-                v-model="profile.gender"
-
-                @change="validateField('gender')"
-
-              >
-
-                <option value="">
-
-                  Select gender
-
-                </option>
-
-                <option>Male</option>
-
-                <option>Female</option>
-
-                <option>Other</option>
-
-              </select>
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>Nationality <span class="required-mark">*</span></label>
-
-              <select
-
-                v-model="profile.nationality"
-
-                @change="validateField('nationality')"
-
-              >
-
-                <option value="">
-
-                  Select nationality
-
-                </option>
-
-                <option>South African</option>
-
-                <option>Other</option>
-
-              </select>
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>Email Address <span class="required-mark">*</span></label>
-
-              <input
-
-                type="email"
-
-                v-model="profile.email"
-
-                @blur="validateField('email')"
-
-                @input="validateField('email')"
-
-                placeholder="example@email.com"
-
-              />
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>Phone Number <span class="required-mark">*</span></label>
-
-              <input
-
-                type="tel"
-
-                v-model="profile.phone"
-
-                @input="sanitizePhoneNumber(); validateField('phone')"
-
-                @blur="validateField('phone')"
-
-                placeholder="Enter your phone number"
-
-                inputmode="numeric"
-
-                maxlength="10"
-
-                pattern="[0-9]*"
-
-                required
-
-              />
-
-            </div>
-
-          </div>
-
-
-
-          <div class="form-group full-width">
-
-            <label>Residential Address <span class="required-mark">*</span></label>
-
-            <textarea
-
-              v-model="profile.address"
-
-              @blur="validateField('address')"
-
-              @input="validateField('address')"
-
-              placeholder="Enter your residential address"
-
-              rows="3"
-
-            ></textarea>
-
-          </div>
-
-
-
-          <div class="form-grid">
-
-            <div class="form-group">
-
-              <label>Province <span class="required-mark">*</span></label>
-
-              <select
-
-                v-model="profile.province"
-
-                @change="validateField('province')"
-
-              >
-
-                <option value="">
-
-                  Select province
-
-                </option>
-
-                <option>Western Cape</option>
-
-                <option>Eastern Cape</option>
-
-                <option>Gauteng</option>
-
-                <option>KwaZulu-Natal</option>
-
-                <option>Free State</option>
-
-                <option>Limpopo</option>
-
-                <option>Mpumalanga</option>
-
-                <option>North West</option>
-
-                <option>Northern Cape</option>
-
-              </select>
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>City / Town <span class="required-mark">*</span></label>
-
-              <input
-
-                type="text"
-
-                v-model="profile.city"
-
-                @blur="validateField('city')"
-
-                @input="validateField('city')"
-
-                placeholder="Enter your city or town"
-
-              />
-
-            </div>
-
-          </div>
-
-
-
-          <div class="card-actions">
-
-            <button
-
-              type="button"
-
-              class="save-btn"
-
-              @click="saveProfile"
-
-            >
-
-              Save Details
-
-            </button>
-
-          </div>
-
-        </section>
-
-
-
-        <!-- ================= ACADEMIC ================= -->
-
-        <section
-
-          v-if="activeSection === 'academic'"
-
-          class="card"
-
-        >
-
-          <div class="section-header">
-
-            <div>
-
-              <h2>Academic Details</h2>
-
-              <p>
-
-                Enter your school and academic information.
-
-              </p>
-
-            </div>
-
-          </div>
-
-
-
-          <div class="form-grid">
-
-            <div class="form-group">
-
-              <label>High School <span class="required-mark">*</span></label>
-
-              <input
-
-                type="text"
-
-                v-model="profile.school"
-
-                @blur="validateField('school')"
-
-                @input="validateField('school')"
-
-                placeholder="Enter your high school"
-
-              />
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>Matric Year <span class="required-mark">*</span></label>
-
-              <select
-
-                v-model="profile.matricYear"
-
-                @change="validateField('matricYear')"
-
-              >
-
-                <option value="">
-
-                  Select year
-
-                </option>
-
-                <option>2026</option>
-
-                <option>2025</option>
-
-                <option>2024</option>
-
-                <option>2023</option>
-
-                <option>2022</option>
-
-                <option>2021</option>
-
-              </select>
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>Qualification <span class="required-mark">*</span></label>
-
-              <select
-
-                v-model="profile.qualification"
-
-                @change="validateField('qualification')"
-
-              >
-
-                <option value="">
-
-                  Select qualification
-
-                </option>
-
-                <option>
-
-                  National Senior Certificate
-
-                </option>
-
-                <option>
-
-                  National Certificate (Vocational)
-
-                </option>
-
-                <option>
-
-                  Other
-
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
-
-
-
-          <h3>Subjects & Results</h3>
-
-
-
-          <div class="subjects-header">
-
-            <span>Subject</span>
-
-            <span>Mark / Level</span>
-
-            <span></span>
-
-          </div>
-
-
-
-          <div
-
-            v-for="(subject, index) in profile.subjects"
-
-            :key="index"
-
-            class="subject-row"
-
-          >
-
-            <div class="subject-autocomplete">
-
-              <input
-
-                type="text"
-
-                v-model="subject.name"
-
-                placeholder="Subject name"
-
-                @focus="activateSubject(index)"
-
-                @input="activateSubject(index)"
-
-                @blur="hideSubjectSuggestions"
-
-              />
-
-
-
-              <div
-
-                v-if="
-
-                  activeSubjectIndex === index &&
-
-                  filteredSubjectSuggestions(subject.name).length
-
-                "
-
-                class="subject-suggestions"
-
-              >
-
-                <button
-
-                  v-for="subjectName in filteredSubjectSuggestions(subject.name)"
-
-                  :key="subjectName"
-
-                  type="button"
-
-                  class="subject-suggestion"
-
-                  @mousedown.prevent="
-
-                    selectSubject(index, subjectName)
-
-                  "
-
-                >
-
-                  {{ subjectName }}
-
-                </button>
-
-              </div>
-
-            </div>
-
-
-
-            <input
-
-              type="number"
-
-              v-model="subject.mark"
-
-              placeholder="Mark %"
-
-              min="0"
-
-              max="100"
-
-            />
-
-
-
-            <button
-
-              type="button"
-
-              class="remove-btn"
-
-              @click="removeSubject(index)"
-
-            >
-
-              Remove
-
-            </button>
-
-          </div>
-
-
-
-          <button
-
-            type="button"
-
-            class="add-subject"
-
-            @click="addSubject"
-
-          >
-
-            + Add Subject
-
-          </button>
-
-        </section>
-
-
-
-        <!-- ================= PREFERENCES ================= -->
-
-        <section
-
-          v-if="activeSection === 'preferences'"
-
-          class="card"
-
-        >
-
-          <div class="section-header">
-
-            <div>
-
-              <h2>Study Preferences</h2>
-
-              <p>
-
-                Tell us what you would like to study.
-
-              </p>
-
-            </div>
-
-          </div>
-
-
-
-          <div class="form-grid">
-
-            <div class="form-group">
-
-              <label>
-
-                Preferred Field of Study <span class="required-mark">*</span>
-
-              </label>
-
-              <select
-
-                v-model="profile.field"
-
-                @change="validateField('field')"
-
-              >
-
-                <option value="">
-
-                  Select field
-
-                </option>
-
-                <option>Information Technology</option>
-
-                <option>Computer Science</option>
-
-                <option>Accounting</option>
-
-                <option>Business Management</option>
-
-                <option>Engineering</option>
-
-                <option>Nursing</option>
-
-                <option>Teaching</option>
-
-                <option>Law</option>
-
-              </select>
-
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label>
-
-                Preferred Province <span class="required-mark">*</span>
-
-              </label>
-
-              <select
-
-                v-model="profile.preferredProvince"
-
-                @change="validateField('preferredProvince')"
-
-              >
-
-                <option value="">
-
-                  Select province
-
-                </option>
-
-                <option>Western Cape</option>
-
-                <option>Eastern Cape</option>
-
-                <option>Gauteng</option>
-
-                <option>KwaZulu-Natal</option>
-
-                <option>Free State</option>
-
-                <option>Limpopo</option>
-
-                <option>Mpumalanga</option>
-
-                <option>North West</option>
-
-                <option>Northern Cape</option>
-
-              </select>
-
-            </div>
-
-          </div>
-
-
-
-          <!-- ================= COURSE SUGGESTIONS ================= -->
-
-          <div class="course-suggestion-section">
-
-            <h3>Course Suggestions</h3>
-
-            <p class="course-description">
-
-              Enter your preferred field and your subject marks,
-
-              then we can suggest courses that may suit you.
-
+          <div class="page-title">
+            <h1>My Application Profile</h1>
+
+            <p>
+              Your profile is your starting point. Keep your details, results
+              and study preferences up to date so you're ready for your next
+              application step.
             </p>
 
+            <p class="required-note">
+              <span class="required-mark">*</span> indicates required fields
+            </p>
 
+            <p v-if="formMessage" class="form-message">
+              {{ formMessage }}
+            </p>
+          </div>
 
-            <button
+          <!-- ================= PERSONAL ================= -->
 
-              type="button"
+          <section v-if="activeSection === 'personal'" class="card">
+            <div class="section-header">
+              <div>
+                <h2>Personal Details</h2>
 
-              class="suggest-button"
+                <p>Tell us about yourself.</p>
+              </div>
+            </div>
 
-              @click="suggestCourses"
+            <div class="form-grid">
+              <div class="form-group">
+                <label>First Name <span class="required-mark">*</span></label>
 
-            >
-
-              Find Suggested Courses
-
-            </button>
-
-
-
-            <div
-
-              v-if="courseSuggestions.length > 0"
-
-              class="course-results"
-
-            >
-
-              <h4>
-
-                Courses You May Be Interested In
-
-              </h4>
-
-
-
-              <p class="course-note">
-
-                These are general suggestions based on the
-
-                information you provided. University admission
-
-                requirements may differ.
-
-              </p>
-
-
-
-              <div
-
-                v-for="(course, index) in courseSuggestions"
-
-                :key="index"
-
-                class="course-card"
-
-              >
-
-                <div class="course-card-content">
-
-                  <h5>
-
-                    {{ course }}
-
-                  </h5>
-
-                  <p>
-
-                    This course matches your preferred
-
-                    field of study and academic interests.
-
-                  </p>
-
-                </div>
-
-
-
-                <button
-
-                  type="button"
-
-                  class="explore-course-button"
-
-                >
-
-                  Explore Course
-
-                </button>
-
+                <input
+                  type="text"
+                  v-model="profile.firstName"
+                  @blur="validateField('firstName')"
+                  @input="validateField('firstName')"
+                  placeholder="Enter your first name"
+                />
               </div>
 
+              <div class="form-group">
+                <label>Surname <span class="required-mark">*</span></label>
+
+                <input
+                  type="text"
+                  v-model="profile.surname"
+                  @blur="validateField('surname')"
+                  @input="validateField('surname')"
+                  placeholder="Enter your surname"
+                />
+              </div>
+
+              <div class="form-group">
+                <label
+                  >ID / Passport Number
+                  <span class="required-mark">*</span></label
+                >
+
+                <input
+                  type="text"
+                  v-model="profile.idNumber"
+                  @input="
+                    sanitizeIdNumber();
+                    validateField('idNumber');
+                  "
+                  @blur="validateField('idNumber')"
+                  placeholder="Enter your ID or passport number"
+                  inputmode="numeric"
+                  maxlength="13"
+                  pattern="[0-9]*"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label
+                  >Date of Birth <span class="required-mark">*</span></label
+                >
+
+                <input
+                  type="date"
+                  v-model="profile.dateOfBirth"
+                  @blur="validateField('dateOfBirth')"
+                  @input="validateField('dateOfBirth')"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Gender <span class="required-mark">*</span></label>
+
+                <select
+                  v-model="profile.gender"
+                  @change="validateField('gender')"
+                >
+                  <option value="">Select gender</option>
+
+                  <option>Male</option>
+
+                  <option>Female</option>
+
+                  <option>Other</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Nationality <span class="required-mark">*</span></label>
+
+                <select
+                  v-model="profile.nationality"
+                  @change="validateField('nationality')"
+                >
+                  <option value="">Select nationality</option>
+
+                  <option>South African</option>
+
+                  <option>Other</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label
+                  >Email Address <span class="required-mark">*</span></label
+                >
+
+                <input
+                  type="email"
+                  v-model="profile.email"
+                  @blur="validateField('email')"
+                  @input="validateField('email')"
+                  placeholder="example@email.com"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Phone Number <span class="required-mark">*</span></label>
+
+                <input
+                  type="tel"
+                  v-model="profile.phone"
+                  @input="
+                    sanitizePhoneNumber();
+                    validateField('phone');
+                  "
+                  @blur="validateField('phone')"
+                  placeholder="Enter your phone number"
+                  inputmode="numeric"
+                  maxlength="10"
+                  pattern="[0-9]*"
+                  required
+                />
+              </div>
             </div>
 
+            <div class="form-group full-width">
+              <label
+                >Residential Address <span class="required-mark">*</span></label
+              >
 
+              <textarea
+                v-model="profile.address"
+                @blur="validateField('address')"
+                @input="validateField('address')"
+                placeholder="Enter your residential address"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Province <span class="required-mark">*</span></label>
+
+                <select
+                  v-model="profile.province"
+                  @change="validateField('province')"
+                >
+                  <option value="">Select province</option>
+
+                  <option>Western Cape</option>
+
+                  <option>Eastern Cape</option>
+
+                  <option>Gauteng</option>
+
+                  <option>KwaZulu-Natal</option>
+
+                  <option>Free State</option>
+
+                  <option>Limpopo</option>
+
+                  <option>Mpumalanga</option>
+
+                  <option>North West</option>
+
+                  <option>Northern Cape</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>City / Town <span class="required-mark">*</span></label>
+
+                <input
+                  type="text"
+                  v-model="profile.city"
+                  @blur="validateField('city')"
+                  @input="validateField('city')"
+                  placeholder="Enter your city or town"
+                />
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button type="button" class="save-btn" @click="saveProfile">
+                Save Details
+              </button>
+            </div>
+          </section>
+
+          <!-- ================= ACADEMIC ================= -->
+
+          <section v-if="activeSection === 'academic'" class="card">
+            <div class="section-header">
+              <div>
+                <h2>Academic Details</h2>
+
+                <p>Enter your school and academic information.</p>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>High School <span class="required-mark">*</span></label>
+
+                <input
+                  type="text"
+                  v-model="profile.school"
+                  @blur="validateField('school')"
+                  @input="validateField('school')"
+                  placeholder="Enter your high school"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Matric Year <span class="required-mark">*</span></label>
+
+                <select
+                  v-model="profile.matricYear"
+                  @change="validateField('matricYear')"
+                >
+                  <option value="">Select year</option>
+
+                  <option>2026</option>
+
+                  <option>2025</option>
+
+                  <option>2024</option>
+
+                  <option>2023</option>
+
+                  <option>2022</option>
+
+                  <option>2021</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label
+                  >Qualification <span class="required-mark">*</span></label
+                >
+
+                <select
+                  v-model="profile.qualification"
+                  @change="validateField('qualification')"
+                >
+                  <option value="">Select qualification</option>
+
+                  <option>National Senior Certificate</option>
+
+                  <option>National Certificate (Vocational)</option>
+
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+
+            <h3>Subjects & Results</h3>
+
+            <div class="subjects-header">
+              <span>Subject</span>
+
+              <span>Mark / Level</span>
+
+              <span></span>
+            </div>
 
             <div
-
-              v-else-if="courseSearchAttempted"
-
-              class="no-course-results"
-
+              v-for="(subject, index) in profile.subjects"
+              :key="index"
+              class="subject-row"
             >
+              <div class="subject-autocomplete">
+                <input
+                  type="text"
+                  v-model="subject.name"
+                  placeholder="Subject name"
+                  @focus="activateSubject(index)"
+                  @input="activateSubject(index)"
+                  @blur="hideSubjectSuggestions"
+                />
 
-              <p>
+                <div
+                  v-if="
+                    activeSubjectIndex === index &&
+                    filteredSubjectSuggestions(subject.name).length
+                  "
+                  class="subject-suggestions"
+                >
+                  <button
+                    v-for="subjectName in filteredSubjectSuggestions(
+                      subject.name,
+                    )"
+                    :key="subjectName"
+                    type="button"
+                    class="subject-suggestion"
+                    @mousedown.prevent="selectSubject(index, subjectName)"
+                  >
+                    {{ subjectName }}
+                  </button>
+                </div>
+              </div>
 
-                Please select a preferred field of study
+              <input
+                type="number"
+                v-model="subject.mark"
+                placeholder="Mark %"
+                min="0"
+                max="100"
+              />
 
-                to get course suggestions.
+              <button
+                type="button"
+                class="remove-btn"
+                @click="removeSubject(index)"
+              >
+                Remove
+              </button>
+            </div>
 
+            <button type="button" class="add-subject" @click="addSubject">
+              + Add Subject
+            </button>
+          </section>
+
+          <!-- ================= PREFERENCES ================= -->
+
+          <section v-if="activeSection === 'preferences'" class="card">
+            <div class="section-header">
+              <div>
+                <h2>Study Preferences</h2>
+
+                <p>Tell us what you would like to study.</p>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>
+                  Preferred Field of Study <span class="required-mark">*</span>
+                </label>
+
+                <select
+                  v-model="profile.field"
+                  @change="validateField('field')"
+                >
+                  <option value="">Select field</option>
+
+                  <option>Information Technology</option>
+
+                  <option>Computer Science</option>
+
+                  <option>Accounting</option>
+
+                  <option>Business Management</option>
+
+                  <option>Engineering</option>
+
+                  <option>Nursing</option>
+
+                  <option>Teaching</option>
+
+                  <option>Law</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>
+                  Preferred Province <span class="required-mark">*</span>
+                </label>
+
+                <select
+                  v-model="profile.preferredProvince"
+                  @change="validateField('preferredProvince')"
+                >
+                  <option value="">Select province</option>
+
+                  <option>Western Cape</option>
+
+                  <option>Eastern Cape</option>
+
+                  <option>Gauteng</option>
+
+                  <option>KwaZulu-Natal</option>
+
+                  <option>Free State</option>
+
+                  <option>Limpopo</option>
+
+                  <option>Mpumalanga</option>
+
+                  <option>North West</option>
+
+                  <option>Northern Cape</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- ================= COURSE SUGGESTIONS ================= -->
+
+            <div class="course-suggestion-section">
+              <h3>Course Suggestions</h3>
+
+              <p class="course-description">
+                Enter your preferred field and your subject marks, then we can
+                suggest courses that may suit you.
               </p>
 
+              <button
+                type="button"
+                class="suggest-button"
+                @click="suggestCourses"
+              >
+                Find Suggested Courses
+              </button>
+
+              <div v-if="courseSuggestions.length > 0" class="course-results">
+                <h4>Courses You May Be Interested In</h4>
+
+                <p class="course-note">
+                  These are general suggestions based on the information you
+                  provided. University admission requirements may differ.
+                </p>
+
+                <div
+                  v-for="(course, index) in courseSuggestions"
+                  :key="index"
+                  class="course-card"
+                >
+                  <div class="course-card-content">
+                    <h5>
+                      {{ course }}
+                    </h5>
+
+                    <p>
+                      This course matches your preferred field of study and
+                      academic interests.
+                    </p>
+                  </div>
+
+                  <button type="button" class="explore-course-button">
+                    Explore Course
+                  </button>
+                </div>
+              </div>
+
+              <div v-else-if="courseSearchAttempted" class="no-course-results">
+                <p>
+                  Please select a preferred field of study to get course
+                  suggestions.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= DOCUMENTS ================= -->
+
+          <section v-if="activeSection === 'documents'" class="card">
+            <div class="section-header">
+              <div>
+                <h2>Documents</h2>
+
+                <p>
+                  Upload the documents required for your applications. All
+                  documents must be in PDF format.
+                </p>
+              </div>
             </div>
 
-          </div>
-
-        </section>
-
-        <!-- ================= DOCUMENTS ================= -->
-
-<section
-
-  v-if="activeSection === 'documents'"
-
-  class="card"
-
->
-
-  <div class="section-header">
-
-    <div>
-
-      <h2>Documents</h2>
-
-      <p>
-
-        Upload the documents required for your applications.
-
-        All documents must be in PDF format.
-
-      </p>
-
-    </div>
-
-  </div>
-
-
-
-  <div class="document-notice">
-
-    <span class="notice-icon">i</span>
-
-    <p>
-
-      Please upload clear PDF documents only.
-
-      JPG, PNG, DOC and DOCX files are not accepted.
-
-      The maximum file size is 5 MB.
-
-    </p>
-
-  </div>
-
-
-
-  <div class="document-list">
-
-    <!-- ID / PASSPORT -->
-
-    <div class="document-item">
-
-      <div class="document-information">
-
-        <strong>ID / Passport</strong>
-
-        <p>PDF only · Maximum size: 5 MB</p>
-
-        <p
-
-          v-if="documentMessages.id"
-
-          :class="[
-
-            'document-message',
-
-            documentMessages.id.type
-
-          ]"
-
-        >
-
-          {{ documentMessages.id.message }}
-
-        </p>
-
-      </div>
-
-      <label class="upload-btn">
-
-        <span>Upload PDF</span>
-
-        <input
-
-          type="file"
-
-          accept=".pdf,application/pdf"
-
-          hidden
-
-          @change="validateDocument($event, 'id')"
-
-        />
-
-      </label>
-
-    </div>
-
-
-
-    <!-- MATRIC RESULTS -->
-
-    <div class="document-item">
-
-      <div class="document-information">
-
-        <strong>Matric Results</strong>
-
-        <p>PDF only · Maximum size: 5 MB</p>
-
-        <p
-
-          v-if="documentMessages.matric"
-
-          :class="[
-
-            'document-message',
-
-            documentMessages.matric.type
-
-          ]"
-
-        >
-
-          {{ documentMessages.matric.message }}
-
-        </p>
-
-      </div>
-
-      <label class="upload-btn">
-
-        <span>Upload PDF</span>
-
-        <input
-
-          type="file"
-
-          accept=".pdf,application/pdf"
-
-          hidden
-
-          @change="validateDocument($event, 'matric')"
-
-        />
-
-      </label>
-
-    </div>
-
-
-
-    <!-- PROOF OF ADDRESS -->
-
-    <div class="document-item">
-
-      <div class="document-information">
-
-        <strong>Proof of Address</strong>
-
-        <p>PDF only · Maximum size: 5 MB</p>
-
-        <p
-
-          v-if="documentMessages.address"
-
-          :class="[
-
-            'document-message',
-
-            documentMessages.address.type
-
-          ]"
-
-        >
-
-          {{ documentMessages.address.message }}
-
-        </p>
-
-      </div>
-
-      <label class="upload-btn">
-
-        <span>Upload PDF</span>
-
-        <input
-
-          type="file"
-
-          accept=".pdf,application/pdf"
-
-          hidden
-
-          @change="validateDocument($event, 'address')"
-
-        />
-
-      </label>
-
-      </div>
-
-     </div>
-
-    </section>
-
-
-
-        <!-- ================= STATUS ================= -->
-
-        <section
-
-          v-if="activeSection === 'status'"
-
-          class="card"
-
-        >
-
-          <div class="section-header">
-
-            <div>
-
-              <h2>Application Status</h2>
+            <div class="document-notice">
+              <span class="notice-icon">i</span>
 
               <p>
-
-                Track the progress of your applications.
-
+                Please upload clear PDF documents only. JPG, PNG, DOC and DOCX
+                files are not accepted. The maximum file size is 5 MB.
               </p>
-
             </div>
 
+            <div class="document-list">
+              <!-- ID / PASSPORT -->
+
+              <div class="document-item">
+                <div class="document-information">
+                  <strong>ID / Passport</strong>
+
+                  <p>PDF only · Maximum size: 5 MB</p>
+
+                  <p
+                    v-if="documentMessages.id"
+                    :class="['document-message', documentMessages.id.type]"
+                  >
+                    {{ documentMessages.id.message }}
+                  </p>
+                </div>
+
+                <label class="upload-btn">
+                  <span>Upload PDF</span>
+
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    hidden
+                    @change="validateDocument($event, 'id')"
+                  />
+                </label>
+              </div>
+
+              <!-- MATRIC RESULTS -->
+
+              <div class="document-item">
+                <div class="document-information">
+                  <strong>Matric Results</strong>
+
+                  <p>PDF only · Maximum size: 5 MB</p>
+
+                  <p
+                    v-if="documentMessages.matric"
+                    :class="['document-message', documentMessages.matric.type]"
+                  >
+                    {{ documentMessages.matric.message }}
+                  </p>
+                </div>
+
+                <label class="upload-btn">
+                  <span>Upload PDF</span>
+
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    hidden
+                    @change="validateDocument($event, 'matric')"
+                  />
+                </label>
+              </div>
+
+              <!-- PROOF OF ADDRESS -->
+
+              <div class="document-item">
+                <div class="document-information">
+                  <strong>Proof of Address</strong>
+
+                  <p>PDF only · Maximum size: 5 MB</p>
+
+                  <p
+                    v-if="documentMessages.address"
+                    :class="['document-message', documentMessages.address.type]"
+                  >
+                    {{ documentMessages.address.message }}
+                  </p>
+                </div>
+
+                <label class="upload-btn">
+                  <span>Upload PDF</span>
+
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    hidden
+                    @change="validateDocument($event, 'address')"
+                  />
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= STATUS ================= -->
+
+          <section v-if="activeSection === 'status'" class="card">
+            <div class="section-header">
+              <div>
+                <h2>Application Status</h2>
+
+                <p>Track the progress of your applications.</p>
+              </div>
+            </div>
+
+            <div class="status-box">
+              <div class="status-circle">✓</div>
+
+              <div>
+                <strong> Profile in Progress </strong>
+
+                <p>Complete your profile before submitting an application.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= SAVE ================= -->
+
+          <div class="bottom-actions">
+            <button type="button" class="save-btn" @click="saveProfile">
+              Save Profile
+            </button>
           </div>
-
-
-
-          <div class="status-box">
-
-            <div class="status-circle">
-
-              ✓
-
-            </div>
-
-
-
-            <div>
-
-              <strong>
-
-                Profile in Progress
-
-              </strong>
-
-              <p>
-
-                Complete your profile before submitting an application.
-
-              </p>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-
-        <!-- ================= SAVE ================= -->
-
-        <div class="bottom-actions">
-
-          <button
-
-            type="button"
-
-            class="save-btn"
-
-            @click="saveProfile"
-
-          >
-
-            Save Profile
-
-          </button>
-
-        </div>
-
         </main>
-
       </div>
-
     </div>
-
   </div>
-
 </template>
 
-
-
 <script>
-
 export default {
-
   name: "Portfolio",
 
-
-
   data() {
-
     return {
-
       profileId: null,
 
       activeSection: "personal",
@@ -1439,7 +730,6 @@ export default {
       formMessage: "",
 
       formErrors: {
-
         firstName: "",
 
         surname: "",
@@ -1470,14 +760,10 @@ export default {
 
         field: "",
 
-        preferredProvince: ""
-
+        preferredProvince: "",
       },
 
-
-
       profile: {
-
         firstName: "",
 
         surname: "",
@@ -1511,23 +797,15 @@ export default {
         preferredProvince: "",
 
         subjects: [
-
           {
-
             name: "",
 
-            mark: ""
-
-          }
-
-        ]
-
+            mark: "",
+          },
+        ],
       },
 
-
-
       subjectSuggestions: [
-
         "Accounting",
 
         "Afrikaans",
@@ -1564,53 +842,38 @@ export default {
 
         "isiZulu",
 
-        "Visual Arts"
-
+        "Visual Arts",
       ],
-
-
 
       activeSubjectIndex: null,
 
-     documents: {
+      documents: {
+        id: null,
 
-      id: null,
+        matric: null,
 
-      matric: null,
+        address: null,
+      },
 
-      address: null
+      documentMessages: {
+        id: null,
 
-     },
+        matric: null,
 
-     documentMessages: {
-
-      id: null,
-
-      matric: null,
-
-      address: null
-
-    },
-
-
+        address: null,
+      },
 
       // Stores the suggested courses
 
       courseSuggestions: [],
 
-
-
       // Lets us know if the user clicked
 
       // the suggestion button
 
-      courseSearchAttempted: false
-
+      courseSearchAttempted: false,
     };
-
   },
-
-
 
   // =========================
 
@@ -1619,12 +882,8 @@ export default {
   // =========================
 
   mounted() {
-
     this.getProfile();
-
   },
-
-
 
   // =========================
 
@@ -1633,54 +892,28 @@ export default {
   // =========================
 
   computed: {
-
     // Show the user's first name when available, otherwise use a neutral label.
     profileDisplayName() {
-
       return this.profile.firstName.trim() || "My Profile";
-
     },
 
     // Owam uses OG by default; other users receive their first and surname initials.
     profileInitials() {
+      const firstName = this.profile.firstName.trim();
 
-      const firstName =
-
-        this.profile.firstName.trim();
-
-
-
-      const surname =
-
-        this.profile.surname.trim();
-
-
+      const surname = this.profile.surname.trim();
 
       if (firstName.toLowerCase() === "owam") {
-
         return `O${surname.charAt(0) || "G"}`.toUpperCase();
-
       }
 
       if (!firstName && !surname) {
-
         return "--";
-
       }
 
-
-
-      return (
-
-        `${firstName.charAt(0)}${surname.charAt(0)}`
-
-      ).toUpperCase();
-
-    }
-
+      return `${firstName.charAt(0)}${surname.charAt(0)}`.toUpperCase();
+    },
   },
-
-
 
   // =========================
 
@@ -1689,191 +922,158 @@ export default {
   // =========================
 
   methods: {
-
     scrollToProfile() {
-
       const profileSection = document.querySelector(".main-content");
 
       if (profileSection) {
-
         profileSection.scrollIntoView({
-
-          behavior: "smooth"
-
+          behavior: "smooth",
         });
-
       }
-
     },
 
     setFormMessage(message) {
-
       this.formMessage = message;
-
     },
 
     sanitizeIdNumber() {
-
-      this.profile.idNumber = String(this.profile.idNumber || "").replace(/\D/g, "").slice(0, 13);
-
+      this.profile.idNumber = String(this.profile.idNumber || "")
+        .replace(/\D/g, "")
+        .slice(0, 13);
     },
 
     sanitizePhoneNumber() {
-
       let digits = String(this.profile.phone || "").replace(/\D/g, "");
 
       if (digits && !digits.startsWith("0")) {
-
         digits = "0" + digits.replace(/^0+/, "");
-
       }
 
       this.profile.phone = digits.slice(0, 10);
-
     },
 
     setFieldError(field, message) {
-
       this.formErrors[field] = message;
-
     },
 
     validateField(field) {
-
       const value = this.profile[field];
 
-      if (field === "firstName" || field === "surname" || field === "address" || field === "city" || field === "school") {
-
+      if (
+        field === "firstName" ||
+        field === "surname" ||
+        field === "address" ||
+        field === "city" ||
+        field === "school"
+      ) {
         if (!String(value || "").trim()) {
-
           this.setFieldError(field, "This field is required.");
 
           return false;
-
         }
 
         this.setFieldError(field, "");
 
         return true;
-
       }
 
       if (field === "idNumber") {
-
         if (!String(value || "").trim()) {
-
           this.setFieldError(field, "ID number is required.");
 
           return false;
-
         }
 
         if (!/^\d{13}$/.test(String(value).trim())) {
-
           this.setFieldError(field, "ID number must be exactly 13 digits.");
 
           return false;
-
         }
 
         this.setFieldError(field, "");
 
         return true;
-
       }
 
       if (field === "phone") {
-
         if (!String(value || "").trim()) {
-
           this.setFieldError(field, "Phone number is required.");
 
           return false;
-
         }
 
         if (!/^0\d{9}$/.test(String(value).trim())) {
-
-          this.setFieldError(field, "Cell number must have 10 digits and start with 0.");
+          this.setFieldError(
+            field,
+            "Cell number must have 10 digits and start with 0.",
+          );
 
           return false;
-
         }
 
         this.setFieldError(field, "");
 
         return true;
-
       }
 
       if (field === "email") {
-
         if (!String(value || "").trim()) {
-
           this.setFieldError(field, "Email is required.");
 
           return false;
-
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim())) {
-
           this.setFieldError(field, "Enter a valid email address.");
 
           return false;
-
         }
 
         this.setFieldError(field, "");
 
         return true;
-
       }
 
-      if (field === "dateOfBirth" || field === "gender" || field === "nationality" || field === "province" || field === "matricYear" || field === "qualification" || field === "field" || field === "preferredProvince") {
-
+      if (
+        field === "dateOfBirth" ||
+        field === "gender" ||
+        field === "nationality" ||
+        field === "province" ||
+        field === "matricYear" ||
+        field === "qualification" ||
+        field === "field" ||
+        field === "preferredProvince"
+      ) {
         if (!value || !String(value).trim()) {
-
           this.setFieldError(field, "Please select an option.");
 
           return false;
-
         }
 
         this.setFieldError(field, "");
 
         return true;
-
       }
 
       this.setFieldError(field, "");
 
       return true;
-
     },
 
     validateIdNumber() {
-
       return /^\d{13}$/.test(this.profile.idNumber.trim());
-
     },
 
     validatePhoneNumber() {
-
       return /^0\d{9}$/.test(this.profile.phone.trim());
-
     },
 
     validateEmail() {
-
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.profile.email.trim());
-
     },
 
     validatePersonalDetails() {
-
       const requiredFields = [
-
         { key: "firstName", label: "First name" },
 
         { key: "surname", label: "Surname" },
@@ -1894,34 +1094,25 @@ export default {
 
         { key: "province", label: "Province" },
 
-        { key: "city", label: "City" }
-
+        { key: "city", label: "City" },
       ];
 
       let valid = true;
 
-      requiredFields.forEach(field => {
-
+      requiredFields.forEach((field) => {
         if (!this.validateField(field.key)) {
-
           valid = false;
-
         }
-
       });
 
       if (valid) {
-
         this.setFormMessage("");
-
       }
 
       return valid;
-
     },
 
     validateAcademicDetails() {
-
       let valid = true;
 
       if (!this.validateField("school")) valid = false;
@@ -1930,26 +1121,27 @@ export default {
 
       if (!this.validateField("qualification")) valid = false;
 
-      if (!this.profile.subjects.length || this.profile.subjects.some(subject => !subject.name.trim() || !String(subject.mark).trim())) {
-
-        this.setFormMessage("Please complete all subject names and marks before continuing.");
+      if (
+        !this.profile.subjects.length ||
+        this.profile.subjects.some(
+          (subject) => !subject.name.trim() || !String(subject.mark).trim(),
+        )
+      ) {
+        this.setFormMessage(
+          "Please complete all subject names and marks before continuing.",
+        );
 
         valid = false;
-
       }
 
       if (valid) {
-
         this.setFormMessage("");
-
       }
 
       return valid;
-
     },
 
     validatePreferences() {
-
       let valid = true;
 
       if (!this.validateField("field")) valid = false;
@@ -1957,52 +1149,35 @@ export default {
       if (!this.validateField("preferredProvince")) valid = false;
 
       if (valid) {
-
         this.setFormMessage("");
-
       }
 
       return valid;
-
     },
 
     canAccessSection(section) {
-
       return true;
-
     },
 
     goToSection(section) {
-
       this.activeSection = section;
-
     },
 
     validateBeforeSave() {
-
       if (this.activeSection === "personal") {
-
         return this.validatePersonalDetails();
-
       }
 
       if (this.activeSection === "academic") {
-
         return this.validateAcademicDetails();
-
       }
 
       if (this.activeSection === "preferences") {
-
         return this.validatePreferences();
-
       }
 
       return true;
-
     },
-
-
 
     // =========================
 
@@ -2011,176 +1186,112 @@ export default {
     // =========================
 
     activateSubject(index) {
-
       this.activeSubjectIndex = index;
-
     },
-
-
 
     hideSubjectSuggestions() {
-
       setTimeout(() => {
-
         this.activeSubjectIndex = null;
-
       }, 100);
-
     },
-
-
 
     filteredSubjectSuggestions(subjectName) {
-
-      const searchTerm =
-
-        subjectName.trim().toLowerCase();
-
-
+      const searchTerm = subjectName.trim().toLowerCase();
 
       if (!searchTerm) {
-
         return [];
-
       }
 
+      return this.subjectSuggestions.filter((suggestion) =>
+        suggestion
 
+          .toLowerCase()
 
-      return this.subjectSuggestions.filter(
-
-        (suggestion) =>
-
-          suggestion
-
-            .toLowerCase()
-
-            .startsWith(searchTerm)
-
+          .startsWith(searchTerm),
       );
-
     },
-
-
 
     selectSubject(index, subjectName) {
-
-      this.profile.subjects[index].name =
-
-        subjectName;
-
-
+      this.profile.subjects[index].name = subjectName;
 
       this.activeSubjectIndex = null;
-
     },
-
-
 
     addSubject() {
-
       this.profile.subjects.push({
-
         name: "",
 
-        mark: ""
-
+        mark: "",
       });
-
     },
-
-
 
     removeSubject(index) {
-
       if (this.profile.subjects.length > 1) {
-
         this.profile.subjects.splice(index, 1);
-
       }
-
     },
 
-
-
     validateDocument(event, documentType) {
+      const file = event.target.files[0];
 
-    const file = event.target.files[0];
+      if (!file) {
+        return;
+      }
 
-    if (!file) {
+      // Maximum file size: 5 MB
 
-     return;
+      const maxFileSize = 5 * 1024 * 1024;
 
-    }
+      // Check whether the file is a PDF
 
-  // Maximum file size: 5 MB
+      const isPDF =
+        file.type === "application/pdf" ||
+        file.name.toLowerCase().endsWith(".pdf");
 
-    const maxFileSize = 5 * 1024 * 1024;
+      // Reject files that are not PDF
 
-  // Check whether the file is a PDF
+      if (!isPDF) {
+        this.documents[documentType] = null;
 
-    const isPDF =
+        this.documentMessages[documentType] = {
+          type: "error-message",
 
-     file.type === "application/pdf" ||
+          message: "Invalid file. Please upload a PDF document only.",
+        };
 
-     file.name.toLowerCase().endsWith(".pdf");
+        // Clear the selected file
 
-  // Reject files that are not PDF
+        event.target.value = "";
 
-  if (!isPDF) {
+        return;
+      }
 
-    this.documents[documentType] = null;
+      // Check file size
 
-    this.documentMessages[documentType] = {
+      if (file.size > maxFileSize) {
+        this.documents[documentType] = null;
 
-      type: "error-message",
+        this.documentMessages[documentType] = {
+          type: "error-message",
 
-      message: "Invalid file. Please upload a PDF document only."
+          message: "File is too large. Please upload a PDF smaller than 5 MB.",
+        };
 
-    };
+        event.target.value = "";
 
-    // Clear the selected file
+        return;
+      }
 
-    event.target.value = "";
+      // Save the valid file
 
-    return;
+      this.documents[documentType] = file;
 
-  }
+      this.documentMessages[documentType] = {
+        type: "success-message",
 
-  // Check file size
-
-  if (file.size > maxFileSize) {
-
-    this.documents[documentType] = null;
-
-    this.documentMessages[documentType] = {
-
-      type: "error-message",
-
-      message: "File is too large. Please upload a PDF smaller than 5 MB."
-
-    };
-
-    event.target.value = "";
-
-    return;
-
-  }
-
-  // Save the valid file
-
-  this.documents[documentType] = file;
-
-  this.documentMessages[documentType] = {
-
-    type: "success-message",
-
-    message: `${file.name} uploaded successfully.`
-
-  };
-
-},
-
-
+        message: `${file.name} uploaded successfully.`,
+      };
+    },
 
     // =========================
 
@@ -2189,70 +1300,29 @@ export default {
     // =========================
 
     suggestCourses() {
-
-      const field =
-
-        this.profile.field.trim().toLowerCase();
-
-
+      const field = this.profile.field.trim().toLowerCase();
 
       this.courseSearchAttempted = true;
 
-
-
-      const subjects =
-
-        this.profile.subjects;
-
-
+      const subjects = this.profile.subjects;
 
       const suggestions = [];
 
-
-
       // Check Mathematics
 
-      const mathematics =
+      const mathematics = subjects.find(
+        (subject) => subject.name.toLowerCase() === "mathematics",
+      );
 
-        subjects.find(subject =>
-
-          subject.name.toLowerCase() === "mathematics"
-
-        );
-
-
-
-      const mathematicsMark =
-
-        mathematics
-
-          ? Number(mathematics.mark)
-
-          : 0;
-
-
+      const mathematicsMark = mathematics ? Number(mathematics.mark) : 0;
 
       // Check English
 
-      const english =
+      const english = subjects.find(
+        (subject) => subject.name.toLowerCase() === "english",
+      );
 
-        subjects.find(subject =>
-
-          subject.name.toLowerCase() === "english"
-
-        );
-
-
-
-      const englishMark =
-
-        english
-
-          ? Number(english.mark)
-
-          : 0;
-
-
+      const englishMark = english ? Number(english.mark) : 0;
 
       // =========================
 
@@ -2261,266 +1331,153 @@ export default {
       // =========================
 
       if (
-
         field.includes("information technology") ||
-
         field.includes("computer science")
-
       ) {
-
-        if (
-
-          mathematicsMark >= 50 &&
-
-          englishMark >= 40
-
-        ) {
-
+        if (mathematicsMark >= 50 && englishMark >= 40) {
           suggestions.push(
-
             "Bachelor of Information Technology",
 
             "Bachelor of Computer Science",
 
             "Diploma in Information Technology",
 
-            "Diploma in Software Development"
-
+            "Diploma in Software Development",
           );
-
         } else {
-
           suggestions.push(
-
             "Diploma in Information Technology",
 
             "Diploma in Software Development",
 
-            "Higher Certificate in Information Technology"
-
+            "Higher Certificate in Information Technology",
           );
-
         }
-
       }
-
-
 
       // =========================
 
       // ACCOUNTING
 
       // =========================
-
-      else if (
-
-        field.includes("accounting")
-
-      ) {
-
+      else if (field.includes("accounting")) {
         if (mathematicsMark >= 50) {
-
           suggestions.push(
-
             "Bachelor of Accounting",
 
             "Bachelor of Commerce in Accounting",
 
             "Diploma in Accounting",
 
-            "Higher Certificate in Accounting"
-
+            "Higher Certificate in Accounting",
           );
-
         } else {
-
           suggestions.push(
-
             "Diploma in Accounting",
 
-            "Higher Certificate in Accounting"
-
+            "Higher Certificate in Accounting",
           );
-
         }
-
       }
-
-
 
       // =========================
 
       // BUSINESS
 
       // =========================
-
-      else if (
-
-        field.includes("business")
-
-      ) {
-
+      else if (field.includes("business")) {
         suggestions.push(
-
           "Bachelor of Business Administration",
 
           "Bachelor of Commerce",
 
           "Diploma in Business Management",
 
-          "Diploma in Financial Management"
-
+          "Diploma in Financial Management",
         );
-
       }
-
-
 
       // =========================
 
       // ENGINEERING
 
       // =========================
-
-      else if (
-
-        field.includes("engineering")
-
-      ) {
-
+      else if (field.includes("engineering")) {
         if (mathematicsMark >= 60) {
-
           suggestions.push(
-
             "Bachelor of Engineering",
 
             "Diploma in Civil Engineering",
 
             "Diploma in Electrical Engineering",
 
-            "Diploma in Mechanical Engineering"
-
+            "Diploma in Mechanical Engineering",
           );
-
         } else {
-
           suggestions.push(
-
             "Engineering Foundation Programme",
 
-            "Engineering Higher Certificate"
-
+            "Engineering Higher Certificate",
           );
-
         }
-
       }
-
-
 
       // =========================
 
       // NURSING
 
       // =========================
-
-      else if (
-
-        field.includes("nursing")
-
-      ) {
-
+      else if (field.includes("nursing")) {
         suggestions.push(
-
           "Bachelor of Nursing",
 
           "Diploma in Nursing",
 
-          "Higher Certificate in Nursing"
-
+          "Higher Certificate in Nursing",
         );
-
       }
-
-
 
       // =========================
 
       // TEACHING
 
       // =========================
-
-      else if (
-
-        field.includes("teaching")
-
-      ) {
-
+      else if (field.includes("teaching")) {
         suggestions.push(
-
           "Bachelor of Education",
 
           "Diploma in Grade R Teaching",
 
-          "Higher Certificate in Education"
-
+          "Higher Certificate in Education",
         );
-
       }
-
-
 
       // =========================
 
       // LAW
 
       // =========================
-
-      else if (
-
-        field.includes("law")
-
-      ) {
-
+      else if (field.includes("law")) {
         suggestions.push(
-
           "Bachelor of Laws",
 
           "Diploma in Law",
 
-          "Higher Certificate in Criminal Justice"
-
+          "Higher Certificate in Criminal Justice",
         );
-
       }
-
-
 
       // =========================
 
       // OTHER
 
       // =========================
-
       else if (field !== "") {
-
-        suggestions.push(
-
-          `Explore ${this.profile.field}-related courses`
-
-        );
-
+        suggestions.push(`Explore ${this.profile.field}-related courses`);
       }
 
-
-
-      this.courseSuggestions =
-
-        suggestions;
-
+      this.courseSuggestions = suggestions;
     },
-
-
 
     // =========================
 
@@ -2529,34 +1486,18 @@ export default {
     // =========================
 
     async getProfile() {
-
       try {
+        const response = await fetch("http://localhost:3000/api/portfolio/1");
 
-        const response = await fetch(
-
-          "http://localhost:3000/api/portfolio/1"
-
-        );
-
-
-
-        const data =
-
-          await response.json();
-
-
+        const data = await response.json();
 
         if (!response.ok) {
-
           console.error(data.message);
 
           return;
-
         }
 
         this.profileId = data.profile.profile_id;
-
-
 
         // =========================
 
@@ -2564,51 +1505,21 @@ export default {
 
         // =========================
 
-        this.profile.firstName =
+        this.profile.firstName = data.profile.first_name || "";
 
-          data.profile.first_name || "";
+        this.profile.surname = data.profile.last_name || "";
 
+        this.profile.email = data.profile.email || "";
 
+        this.profile.phone = data.profile.phone || "";
 
-        this.profile.surname =
+        this.profile.dateOfBirth = data.profile.date_of_birth
+          ? data.profile.date_of_birth.substring(0, 10)
+          : "";
 
-          data.profile.last_name || "";
+        this.profile.address = data.profile.address || "";
 
-
-
-        this.profile.email =
-
-          data.profile.email || "";
-
-
-
-        this.profile.phone =
-
-          data.profile.phone || "";
-
-
-
-        this.profile.dateOfBirth =
-
-          data.profile.date_of_birth
-
-            ? data.profile.date_of_birth.substring(0, 10)
-
-            : "";
-
-
-
-        this.profile.address =
-
-          data.profile.address || "";
-
-
-
-        this.profile.province =
-
-          data.profile.province || "";
-
-
+        this.profile.province = data.profile.province || "";
 
         // =========================
 
@@ -2616,21 +1527,11 @@ export default {
 
         // =========================
 
-        this.profile.school =
+        this.profile.school = data.profile.school_name || "";
 
-          data.profile.school_name || "";
-
-
-
-        this.profile.matricYear =
-
-          data.profile.matric_year
-
-            ? String(data.profile.matric_year)
-
-            : "";
-
-
+        this.profile.matricYear = data.profile.matric_year
+          ? String(data.profile.matric_year)
+          : "";
 
         // =========================
 
@@ -2638,59 +1539,29 @@ export default {
 
         // =========================
 
-        if (
+        if (data.subjects && data.subjects.length > 0) {
+          this.profile.subjects = data.subjects.map((subject) => ({
+            name: subject.subject_name || "",
 
-          data.subjects &&
-
-          data.subjects.length > 0
-
-        ) {
-
-          this.profile.subjects =
-
-            data.subjects.map(subject => ({
-
-              name:
-
-                subject.subject_name || "",
-
-              mark:
-
-                subject.mark || ""
-
-            }));
-
+            mark: subject.mark || "",
+          }));
         } else {
-
           this.profile.subjects = [
-
             {
-
               name: "",
 
-              mark: ""
-
-            }
-
+              mark: "",
+            },
           ];
-
         }
-
       } catch (error) {
-
         console.error(
-
           "Error loading profile:",
 
-          error
-
+          error,
         );
-
       }
-
     },
-
-
 
     // =========================
 
@@ -2699,17 +1570,12 @@ export default {
     // =========================
 
     async saveProfile() {
-
       if (!this.validateBeforeSave()) {
-
         return;
-
       }
 
       try {
-
         const profileData = {
-
           student_id: 1,
 
           first_name: this.profile.firstName,
@@ -2736,18 +1602,15 @@ export default {
 
           subjects: this.profile.subjects
 
-            .filter(subject => subject.name)
+            .filter((subject) => subject.name)
 
-            .map(subject => ({
-
+            .map((subject) => ({
               subject_name: subject.name,
 
               mark: subject.mark || null,
 
-              grade: ""
-
-            }))
-
+              grade: "",
+            })),
         };
 
         let response;
@@ -2755,82 +1618,54 @@ export default {
         // CREATE NEW PROFILE
 
         if (!this.profileId) {
-
           response = await fetch("http://localhost:3000/api/portfolio", {
-
             method: "POST",
 
             headers: {
-
-              "Content-Type": "application/json"
-
+              "Content-Type": "application/json",
             },
 
-            body: JSON.stringify(profileData)
-
+            body: JSON.stringify(profileData),
           });
-
         }
 
         // UPDATE EXISTING PROFILE
-
         else {
-
           response = await fetch(
-
             `http://localhost:3000/api/portfolio/${this.profileId}`,
 
             {
-
               method: "PUT",
 
               headers: {
-
-                "Content-Type": "application/json"
-
+                "Content-Type": "application/json",
               },
 
-              body: JSON.stringify(profileData)
-
-            }
-
+              body: JSON.stringify(profileData),
+            },
           );
-
         }
 
         const data = await response.json();
 
         if (!response.ok) {
-
           throw new Error(data.message || "Could not save profile");
-
         }
 
         if (data.profile_id) {
-
           this.profileId = data.profile_id;
-
         }
 
         alert(data.message);
-
       } catch (error) {
-
         console.error("Save error:", error);
 
         alert("Could not connect to the server.");
-
       }
-
-    }
-
-  }
-
+    },
+  },
 };
-
 </script>
-
-
 
 <style scoped>
 /* =========================================
@@ -2838,7 +1673,9 @@ export default {
    Youthful South African visual system
 ========================================= */
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 .profile-page {
   --navy: #001b5e;
@@ -2879,8 +1716,12 @@ export default {
   letter-spacing: -0.5px;
 }
 
-.bg-navy { background-color: var(--navy-dark) !important; }
-.text-gold { color: var(--gold) !important; }
+.bg-navy {
+  background-color: var(--navy-dark) !important;
+}
+.text-gold {
+  color: var(--gold) !important;
+}
 
 .profile-account {
   display: inline-flex;
@@ -2916,7 +1757,10 @@ export default {
   text-decoration: none;
   font-size: 14px;
   font-weight: 700;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .sa-nav-tab:hover {
@@ -2928,15 +1772,31 @@ export default {
 /* Active navigation follows the group's SA colour system.
   Exact matching prevents the Universities link from staying active on Profile. */
 .sa-nav-tab.tab-green.router-link-exact-active,
-.sa-nav-tab.tab-green.active { background: var(--green) !important; box-shadow: 0 5px 16px rgba(0, 122, 61, 0.4); }
+.sa-nav-tab.tab-green.active {
+  background: var(--green) !important;
+  box-shadow: 0 5px 16px rgba(0, 122, 61, 0.4);
+}
 .sa-nav-tab.tab-gold.router-link-exact-active,
-.sa-nav-tab.tab-gold.active { background: var(--gold) !important; color: #101010 !important; box-shadow: 0 5px 16px rgba(255, 184, 28, 0.4); }
+.sa-nav-tab.tab-gold.active {
+  background: var(--gold) !important;
+  color: #101010 !important;
+  box-shadow: 0 5px 16px rgba(255, 184, 28, 0.4);
+}
 .sa-nav-tab.tab-red.router-link-exact-active,
-.sa-nav-tab.tab-red.active { background: var(--red) !important; box-shadow: 0 5px 16px rgba(222, 56, 49, 0.4); }
+.sa-nav-tab.tab-red.active {
+  background: var(--red) !important;
+  box-shadow: 0 5px 16px rgba(222, 56, 49, 0.4);
+}
 .sa-nav-tab.tab-blue.router-link-exact-active,
-.sa-nav-tab.tab-blue.active { background: var(--blue) !important; box-shadow: 0 5px 16px rgba(0, 35, 149, 0.4); }
+.sa-nav-tab.tab-blue.active {
+  background: var(--blue) !important;
+  box-shadow: 0 5px 16px rgba(0, 35, 149, 0.4);
+}
 .sa-nav-tab.tab-black.router-link-exact-active,
-.sa-nav-tab.tab-black.active { background: #191919 !important; box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4); }
+.sa-nav-tab.tab-black.active {
+  background: #191919 !important;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
+}
 
 /* ================= PAGE LAYOUT ================= */
 .page-layout {
@@ -2957,7 +1817,7 @@ export default {
   padding: 28px 18px;
   background: var(--navy-dark);
   color: #fff;
-  border-right: 1px solid rgba(255,255,255,0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-title {
@@ -2980,7 +1840,7 @@ export default {
   border: 1px solid transparent;
   border-radius: 13px;
   background: transparent;
-  color: rgba(255,255,255,0.72);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 14px;
   font-weight: 600;
   text-align: left;
@@ -2989,7 +1849,7 @@ export default {
 }
 
 .sidebar-item:hover {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
   transform: translateX(3px);
 }
@@ -2997,7 +1857,7 @@ export default {
 .sidebar-item.active {
   background: var(--green);
   color: #fff;
-  border-color: rgba(255,255,255,0.12);
+  border-color: rgba(255, 255, 255, 0.12);
   font-weight: 800;
   box-shadow: 4px 4px 0 var(--gold);
   transform: translateX(2px);
@@ -3011,8 +1871,8 @@ export default {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
   font-size: 12px;
   font-weight: 800;
@@ -3044,7 +1904,7 @@ export default {
   right: 7%;
   top: 50%;
   transform: translateY(-50%);
-  border: 35px solid rgba(255,184,28,0.14);
+  border: 35px solid rgba(255, 184, 28, 0.14);
   border-radius: 50%;
 }
 
@@ -3086,7 +1946,7 @@ export default {
 .hero-description {
   max-width: 650px;
   margin: 0 0 25px;
-  color: rgba(255,255,255,0.84);
+  color: rgba(255, 255, 255, 0.84);
   font-size: 16px;
   line-height: 1.7;
 }
@@ -3138,7 +1998,12 @@ export default {
   height: 5px;
   margin-bottom: 13px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--green) 0 50%, var(--gold) 50% 75%, var(--red) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--green) 0 50%,
+    var(--gold) 50% 75%,
+    var(--red) 75%
+  );
 }
 
 .page-title p {
@@ -3165,7 +2030,10 @@ export default {
   font-weight: 700;
 }
 
-.required-mark { color: var(--red); font-weight: 900; }
+.required-mark {
+  color: var(--red);
+  font-weight: 900;
+}
 
 /* ================= CARDS ================= */
 .card {
@@ -3186,7 +2054,12 @@ export default {
   height: 5px;
   margin-bottom: 22px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--green) 0 52%, var(--gold) 52% 76%, var(--red) 76%);
+  background: linear-gradient(
+    90deg,
+    var(--green) 0 52%,
+    var(--gold) 52% 76%,
+    var(--red) 76%
+  );
 }
 
 .section-header {
@@ -3220,7 +2093,10 @@ export default {
   margin-bottom: 18px;
 }
 
-.form-group { display: flex; flex-direction: column; }
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
 
 .form-group label {
   margin-bottom: 7px;
@@ -3241,7 +2117,11 @@ export default {
   color: #1c2c43;
   font-size: 14px;
   outline: none;
-  transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  transition:
+    border 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .form-group input:focus,
@@ -3250,21 +2130,33 @@ export default {
 .subject-row input:focus {
   border-color: var(--green);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(0,122,61,0.10);
+  box-shadow: 0 0 0 4px rgba(0, 122, 61, 0.1);
   transform: translateY(-1px);
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder,
-.subject-row input::placeholder { color: #9aa5b3; }
+.subject-row input::placeholder {
+  color: #9aa5b3;
+}
 
-.full-width { margin-bottom: 18px; }
+.full-width {
+  margin-bottom: 18px;
+}
 
 /* ================= BUTTONS ================= */
 .card-actions,
-.bottom-actions { display: flex; justify-content: flex-end; }
-.card-actions { margin-top: 22px; }
-.bottom-actions { margin-top: 5px; padding-bottom: 20px; }
+.bottom-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.card-actions {
+  margin-top: 22px;
+}
+.bottom-actions {
+  margin-top: 5px;
+  padding-bottom: 20px;
+}
 
 .save-btn,
 .suggest-button {
@@ -3309,8 +2201,12 @@ export default {
   font-weight: 800;
 }
 
-.subject-row { margin-bottom: 10px; }
-.subject-autocomplete { position: relative; }
+.subject-row {
+  margin-bottom: 10px;
+}
+.subject-autocomplete {
+  position: relative;
+}
 
 .subject-suggestions {
   position: absolute;
@@ -3323,7 +2219,7 @@ export default {
   background: #fff;
   border: 1px solid #d7dee8;
   border-radius: 11px;
-  box-shadow: 0 14px 30px rgba(0,18,66,0.14);
+  box-shadow: 0 14px 30px rgba(0, 18, 66, 0.14);
 }
 
 .subject-suggestion {
@@ -3337,7 +2233,10 @@ export default {
   font-size: 13px;
 }
 
-.subject-suggestion:hover { background: #edf8f2; color: var(--green-dark); }
+.subject-suggestion:hover {
+  background: #edf8f2;
+  color: var(--green-dark);
+}
 
 .remove-btn {
   border: 1px solid #f1cbc8;
@@ -3349,7 +2248,9 @@ export default {
   cursor: pointer;
 }
 
-.remove-btn:hover { background: #ffe5e2; }
+.remove-btn:hover {
+  background: #ffe5e2;
+}
 
 .add-subject {
   margin-top: 8px;
@@ -3377,7 +2278,10 @@ export default {
   border-top: 1px solid #e8edf2;
 }
 
-.course-suggestion-section h3 { margin-top: 0; color: var(--green-dark); }
+.course-suggestion-section h3 {
+  margin-top: 0;
+  color: var(--green-dark);
+}
 
 .course-description,
 .course-note {
@@ -3386,10 +2290,21 @@ export default {
   line-height: 1.6;
 }
 
-.course-description { margin-bottom: 18px; }
-.course-results { margin-top: 28px; }
-.course-results h4 { margin-bottom: 8px; color: var(--navy-dark); font-size: 18px; font-weight: 900; }
-.course-note { margin-bottom: 18px; }
+.course-description {
+  margin-bottom: 18px;
+}
+.course-results {
+  margin-top: 28px;
+}
+.course-results h4 {
+  margin-bottom: 8px;
+  color: var(--navy-dark);
+  font-size: 18px;
+  font-weight: 900;
+}
+.course-note {
+  margin-bottom: 18px;
+}
 
 .course-card {
   display: flex;
@@ -3408,12 +2323,24 @@ export default {
 .course-card:hover {
   border-left-color: var(--green);
   transform: translateY(-2px);
-  box-shadow: 0 9px 22px rgba(0,18,66,0.08);
+  box-shadow: 0 9px 22px rgba(0, 18, 66, 0.08);
 }
 
-.course-card-content { flex: 1; }
-.course-card h5 { margin: 0 0 6px; color: var(--navy-dark); font-size: 15px; font-weight: 900; }
-.course-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.course-card-content {
+  flex: 1;
+}
+.course-card h5 {
+  margin: 0 0 6px;
+  color: var(--navy-dark);
+  font-size: 15px;
+  font-weight: 900;
+}
+.course-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
 
 .explore-course-button {
   flex-shrink: 0;
@@ -3428,7 +2355,10 @@ export default {
   transition: 0.2s ease;
 }
 
-.explore-course-button:hover { background: var(--blue); color: #fff; }
+.explore-course-button:hover {
+  background: var(--blue);
+  color: #fff;
+}
 
 .no-course-results {
   margin-top: 20px;
@@ -3466,8 +2396,17 @@ export default {
   font-weight: 900;
 }
 
-.document-notice p { margin: 0; color: #5f563c; font-size: 13px; line-height: 1.6; }
-.document-list { display: flex; flex-direction: column; gap: 13px; }
+.document-notice p {
+  margin: 0;
+  color: #5f563c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
 
 .document-item {
   display: flex;
@@ -3482,14 +2421,26 @@ export default {
 }
 
 .document-item:hover {
-  border-color: rgba(0,122,61,0.4);
-  box-shadow: 0 8px 20px rgba(0,18,66,0.07);
+  border-color: rgba(0, 122, 61, 0.4);
+  box-shadow: 0 8px 20px rgba(0, 18, 66, 0.07);
   transform: translateY(-2px);
 }
 
-.document-information { min-width: 0; }
-.document-information strong { display: block; margin-bottom: 6px; color: var(--navy-dark); font-size: 16px; font-weight: 900; }
-.document-information > p:not(.document-message) { margin: 0; color: var(--muted); font-size: 13px; }
+.document-information {
+  min-width: 0;
+}
+.document-information strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--navy-dark);
+  font-size: 16px;
+  font-weight: 900;
+}
+.document-information > p:not(.document-message) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
 
 .upload-btn {
   display: inline-flex;
@@ -3506,11 +2457,23 @@ export default {
   transition: 0.2s ease;
 }
 
-.upload-btn:hover { background: var(--green-dark); transform: translateY(-2px); }
+.upload-btn:hover {
+  background: var(--green-dark);
+  transform: translateY(-2px);
+}
 
-.document-message { margin-top: 8px !important; font-size: 13px !important; font-weight: 800; line-height: 1.4; }
-.error-message { color: var(--red) !important; }
-.success-message { color: var(--green) !important; }
+.document-message {
+  margin-top: 8px !important;
+  font-size: 13px !important;
+  font-weight: 800;
+  line-height: 1.4;
+}
+.error-message {
+  color: var(--red) !important;
+}
+.success-message {
+  color: var(--green) !important;
+}
 
 /* ================= STATUS ================= */
 .status-box {
@@ -3518,7 +2481,7 @@ export default {
   align-items: center;
   gap: 16px;
   padding: 22px;
-  border: 1px solid rgba(0,122,61,0.18);
+  border: 1px solid rgba(0, 122, 61, 0.18);
   border-radius: 15px;
   background: linear-gradient(135deg, #eef9f3, #f9fcfa);
 }
@@ -3537,26 +2500,52 @@ export default {
   box-shadow: 4px 4px 0 var(--gold);
 }
 
-.status-box strong { color: var(--green-dark); font-size: 16px; font-weight: 900; }
-.status-box p { margin: 5px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.status-box strong {
+  color: var(--green-dark);
+  font-size: 16px;
+  font-weight: 900;
+}
+.status-box p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1100px) {
-  .main-content { padding: 34px 30px; }
+  .main-content {
+    padding: 34px 30px;
+  }
 }
 
 @media (max-width: 850px) {
-  .sidebar { width: 215px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .main-content { padding: 30px 22px; }
-  .course-card { align-items: flex-start; flex-direction: column; }
-  .explore-course-button { width: 100%; }
+  .sidebar {
+    width: 215px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .main-content {
+    padding: 30px 22px;
+  }
+  .course-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .explore-course-button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 650px) {
   /* Keep the account indicator readable when the navigation stacks vertically. */
-  .top-header .navbar-collapse { margin-left: 0; }
-  .top-header .navbar-nav { margin-left: 0; }
+  .top-header .navbar-collapse {
+    margin-left: 0;
+  }
+  .top-header .navbar-nav {
+    margin-left: 0;
+  }
   .profile-account {
     justify-content: center;
     margin: 8px 0 0;
@@ -3564,25 +2553,71 @@ export default {
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     border-left: 0;
   }
-  .sidebar { display: none; }
-  .main-content { padding: 25px 16px; }
-  .portfolio-hero { min-height: 330px; }
-  .hero-overlay { padding: 45px 24px; }
-  .hero-content h1 { font-size: 35px; letter-spacing: -1px; }
-  .hero-description { font-size: 14px; }
-  .card { padding: 21px; border-radius: 16px; }
-  .subject-row, .subjects-header { grid-template-columns: 1fr; }
-  .remove-btn { padding: 10px; }
-  .document-item { align-items: flex-start; flex-direction: column; gap: 15px; }
-  .upload-btn { width: 100%; }
-  .bottom-actions, .card-actions { justify-content: stretch; }
-  .save-btn, .suggest-button { width: 100%; }
-  .status-box { align-items: flex-start; }
+  .sidebar {
+    display: none;
+  }
+  .main-content {
+    padding: 25px 16px;
+  }
+  .portfolio-hero {
+    min-height: 330px;
+  }
+  .hero-overlay {
+    padding: 45px 24px;
+  }
+  .hero-content h1 {
+    font-size: 35px;
+    letter-spacing: -1px;
+  }
+  .hero-description {
+    font-size: 14px;
+  }
+  .card {
+    padding: 21px;
+    border-radius: 16px;
+  }
+  .subject-row,
+  .subjects-header {
+    grid-template-columns: 1fr;
+  }
+  .remove-btn {
+    padding: 10px;
+  }
+  .document-item {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .upload-btn {
+    width: 100%;
+  }
+  .bottom-actions,
+  .card-actions {
+    justify-content: stretch;
+  }
+  .save-btn,
+  .suggest-button {
+    width: 100%;
+  }
+  .status-box {
+    align-items: flex-start;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sa-nav-tab, .sidebar-item, .save-btn, .suggest-button, .add-subject,
-  .document-item, .form-group input, .form-group select, .form-group textarea,
-  .subject-row input, .hero-btn, .course-card { transition: none; }
+  .sa-nav-tab,
+  .sidebar-item,
+  .save-btn,
+  .suggest-button,
+  .add-subject,
+  .document-item,
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .subject-row input,
+  .hero-btn,
+  .course-card {
+    transition: none;
+  }
 }
 </style>

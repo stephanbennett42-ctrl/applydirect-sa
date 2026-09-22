@@ -1,236 +1,270 @@
 <template>
-  <header class="site-nav">
-    <div class="container nav-inner">
-      <router-link to="/" class="nav-brand">
-        ApplyDirect <span>SA</span>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-navy sticky-top py-2">
+    <div class="container-fluid px-3 px-md-4">
+      <router-link
+        to="/institutions"
+        class="navbar-brand fw-bold fs-4 text-white me-lg-4"
+        @click="closeMobileNav"
+      >
+        ApplyDirect-<span class="text-gold">SA</span>
       </router-link>
 
-      <nav class="nav-links">
-        <router-link to="/payment-plan" class="nav-link">Payment Plans</router-link>
-        <router-link to="/jobs" class="nav-link">Graduate Jobs</router-link>
-        <router-link v-if="isLoggedIn()" to="/payment" class="nav-link">Checkout</router-link>
-      </nav>
-
-      <div class="nav-auth">
-        <template v-if="isLoggedIn()">
-          <span class="nav-user">Hi, {{ currentUser.firstName }}</span>
-          <button class="nav-btn" @click="handleLogout">Logout</button>
-        </template>
-        <router-link v-else to="/login" class="btn btn-primary btn-sm">Log In</router-link>
-      </div>
-
-      <button class="nav-toggle" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen ? 'true' : 'false'" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
+      <button
+        class="navbar-toggler border-0"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarContent"
+        aria-controls="navbarContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
       </button>
-    </div>
 
-    <!-- Mobile menu -->
-    <div v-if="menuOpen" class="mobile-menu">
-      <router-link to="/payment-plan" class="mobile-link" @click="menuOpen = false">Payment Plans</router-link>
-      <router-link to="/jobs" class="mobile-link" @click="menuOpen = false">Graduate Jobs</router-link>
-      <router-link v-if="isLoggedIn()" to="/payment" class="mobile-link" @click="menuOpen = false">Checkout</router-link>
-      <div class="mobile-auth">
-        <template v-if="isLoggedIn()">
-          <span class="mobile-user">Hi, {{ currentUser.firstName }}</span>
-          <button class="nav-btn" @click="handleLogout">Logout</button>
-        </template>
-        <router-link v-else to="/login" class="btn btn-primary btn-sm" @click="menuOpen = false">Log In</router-link>
+      <div
+        class="collapse navbar-collapse mt-2 mt-lg-0"
+        id="navbarContent"
+        ref="navCollapse"
+      >
+        <div
+          v-if="$route.path === '/institutions' || $route.path === '/'"
+          class="d-flex flex-column flex-lg-row gap-2 my-2 my-lg-0 mx-auto w-100 max-w-lg"
+        >
+          <input
+            v-model="searchFilter.searchQuery"
+            type="text"
+            class="form-control rounded-pill bg-light border-0 px-3"
+            placeholder="Search university or city..."
+            aria-label="Search university or city"
+          />
+          <select
+            v-model="searchFilter.selectedProvince"
+            class="form-select rounded-pill bg-light border-0"
+            aria-label="Filter by province"
+          >
+            <option value="">All Provinces</option>
+            <option>Gauteng</option>
+            <option>Western Cape</option>
+            <option>KwaZulu-Natal</option>
+            <option>Eastern Cape</option>
+            <option>Free State</option>
+            <option>Limpopo</option>
+            <option>Mpumalanga</option>
+            <option>North West</option>
+            <option>Northern Cape</option>
+          </select>
+          <select
+            v-model="searchFilter.selectedType"
+            class="form-select rounded-pill bg-light border-0"
+            aria-label="Filter by institution type"
+          >
+            <option value="">All Types</option>
+            <option>University</option>
+            <option>TVET</option>
+          </select>
+        </div>
+
+        <div
+          class="navbar-nav d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 ms-auto pt-2 pt-lg-0"
+        >
+          <router-link
+            to="/institutions"
+            class="sa-nav-tab tab-green text-center"
+            @click="closeMobileNav"
+            >Universities</router-link
+          >
+          <router-link
+            to="/profile"
+            class="sa-nav-tab tab-gold text-center"
+            @click="closeMobileNav"
+            >Profile</router-link
+          >
+          <router-link
+            to="/about"
+            class="sa-nav-tab tab-red text-center"
+            @click="closeMobileNav"
+            >About Us</router-link
+          >
+          <router-link
+            to="/contact"
+            class="sa-nav-tab tab-blue text-center"
+            @click="closeMobileNav"
+            >Contact</router-link
+          >
+          <router-link
+            to="/subscription"
+            class="sa-nav-tab tab-black text-center"
+            @click="closeMobileNav"
+            >Subscription</router-link
+          >
+          <router-link
+            to="/profile"
+            class="profile-avatar"
+            :aria-label="
+              currentUser
+                ? `Open ${userFirstName || 'your'} profile`
+                : 'Open profile'
+            "
+            title="Profile"
+            @click="closeMobileNav"
+            >{{ userInitials }}</router-link
+          >
+          <button type="button" class="logout-button" @click="logout">
+            Log Out
+          </button>
+        </div>
       </div>
     </div>
-  </header>
+  </nav>
 </template>
 
 <script>
-import { getCurrentUser, isLoggedIn, logout } from '../store/auth.js'
+import { Collapse } from "bootstrap";
+import { getCurrentUser, logout as clearSession } from "../store/auth.js";
 
 export default {
-  name: 'Navbar',
+  name: "Navbar",
+  props: { searchFilter: { type: Object, required: true } },
   data() {
-    return {
-      currentUser: getCurrentUser(),
-      menuOpen: false
-    }
+    return { currentUser: this.getStoredUser() };
   },
-  created() {
-    this.loggedIn = isLoggedIn()
+  computed: {
+    userFirstName() {
+      return (
+        this.currentUser?.firstName ||
+        this.currentUser?.first_name ||
+        ""
+      ).trim();
+    },
+    userInitials() {
+      if (!this.currentUser) return "?";
+      const surname = (
+        this.currentUser.lastName ||
+        this.currentUser.last_name ||
+        this.currentUser.surname ||
+        ""
+      ).trim();
+      const initials =
+        `${this.userFirstName.charAt(0)}${surname.charAt(0)}`.toUpperCase();
+      return (
+        initials || (this.currentUser.email?.charAt(0) || "?").toUpperCase()
+      );
+    },
+  },
+  watch: {
+    "$route.fullPath"() {
+      this.currentUser = this.getStoredUser();
+    },
   },
   methods: {
-    isLoggedIn() {
-      return isLoggedIn()
+    getStoredUser() {
+      try {
+        return getCurrentUser();
+      } catch {
+        return null;
+      }
     },
-    handleLogout() {
-      logout()
-      this.currentUser = null
-      this.menuOpen = false
-      this.$router.push('/login')
-    }
-  }
-}
+    closeMobileNav() {
+      const navCollapse = this.$refs.navCollapse;
+      if (navCollapse?.classList.contains("show"))
+        (Collapse.getInstance(navCollapse) || new Collapse(navCollapse)).hide();
+    },
+    logout() {
+      clearSession();
+      window.location.href =
+        "http://localhost:3007/?logout=1&redirect=" +
+        encodeURIComponent("http://localhost:5173/institutions");
+    },
+  },
+};
 </script>
 
 <style scoped>
-.site-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--primary-dark);
-  color: var(--text-white);
-  box-shadow: var(--shadow-md);
-  border-bottom: 3px solid var(--flag-stripe);
+.bg-navy {
+  background-color: #001242 !important;
 }
-
-.nav-inner {
-  display: flex;
+.text-gold {
+  color: #ffb81c !important;
+}
+.max-w-lg {
+  max-width: 600px;
+}
+.sa-nav-tab {
+  padding: 8px 18px;
+  border-radius: 50rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.25s ease-in-out;
+  display: inline-block;
+}
+.sa-nav-tab:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+.profile-avatar {
   align-items: center;
-  justify-content: space-between;
-  height: 68px;
-  gap: 16px;
-}
-
-.nav-brand {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--text-white);
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.nav-brand span {
-  color: var(--gold-light);
-}
-
-.nav-links {
-  display: flex;
-  gap: 24px;
-}
-
-.nav-link {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: var(--transition);
-}
-
-.nav-link:hover,
-.nav-link.router-link-active {
-  color: var(--gold-light);
-}
-
-.nav-auth {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.nav-user {
+  background: #ffb81c;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  color: #001242;
+  display: inline-flex;
+  flex: 0 0 42px;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.85);
-  white-space: nowrap;
+  font-weight: 700;
+  height: 42px;
+  justify-content: center;
+  text-decoration: none;
+  width: 42px;
 }
-
-.nav-btn {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--text-white);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 7px 14px;
-  border-radius: var(--radius);
-  font-size: 0.82rem;
+.profile-avatar:hover {
+  box-shadow: 0 4px 12px rgba(255, 184, 28, 0.45);
+  color: #001242;
+  transform: translateY(-1px);
+}
+.logout-button {
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50rem;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  font-family: inherit;
-  transition: var(--transition);
 }
-
-.nav-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+.logout-button:hover {
+  background: rgba(224, 60, 49, 0.9);
+  border-color: #e03c31;
 }
-
-/* Hamburger - hidden on desktop */
-.nav-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  width: 42px;
-  height: 42px;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: var(--radius);
-  cursor: pointer;
+.tab-green.router-link-active,
+.tab-green.router-link-exact-active {
+  background: #007a3d !important;
+  color: #fff !important;
 }
-
-.nav-toggle span {
-  display: block;
-  height: 2px;
-  width: 100%;
-  background: var(--text-white);
-  border-radius: 2px;
-  transition: var(--transition-fast);
+.tab-gold.router-link-active,
+.tab-gold.router-link-exact-active {
+  background: #ffb81c !important;
+  color: #000 !important;
 }
-
-.nav-toggle[aria-expanded="true"] span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
+.tab-red.router-link-active,
+.tab-red.router-link-exact-active {
+  background: #e03c31 !important;
+  color: #fff !important;
 }
-
-.nav-toggle[aria-expanded="true"] span:nth-child(2) {
-  opacity: 0;
+.tab-blue.router-link-active,
+.tab-blue.router-link-exact-active {
+  background: #002395 !important;
+  color: #fff !important;
 }
-
-.nav-toggle[aria-expanded="true"] span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
+.tab-black.router-link-active,
+.tab-black.router-link-exact-active {
+  background: #1a1a1a !important;
+  color: #fff !important;
 }
-
-/* Mobile menu panel */
-.mobile-menu {
-  display: none;
-  background: var(--primary-dark);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 12px 20px 20px;
-  flex-direction: column;
-}
-
-.mobile-link {
-  padding: 14px 4px;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  font-size: 0.95rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  transition: var(--transition);
-}
-
-.mobile-link:hover,
-.mobile-link.router-link-active {
-  color: var(--gold-light);
-}
-
-.mobile-auth {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 16px;
-}
-
-.mobile-user {
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-@media (max-width: 768px) {
-  .nav-links,
-  .nav-auth {
-    display: none;
-  }
-
-  .nav-toggle {
-    display: flex;
-  }
-
-  .mobile-menu {
-    display: flex;
+@media (max-width: 991.98px) {
+  .profile-avatar {
+    align-self: flex-start;
   }
 }
 </style>

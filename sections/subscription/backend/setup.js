@@ -6,28 +6,28 @@
  * it only creates missing tables and seeds empty ones.
  * Connects to XAMPP MySQL on port 3307 (see .env).
  */
-import mysql from 'mysql2/promise'
-import bcrypt from 'bcryptjs'
-import dotenv from 'dotenv'
+import mysql from "mysql2/promise";
+import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config({ path: [".env", "../../../backend/.env"] });
 
 async function setup() {
-  console.log('Setting up UniApply Subscription database...\n')
+  console.log("Setting up UniApply Subscription database...\n");
 
   const conn = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || "localhost",
     port: Number(process.env.DB_PORT) || 3307,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    multipleStatements: true
-  })
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "",
+    multipleStatements: true,
+  });
 
-  console.log('Connected to MySQL')
+  console.log("Connected to MySQL");
 
-  await conn.query('CREATE DATABASE IF NOT EXISTS uniapply')
-  await conn.query('USE uniapply')
-  console.log('Database "uniapply" ready\n')
+  await conn.query("CREATE DATABASE IF NOT EXISTS uniapply");
+  await conn.query("USE uniapply");
+  console.log('Database "uniapply" ready\n');
 
   // ============================================
   // Create tables (IF NOT EXISTS — keeps existing data)
@@ -49,17 +49,19 @@ async function setup() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
-  `)
-  console.log('Table ready: users')
+  `);
+  console.log("Table ready: users");
 
   // Add field_of_study to existing installs (MySQL has no ADD COLUMN IF NOT EXISTS)
   const [colCheck] = await conn.query(
     `SELECT COUNT(*) AS total FROM information_schema.COLUMNS
-     WHERE TABLE_SCHEMA = 'uniapply' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'field_of_study'`
-  )
+     WHERE TABLE_SCHEMA = 'uniapply' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'field_of_study'`,
+  );
   if (Number(colCheck[0].total) === 0) {
-    await conn.query('ALTER TABLE users ADD COLUMN field_of_study VARCHAR(150)')
-    console.log('Column added: users.field_of_study')
+    await conn.query(
+      "ALTER TABLE users ADD COLUMN field_of_study VARCHAR(150)",
+    );
+    console.log("Column added: users.field_of_study");
   }
 
   await conn.query(`
@@ -73,8 +75,8 @@ async function setup() {
       highlighted BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
-  `)
-  console.log('Table ready: packages')
+  `);
+  console.log("Table ready: packages");
 
   await conn.query(`
     CREATE TABLE IF NOT EXISTS orders (
@@ -89,8 +91,8 @@ async function setup() {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (package_id) REFERENCES packages(id)
     )
-  `)
-  console.log('Table ready: orders')
+  `);
+  console.log("Table ready: orders");
 
   await conn.query(`
     CREATE TABLE IF NOT EXISTS payments (
@@ -104,8 +106,8 @@ async function setup() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
     )
-  `)
-  console.log('Table ready: payments\n')
+  `);
+  console.log("Table ready: payments\n");
 
   await conn.query(`
     CREATE TABLE IF NOT EXISTS jobs (
@@ -121,8 +123,8 @@ async function setup() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
-  `)
-  console.log('Table ready: jobs\n')
+  `);
+  console.log("Table ready: jobs\n");
 
   await conn.query(`
     CREATE TABLE IF NOT EXISTS placements (
@@ -135,8 +137,8 @@ async function setup() {
       FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
     )
-  `)
-  console.log('Table ready: placements')
+  `);
+  console.log("Table ready: placements");
 
   await conn.query(`
     CREATE TABLE IF NOT EXISTS job_applications (
@@ -156,14 +158,14 @@ async function setup() {
       FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
       FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
     )
-  `)
-  console.log('Table ready: job_applications\n')
+  `);
+  console.log("Table ready: job_applications\n");
 
   // ============================================
   // Seed data (only when the tables are empty)
   // ============================================
 
-  const [jobCount] = await conn.query('SELECT COUNT(*) AS total FROM jobs')
+  const [jobCount] = await conn.query("SELECT COUNT(*) AS total FROM jobs");
 
   if (Number(jobCount[0].total) === 0) {
     await conn.query(`
@@ -200,13 +202,15 @@ async function setup() {
        'Design and run programmes that support youth employment and skills development across the province.'),
       ('Graduate Agronomist', 'Grain SA', 'Bloemfontein', 'Agriculture & Environmental', 'full-time', 'R 280,000 – R 360,000 p/a',
        'Work with grains and oilseeds producers on soil health, crop rotation and sustainable farming practices.')
-    `)
-    console.log('Seeded: 16 graduate jobs')
+    `);
+    console.log("Seeded: 16 graduate jobs");
   } else {
-    console.log('Jobs already seeded — skipped')
+    console.log("Jobs already seeded — skipped");
   }
 
-  const [placementCount] = await conn.query('SELECT COUNT(*) AS total FROM placements')
+  const [placementCount] = await conn.query(
+    "SELECT COUNT(*) AS total FROM placements",
+  );
 
   if (Number(placementCount[0].total) === 0) {
     await conn.query(`
@@ -214,22 +218,24 @@ async function setup() {
       SELECT u.id, j.id, 320000.00, '2024-03-01'
       FROM users u, jobs j
       WHERE u.email = 'thabo@email.com' AND j.title = 'Junior Software Developer'
-    `)
+    `);
     await conn.query(`
       INSERT INTO placements (student_id, job_id, salary, employment_start)
       SELECT u.id, j.id, 380000.00, '2025-05-01'
       FROM users u, jobs j
       WHERE u.email = 'zanele@email.com' AND j.title = 'Graduate Financial Analyst'
-    `)
-    const [seedCheck] = await conn.query("SELECT COUNT(*) AS total FROM placements WHERE student_id IS NOT NULL")
+    `);
+    const [seedCheck] = await conn.query(
+      "SELECT COUNT(*) AS total FROM placements WHERE student_id IS NOT NULL",
+    );
     if (Number(seedCheck[0].total) > 0) {
-      console.log('Seeded: 2 demo placements (5% commission running)')
+      console.log("Seeded: 2 demo placements (5% commission running)");
     }
   } else {
-    console.log('Placements already seeded — skipped')
+    console.log("Placements already seeded — skipped");
   }
 
-  const [pkgCount] = await conn.query('SELECT COUNT(*) AS total FROM packages')
+  const [pkgCount] = await conn.query("SELECT COUNT(*) AS total FROM packages");
 
   if (Number(pkgCount[0].total) === 0) {
     await conn.query(`
@@ -240,53 +246,77 @@ async function setup() {
       ('Premium', 500.00, 'Application to up to 5 universities + career guidance', 5,
        '["Application to up to 5 universities","Document verification & optimization","Application submission","Real-time status tracking","Dedicated advisor","Career guidance session","Job placement assistance after graduation"]',
        TRUE)
-    `)
-    console.log('Seeded: 2 packages (Basic free, Premium R500)')
+    `);
+    console.log("Seeded: 2 packages (Basic free, Premium R500)");
   } else {
-    console.log('Packages already seeded — skipped')
+    console.log("Packages already seeded — skipped");
   }
 
-  const [userCount] = await conn.query("SELECT COUNT(*) AS total FROM users WHERE role = 'student'")
+  const [userCount] = await conn.query(
+    "SELECT COUNT(*) AS total FROM users WHERE role = 'student'",
+  );
 
   if (Number(userCount[0].total) === 0) {
-    const studentHash = await bcrypt.hash('password123', 10)
+    const studentHash = await bcrypt.hash("password123", 10);
     await conn.query(
-      'INSERT INTO users (first_name, last_name, email, password, phone, university, field_of_study, status, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      ['Thabo', 'Mokoena', 'thabo@email.com', studentHash, '+27 82 123 4567', 'University of Cape Town (UCT)', 'Information Technology & Computer Science', 'approved', 'student']
-    )
+      "INSERT INTO users (first_name, last_name, email, password, phone, university, field_of_study, status, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        "Thabo",
+        "Mokoena",
+        "thabo@email.com",
+        studentHash,
+        "+27 82 123 4567",
+        "University of Cape Town (UCT)",
+        "Information Technology & Computer Science",
+        "approved",
+        "student",
+      ],
+    );
     await conn.query(
-      'INSERT INTO users (first_name, last_name, email, password, phone, university, field_of_study, status, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      ['Zanele', 'Khumalo', 'zanele@email.com', studentHash, '+27 83 456 7890', 'Stellenbosch University', 'Business & Finance', 'approved', 'student']
-    )
-    console.log('Seeded: 2 demo students (password: password123)')
+      "INSERT INTO users (first_name, last_name, email, password, phone, university, field_of_study, status, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        "Zanele",
+        "Khumalo",
+        "zanele@email.com",
+        studentHash,
+        "+27 83 456 7890",
+        "Stellenbosch University",
+        "Business & Finance",
+        "approved",
+        "student",
+      ],
+    );
+    console.log("Seeded: 2 demo students (password: password123)");
   } else {
-    console.log('Students already seeded — skipped')
+    console.log("Students already seeded — skipped");
   }
 
-console.log('\nDatabase setup complete!')
-console.log('Demo students:')
-console.log('  thabo@email.com / password123 (approved)')
-console.log('  zanele@email.com / password123 (approved)')
+  console.log("\nDatabase setup complete!");
+  console.log("Demo students:");
+  console.log("  thabo@email.com / password123 (approved)");
+  console.log("  zanele@email.com / password123 (approved)");
 
   // Backfill field of study on existing demo students (idempotent)
   await conn.query(
     `UPDATE users SET field_of_study = ?
      WHERE email = 'thabo@email.com' AND (field_of_study IS NULL OR field_of_study = '')`,
-    ['Information Technology & Computer Science']
-  )
+    ["Information Technology & Computer Science"],
+  );
   await conn.query(
     `UPDATE users SET field_of_study = ?
      WHERE email = 'zanele@email.com' AND (field_of_study IS NULL OR field_of_study = '')`,
-    ['Business & Finance']
-  )
-  console.log('Demo student fields backfilled.')
+    ["Business & Finance"],
+  );
+  console.log("Demo student fields backfilled.");
 
-  await conn.end()
-  process.exit(0)
+  await conn.end();
+  process.exit(0);
 }
 
-setup().catch(err => {
-  console.error('Setup failed:', err.message)
-  console.error(`\nMake sure your MySQL server is running on port ${process.env.DB_PORT || 3307}`)
-  process.exit(1)
-})
+setup().catch((err) => {
+  console.error("Setup failed:", err.message);
+  console.error(
+    `\nMake sure your MySQL server is running on port ${process.env.DB_PORT || 3307}`,
+  );
+  process.exit(1);
+});

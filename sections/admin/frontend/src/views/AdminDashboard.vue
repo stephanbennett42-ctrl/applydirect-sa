@@ -5,6 +5,15 @@
         <span class="admin-nav-brand">ApplyDirect <span>SA</span> Admin</span>
         <div class="admin-nav-right">
           <span class="admin-nav-user">Hi, {{ adminName }}</span>
+          <a
+            class="admin-nav-btn admin-user-site-btn"
+            href="http://localhost:5173/institutions"
+            target="_blank"
+            rel="noopener"
+            aria-label="Open the user site"
+          >
+            View User Site
+          </a>
           <button class="admin-nav-btn" @click="handleLogout">Sign Out</button>
         </div>
       </div>
@@ -23,15 +32,21 @@
         </div>
         <div class="stat-card">
           <span class="stat-label">Pending Approval</span>
-          <span class="stat-value stat-pending">{{ countStatus('pending') }}</span>
+          <span class="stat-value stat-pending">{{
+            countStatus("pending")
+          }}</span>
         </div>
         <div class="stat-card">
           <span class="stat-label">Approved</span>
-          <span class="stat-value stat-approved">{{ countStatus('approved') }}</span>
+          <span class="stat-value stat-approved">{{
+            countStatus("approved")
+          }}</span>
         </div>
         <div class="stat-card">
           <span class="stat-label">Rejected</span>
-          <span class="stat-value stat-rejected">{{ countStatus('rejected') }}</span>
+          <span class="stat-value stat-rejected">{{
+            countStatus("rejected")
+          }}</span>
         </div>
         <div class="stat-card">
           <span class="stat-label">Active Plans</span>
@@ -53,18 +68,68 @@
 
       <!-- Tabs -->
       <div class="admin-tabs">
-        <button :class="['admin-tab', { active: tab === 'students' }]" @click="tab = 'students'">Students</button>
-        <button :class="['admin-tab', { active: tab === 'plans' }]" @click="tab = 'plans'">Subscription Plans</button>
-        <button :class="['admin-tab', { active: tab === 'orders' }]" @click="tab = 'orders'">Orders</button>
-        <button :class="['admin-tab', { active: tab === 'admins' }]" @click="tab = 'admins'">Admins</button>
-        <button :class="['admin-tab', { active: tab === 'jobs' }]" @click="tab = 'jobs'">Graduate Jobs</button>
-        <button :class="['admin-tab', { active: tab === 'placements' }]" @click="tab = 'placements'">Placements</button>
-        <button :class="['admin-tab', { active: tab === 'applications' }]" @click="tab = 'applications'">Applications</button>
-        <button :class="['admin-tab', { active: tab === 'messages' }]" @click="tab = 'messages'">WhatsApp</button>
+        <button
+          :class="['admin-tab', { active: tab === 'students' }]"
+          @click="tab = 'students'"
+        >
+          Students
+        </button>
+        <button
+          :class="['admin-tab', { active: tab === 'plans' }]"
+          @click="tab = 'plans'"
+        >
+          Subscription Plans
+        </button>
+        <button
+          :class="['admin-tab', { active: tab === 'orders' }]"
+          @click="tab = 'orders'"
+        >
+          Orders
+        </button>
+        <button
+          :class="['admin-tab', { active: tab === 'admins' }]"
+          @click="tab = 'admins'"
+        >
+          Admins
+        </button>
+        <button
+          :class="['admin-tab', { active: tab === 'jobs' }]"
+          @click="tab = 'jobs'"
+        >
+          Graduate Jobs
+        </button>
+        <button
+          :class="['admin-tab', { active: tab === 'placements' }]"
+          @click="tab = 'placements'"
+        >
+          Placements
+        </button>
+        <button
+          :class="['admin-tab', { active: tab === 'applications' }]"
+          @click="tab = 'applications'"
+        >
+          Applications
+        </button>
+        <button
+          :class="['admin-tab', { active: tab === 'messages' }]"
+          @click="tab = 'messages'"
+        >
+          WhatsApp
+        </button>
       </div>
 
       <div v-if="message" class="alert admin-alert">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
         <span>{{ message }}</span>
       </div>
 
@@ -83,12 +148,16 @@
               :key="f"
               :class="['chip', { active: filter === f }]"
               @click="filter = f"
-            >{{ f }}</button>
+            >
+              {{ f }}
+            </button>
           </div>
         </div>
 
         <p v-if="loadingUsers" class="admin-note">Loading students...</p>
-        <p v-else-if="filteredStudents.length === 0" class="admin-note">No students match your search.</p>
+        <p v-else-if="filteredStudents.length === 0" class="admin-note">
+          No students match your search.
+        </p>
 
         <div v-else class="table-wrap">
           <table class="admin-table">
@@ -106,13 +175,17 @@
               <tr v-for="u in filteredStudents" :key="u.id">
                 <td>
                   <strong>{{ u.firstName }} {{ u.lastName }}</strong>
-                  <span v-if="u.role === 'admin'" class="role-badge">Admin</span>
+                  <span v-if="u.role === 'admin'" class="role-badge"
+                    >Admin</span
+                  >
                 </td>
                 <td>{{ u.email }}</td>
-                <td>{{ u.phone || '—' }}</td>
-                <td>{{ u.university || '—' }}</td>
+                <td>{{ u.phone || "—" }}</td>
+                <td>{{ u.university || "—" }}</td>
                 <td>
-                  <span :class="['status-badge', 'status-' + u.status]">{{ u.status }}</span>
+                  <span :class="['status-badge', 'status-' + u.status]">{{
+                    u.status
+                  }}</span>
                 </td>
                 <td class="col-actions">
                   <template v-if="u.role !== 'admin'">
@@ -124,7 +197,19 @@
                       aria-label="Approve"
                       title="Approve"
                     >
-                      <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <svg
+                        class="btn-icon"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
                       Approve
                     </button>
                     <button
@@ -135,7 +220,20 @@
                       aria-label="Reject"
                       title="Reject"
                     >
-                      <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      <svg
+                        class="btn-icon"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
                       Reject
                     </button>
                     <button
@@ -146,7 +244,20 @@
                       aria-label="Reset to pending"
                       title="Reset to pending"
                     >
-                      <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                      <svg
+                        class="btn-icon"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <polyline points="1 4 1 10 7 10" />
+                        <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+                      </svg>
                       Reset
                     </button>
                   </template>
@@ -160,32 +271,84 @@
 
       <!-- Admins tab -->
       <div v-if="tab === 'admins'">
-        <p class="admin-note">Create new admin logins directly. Created accounts are approved immediately and can sign in using the credentials you set here.</p>
+        <p class="admin-note">
+          Create new admin logins directly. Created accounts are approved
+          immediately and can sign in using the credentials you set here.
+        </p>
 
         <div class="panel-card">
           <h3 class="panel-title">Create New Admin</h3>
           <form @submit.prevent="createAdmin" class="admin-form">
             <div class="form-row-3">
-              <div class="field"><label>First name</label><input v-model="adminForm.firstName" @input="adminForm.firstName = sanitizeName(adminForm.firstName)" placeholder="First name" required /></div>
-              <div class="field"><label>Last name</label><input v-model="adminForm.lastName" @input="adminForm.lastName = sanitizeName(adminForm.lastName)" placeholder="Last name" required /></div>
-              <div class="field"><label>Email</label><input type="email" v-model="adminForm.email" placeholder="admin@example.com" required /></div>
+              <div class="field">
+                <label>First name</label
+                ><input
+                  v-model="adminForm.firstName"
+                  @input="
+                    adminForm.firstName = sanitizeName(adminForm.firstName)
+                  "
+                  placeholder="First name"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label>Last name</label
+                ><input
+                  v-model="adminForm.lastName"
+                  @input="adminForm.lastName = sanitizeName(adminForm.lastName)"
+                  placeholder="Last name"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label>Email</label
+                ><input
+                  type="email"
+                  v-model="adminForm.email"
+                  placeholder="admin@example.com"
+                  required
+                />
+              </div>
             </div>
-            <div class="field" style="max-width:320px;">
+            <div class="field" style="max-width: 320px">
               <label>Password</label>
-              <input v-model="adminForm.password" placeholder="Min 6 characters" required minlength="6" />
+              <input
+                v-model="adminForm.password"
+                placeholder="Min 6 characters"
+                required
+                minlength="6"
+              />
             </div>
-            <button class="btn btn-primary btn-small" :disabled="creatingAdmin" type="submit">
-              {{ creatingAdmin ? 'Creating...' : 'Create Admin' }}
+            <button
+              class="btn btn-primary btn-small"
+              :disabled="creatingAdmin"
+              type="submit"
+            >
+              {{ creatingAdmin ? "Creating..." : "Create Admin" }}
             </button>
           </form>
 
           <div v-if="adminCreated" class="alert success-alert">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <span>Admin created — login: <strong>{{ adminCreated.email }}</strong> / {{ adminCreated.password }}</span>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <span
+              >Admin created — login:
+              <strong>{{ adminCreated.email }}</strong> /
+              {{ adminCreated.password }}</span
+            >
           </div>
         </div>
 
-        <div class="table-wrap" style="margin-top:24px;">
+        <div class="table-wrap" style="margin-top: 24px">
           <table class="admin-table">
             <thead>
               <tr>
@@ -198,13 +361,38 @@
             </thead>
             <tbody>
               <tr v-for="a in admins" :key="a.id">
-                <td><strong>{{ a.firstName }} {{ a.lastName }}</strong></td>
+                <td>
+                  <strong>{{ a.firstName }} {{ a.lastName }}</strong>
+                </td>
                 <td>{{ a.email }}</td>
-                <td><span :class="['status-badge', 'status-' + a.status]">{{ a.status }}</span></td>
+                <td>
+                  <span :class="['status-badge', 'status-' + a.status]">{{
+                    a.status
+                  }}</span>
+                </td>
                 <td>{{ formatDate(a.registeredDate) }}</td>
                 <td class="col-actions">
-                  <button class="btn btn-ghost btn-small" title="Edit login details" @click="startEditAdmin(a)">
-                    <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  <button
+                    class="btn btn-ghost btn-small"
+                    title="Edit login details"
+                    @click="startEditAdmin(a)"
+                  >
+                    <svg
+                      class="btn-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                      />
+                      <path
+                        d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                      />
+                    </svg>
                     Edit
                   </button>
                 </td>
@@ -215,33 +403,91 @@
       </div>
 
       <!-- Edit admin login modal -->
-      <div v-if="editingAdmin" class="admin-modal-overlay" @click.self="closeEditAdmin">
+      <div
+        v-if="editingAdmin"
+        class="admin-modal-overlay"
+        @click.self="closeEditAdmin"
+      >
         <div class="admin-modal">
           <button class="admin-modal-close" @click="closeEditAdmin">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
           <h3 class="panel-title">Edit Admin Login</h3>
-          <p class="admin-note" style="margin-bottom:16px;">Update {{ editingAdmin.firstName }} {{ editingAdmin.lastName }}'s login details. Leave the password blank to keep the current one.</p>
+          <p class="admin-note" style="margin-bottom: 16px">
+            Update {{ editingAdmin.firstName }} {{ editingAdmin.lastName }}'s
+            login details. Leave the password blank to keep the current one.
+          </p>
 
           <form @submit.prevent="saveAdminEdit" class="admin-form">
             <div class="form-row-2">
-              <div class="field"><label>First name</label><input v-model="editingAdmin.firstName" @input="editingAdmin.firstName = sanitizeName(editingAdmin.firstName)" required /></div>
-              <div class="field"><label>Last name</label><input v-model="editingAdmin.lastName" @input="editingAdmin.lastName = sanitizeName(editingAdmin.lastName)" required /></div>
+              <div class="field">
+                <label>First name</label
+                ><input
+                  v-model="editingAdmin.firstName"
+                  @input="
+                    editingAdmin.firstName = sanitizeName(
+                      editingAdmin.firstName,
+                    )
+                  "
+                  required
+                />
+              </div>
+              <div class="field">
+                <label>Last name</label
+                ><input
+                  v-model="editingAdmin.lastName"
+                  @input="
+                    editingAdmin.lastName = sanitizeName(editingAdmin.lastName)
+                  "
+                  required
+                />
+              </div>
             </div>
             <div class="field">
               <label>Email</label>
               <input type="email" v-model="editingAdmin.email" required />
             </div>
             <div class="field">
-              <label>New password <span class="field-hint">Blank = keep current</span></label>
-              <input v-model="editingAdmin.password" type="password" placeholder="Min 6 characters (blank keeps current)" minlength="6" autocomplete="new-password" />
+              <label
+                >New password
+                <span class="field-hint">Blank = keep current</span></label
+              >
+              <input
+                v-model="editingAdmin.password"
+                type="password"
+                placeholder="Min 6 characters (blank keeps current)"
+                minlength="6"
+                autocomplete="new-password"
+              />
             </div>
-            <p v-if="editAdminError" class="admin-error">{{ editAdminError }}</p>
+            <p v-if="editAdminError" class="admin-error">
+              {{ editAdminError }}
+            </p>
             <div class="form-actions">
-              <button class="btn btn-primary btn-small" type="submit" :disabled="savingAdminEdit">
-                {{ savingAdminEdit ? 'Saving...' : 'Save Changes' }}
+              <button
+                class="btn btn-primary btn-small"
+                type="submit"
+                :disabled="savingAdminEdit"
+              >
+                {{ savingAdminEdit ? "Saving..." : "Save Changes" }}
               </button>
-              <button class="btn btn-ghost btn-small" type="button" @click="closeEditAdmin">Cancel</button>
+              <button
+                class="btn btn-ghost btn-small"
+                type="button"
+                @click="closeEditAdmin"
+              >
+                Cancel
+              </button>
             </div>
           </form>
         </div>
@@ -249,10 +495,18 @@
 
       <!-- Job Applications tab -->
       <div v-if="tab === 'applications'">
-        <p class="admin-note">Job applications submitted by students from the Graduate Jobs page. Review, shortlist, hire or reject each applicant.</p>
+        <p class="admin-note">
+          Job applications submitted by students from the Graduate Jobs page.
+          Review, shortlist, hire or reject each applicant.
+        </p>
 
-        <p v-if="loadingApplications" class="admin-note">Loading applications...</p>
-        <p v-else-if="applications.length === 0" class="admin-note">No job applications yet. Applications appear here when students apply on the site.</p>
+        <p v-if="loadingApplications" class="admin-note">
+          Loading applications...
+        </p>
+        <p v-else-if="applications.length === 0" class="admin-note">
+          No job applications yet. Applications appear here when students apply
+          on the site.
+        </p>
 
         <div v-else class="table-wrap">
           <table class="admin-table">
@@ -270,26 +524,72 @@
               <tr v-for="a in applications" :key="a.id">
                 <td>
                   <strong>{{ a.fullName }}</strong>
-                  <span class="sub-cell">{{ a.email }}<template v-if="a.phone"> · {{ a.phone }}</template></span>
-                  <span v-if="a.university" class="sub-cell">{{ a.university }}<template v-if="a.fieldOfStudy"> — {{ a.fieldOfStudy }}</template></span>
+                  <span class="sub-cell"
+                    >{{ a.email
+                    }}<template v-if="a.phone"> · {{ a.phone }}</template></span
+                  >
+                  <span v-if="a.university" class="sub-cell"
+                    >{{ a.university
+                    }}<template v-if="a.fieldOfStudy">
+                      — {{ a.fieldOfStudy }}</template
+                    ></span
+                  >
                 </td>
                 <td>
                   <strong>{{ a.jobTitle }}</strong>
                   <span class="sub-cell">{{ a.company }}</span>
                 </td>
-                <td>{{ a.location || '—' }}</td>
+                <td>{{ a.location || "—" }}</td>
                 <td>{{ formatDate(a.appliedDate) }}</td>
                 <td>
-                  <span :class="['status-badge', appStatusClass(a.status)]">{{ a.status }}</span>
+                  <span :class="['status-badge', appStatusClass(a.status)]">{{
+                    a.status
+                  }}</span>
                 </td>
                 <td class="col-actions">
-                  <button class="btn btn-ghost btn-small" title="View application" @click="selectedApplication = a">
-                    <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <button
+                    class="btn btn-ghost btn-small"
+                    title="View application"
+                    @click="selectedApplication = a"
+                  >
+                    <svg
+                      class="btn-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
                     View
                   </button>
-                  <button v-if="a.status !== 'shortlisted'" class="btn btn-primary btn-small" @click="setApplicationStatus(a, 'shortlisted')" :disabled="savingApplicationId === a.id">Shortlist</button>
-                  <button v-if="a.status !== 'hired'" class="btn btn-primary btn-small" @click="setApplicationStatus(a, 'hired')" :disabled="savingApplicationId === a.id">Hire</button>
-                  <button v-if="a.status !== 'rejected'" class="btn btn-accent btn-small" @click="setApplicationStatus(a, 'rejected')" :disabled="savingApplicationId === a.id">Reject</button>
+                  <button
+                    v-if="a.status !== 'shortlisted'"
+                    class="btn btn-primary btn-small"
+                    @click="setApplicationStatus(a, 'shortlisted')"
+                    :disabled="savingApplicationId === a.id"
+                  >
+                    Shortlist
+                  </button>
+                  <button
+                    v-if="a.status !== 'hired'"
+                    class="btn btn-primary btn-small"
+                    @click="setApplicationStatus(a, 'hired')"
+                    :disabled="savingApplicationId === a.id"
+                  >
+                    Hire
+                  </button>
+                  <button
+                    v-if="a.status !== 'rejected'"
+                    class="btn btn-accent btn-small"
+                    @click="setApplicationStatus(a, 'rejected')"
+                    :disabled="savingApplicationId === a.id"
+                  >
+                    Reject
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -298,15 +598,39 @@
       </div>
 
       <!-- Application detail modal -->
-      <div v-if="selectedApplication" class="admin-modal-overlay" @click.self="selectedApplication = null">
+      <div
+        v-if="selectedApplication"
+        class="admin-modal-overlay"
+        @click.self="selectedApplication = null"
+      >
         <div class="admin-modal admin-modal-wide">
           <button class="admin-modal-close" @click="selectedApplication = null">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
 
-          <h3 class="panel-title">{{ selectedApplication.jobTitle }} <span class="field-hint">at {{ selectedApplication.company }}</span></h3>
-          <p class="admin-note">Applied {{ formatDate(selectedApplication.appliedDate) }} · Status:
-            <span :class="['status-badge', appStatusClass(selectedApplication.status)]">{{ selectedApplication.status }}</span>
+          <h3 class="panel-title">
+            {{ selectedApplication.jobTitle }}
+            <span class="field-hint">at {{ selectedApplication.company }}</span>
+          </h3>
+          <p class="admin-note">
+            Applied {{ formatDate(selectedApplication.appliedDate) }} · Status:
+            <span
+              :class="[
+                'status-badge',
+                appStatusClass(selectedApplication.status),
+              ]"
+              >{{ selectedApplication.status }}</span
+            >
           </p>
 
           <div class="app-detail-grid">
@@ -320,73 +644,133 @@
             </div>
             <div class="field">
               <label>Phone</label>
-              <p class="app-detail-text">{{ selectedApplication.phone || '—' }}</p>
+              <p class="app-detail-text">
+                {{ selectedApplication.phone || "—" }}
+              </p>
             </div>
             <div class="field">
               <label>University</label>
-              <p class="app-detail-text">{{ selectedApplication.university || '—' }}</p>
+              <p class="app-detail-text">
+                {{ selectedApplication.university || "—" }}
+              </p>
             </div>
             <div class="field">
               <label>Field of study</label>
-              <p class="app-detail-text">{{ selectedApplication.fieldOfStudy || '—' }}</p>
+              <p class="app-detail-text">
+                {{ selectedApplication.fieldOfStudy || "—" }}
+              </p>
             </div>
             <div class="field">
               <label>Location</label>
-              <p class="app-detail-text">{{ selectedApplication.location || '—' }}</p>
+              <p class="app-detail-text">
+                {{ selectedApplication.location || "—" }}
+              </p>
             </div>
           </div>
 
           <div class="field">
             <label>Cover letter</label>
-            <p class="app-detail-text app-detail-block">{{ selectedApplication.coverLetter }}</p>
+            <p class="app-detail-text app-detail-block">
+              {{ selectedApplication.coverLetter }}
+            </p>
           </div>
           <div class="field" v-if="selectedApplication.experience">
             <label>Experience / notes</label>
-            <p class="app-detail-text app-detail-block">{{ selectedApplication.experience }}</p>
+            <p class="app-detail-text app-detail-block">
+              {{ selectedApplication.experience }}
+            </p>
           </div>
 
-          <div class="form-actions" style="margin-top:16px;">
-            <button v-if="selectedApplication.status !== 'shortlisted'" class="btn btn-primary btn-small" @click="setApplicationStatus(selectedApplication, 'shortlisted'); selectedApplication = null">Shortlist</button>
-            <button v-if="selectedApplication.status !== 'hired'" class="btn btn-primary btn-small" @click="setApplicationStatus(selectedApplication, 'hired'); selectedApplication = null">Mark Hired</button>
-            <button v-if="selectedApplication.status !== 'rejected'" class="btn btn-accent btn-small" @click="setApplicationStatus(selectedApplication, 'rejected'); selectedApplication = null">Reject</button>
-            <button class="btn btn-ghost btn-small" @click="selectedApplication = null">Close</button>
+          <div class="form-actions" style="margin-top: 16px">
+            <button
+              v-if="selectedApplication.status !== 'shortlisted'"
+              class="btn btn-primary btn-small"
+              @click="
+                setApplicationStatus(selectedApplication, 'shortlisted');
+                selectedApplication = null;
+              "
+            >
+              Shortlist
+            </button>
+            <button
+              v-if="selectedApplication.status !== 'hired'"
+              class="btn btn-primary btn-small"
+              @click="
+                setApplicationStatus(selectedApplication, 'hired');
+                selectedApplication = null;
+              "
+            >
+              Mark Hired
+            </button>
+            <button
+              v-if="selectedApplication.status !== 'rejected'"
+              class="btn btn-accent btn-small"
+              @click="
+                setApplicationStatus(selectedApplication, 'rejected');
+                selectedApplication = null;
+              "
+            >
+              Reject
+            </button>
+            <button
+              class="btn btn-ghost btn-small"
+              @click="selectedApplication = null"
+            >
+              Close
+            </button>
           </div>
         </div>
       </div>
 
       <!-- WhatsApp Messages tab -->
       <div v-if="tab === 'messages'">
-        <p class="admin-note">Compose a message, pick a student, and WhatsApp opens with it pre-filled — just press send. Works for any number, no API account needed.</p>
+        <p class="admin-note">
+          Compose a message, pick a student, and WhatsApp opens with it
+          pre-filled — just press send. Works for any number, no API account
+          needed.
+        </p>
 
         <div class="panel-card">
           <h3 class="panel-title">Send Message on WhatsApp</h3>
 
-          <div class="field" style="max-width:520px;">
+          <div class="field" style="max-width: 520px">
             <label>Student</label>
             <select v-model="msgUserId" @change="onSelectStudent">
               <option value="" disabled>Select a student...</option>
               <option v-for="u in students" :key="u.id" :value="u.id">
-                {{ u.firstName }} {{ u.lastName }} — {{ u.phone || 'no phone' }}
+                {{ u.firstName }} {{ u.lastName }} — {{ u.phone || "no phone" }}
               </option>
             </select>
           </div>
 
-          <div class="field" style="max-width:520px;">
+          <div class="field" style="max-width: 520px">
             <label>Phone number (WhatsApp)</label>
             <input v-model="msgPhone" placeholder="e.g. 067 802 0783" />
           </div>
 
           <div class="field">
             <label>Message</label>
-            <textarea v-model="msgText" rows="4" placeholder="Type your message here..."></textarea>
+            <textarea
+              v-model="msgText"
+              rows="4"
+              placeholder="Type your message here..."
+            ></textarea>
           </div>
 
-          <button class="btn btn-primary btn-small" @click="openWhatsApp" :disabled="msgBusy || !msgPhone.trim() || !msgText.trim()">
+          <button
+            class="btn btn-primary btn-small"
+            @click="openWhatsApp"
+            :disabled="msgBusy || !msgPhone.trim() || !msgText.trim()"
+          >
             <span v-if="msgBusy">Opening WhatsApp...</span>
             <span v-else>Open WhatsApp</span>
           </button>
 
-          <div v-if="msgError" class="alert admin-alert msg-error" style="margin-top:14px;">
+          <div
+            v-if="msgError"
+            class="alert admin-alert msg-error"
+            style="margin-top: 14px"
+          >
             {{ msgError }}
           </div>
         </div>
@@ -413,11 +797,20 @@
               </div>
               <div class="field">
                 <label>Price (Rands)</label>
-                <input type="number" v-model.number="p.price" min="0" step="0.01" />
+                <input
+                  type="number"
+                  v-model.number="p.price"
+                  min="0"
+                  step="0.01"
+                />
               </div>
               <div class="field">
                 <label>Max Universities</label>
-                <input type="number" v-model.number="p.maxUniversities" min="1" />
+                <input
+                  type="number"
+                  v-model.number="p.maxUniversities"
+                  min="1"
+                />
               </div>
             </div>
 
@@ -435,7 +828,9 @@
               class="btn btn-primary btn-small"
               @click="savePackage(p)"
               :disabled="busyId === p.id"
-            >{{ busyId === p.id ? 'Saving...' : 'Save Changes' }}</button>
+            >
+              {{ busyId === p.id ? "Saving..." : "Save Changes" }}
+            </button>
           </div>
         </div>
       </div>
@@ -443,7 +838,9 @@
       <!-- Orders tab -->
       <div v-if="tab === 'orders'">
         <p v-if="loadingOrders" class="admin-note">Loading orders...</p>
-        <p v-else-if="orders.length === 0" class="admin-note">No orders have been placed yet.</p>
+        <p v-else-if="orders.length === 0" class="admin-note">
+          No orders have been placed yet.
+        </p>
 
         <div v-else class="table-wrap">
           <table class="admin-table">
@@ -466,9 +863,11 @@
                 <td>{{ o.studentEmail }}</td>
                 <td>{{ o.packageName }}</td>
                 <td>R {{ o.amount }}</td>
-                <td>{{ o.paymentMethod || '—' }}</td>
+                <td>{{ o.paymentMethod || "—" }}</td>
                 <td>
-                  <span :class="['status-badge', 'status-' + o.status]">{{ o.status }}</span>
+                  <span :class="['status-badge', 'status-' + o.status]">{{
+                    o.status
+                  }}</span>
                 </td>
                 <td>{{ formatDate(o.createdAt) }}</td>
               </tr>
@@ -479,29 +878,48 @@
 
       <!-- Graduate Jobs tab -->
       <div v-if="tab === 'jobs'">
-        <p class="admin-note">Manage graduate job listings shown on the public site. Students browse these by their field of study.</p>
+        <p class="admin-note">
+          Manage graduate job listings shown on the public site. Students browse
+          these by their field of study.
+        </p>
 
         <div class="panel-card">
-          <h3 class="panel-title">{{ editingJobId ? 'Edit Job' : 'Add New Job' }}</h3>
+          <h3 class="panel-title">
+            {{ editingJobId ? "Edit Job" : "Add New Job" }}
+          </h3>
           <form @submit.prevent="saveJob" class="admin-form">
             <div class="form-row-2">
               <div class="field">
                 <label>Job Title *</label>
-                <input v-model="jobForm.title" placeholder="e.g. Junior Software Developer" required />
+                <input
+                  v-model="jobForm.title"
+                  placeholder="e.g. Junior Software Developer"
+                  required
+                />
               </div>
               <div class="field">
                 <label>Company *</label>
-                <input v-model="jobForm.company" placeholder="e.g. AfroSoft Solutions" required />
+                <input
+                  v-model="jobForm.company"
+                  placeholder="e.g. AfroSoft Solutions"
+                  required
+                />
               </div>
             </div>
             <div class="form-row-2">
               <div class="field">
                 <label>Location</label>
-                <input v-model="jobForm.location" placeholder="e.g. Cape Town" />
+                <input
+                  v-model="jobForm.location"
+                  placeholder="e.g. Cape Town"
+                />
               </div>
               <div class="field">
                 <label>Salary</label>
-                <input v-model="jobForm.salary" placeholder="e.g. R 240,000 – R 340,000 p/a" />
+                <input
+                  v-model="jobForm.salary"
+                  placeholder="e.g. R 240,000 – R 340,000 p/a"
+                />
               </div>
             </div>
             <div class="form-row-2">
@@ -509,7 +927,9 @@
                 <label>Field of Study *</label>
                 <select v-model="jobForm.field" required>
                   <option value="" disabled>Select field...</option>
-                  <option v-for="f in fieldOptions" :key="f" :value="f">{{ f }}</option>
+                  <option v-for="f in fieldOptions" :key="f" :value="f">
+                    {{ f }}
+                  </option>
                 </select>
               </div>
               <div class="field">
@@ -524,19 +944,42 @@
             </div>
             <div class="field">
               <label>Description</label>
-              <textarea v-model="jobForm.description" rows="4" placeholder="Describe the role and what they'll do..."></textarea>
+              <textarea
+                v-model="jobForm.description"
+                rows="4"
+                placeholder="Describe the role and what they'll do..."
+              ></textarea>
             </div>
             <div class="form-actions">
-              <button class="btn btn-primary btn-small" type="submit" :disabled="savingJob">
-                {{ savingJob ? 'Saving...' : editingJobId ? 'Save Changes' : 'Publish Job' }}
+              <button
+                class="btn btn-primary btn-small"
+                type="submit"
+                :disabled="savingJob"
+              >
+                {{
+                  savingJob
+                    ? "Saving..."
+                    : editingJobId
+                      ? "Save Changes"
+                      : "Publish Job"
+                }}
               </button>
-              <button v-if="editingJobId" class="btn btn-ghost btn-small" type="button" @click="resetJobForm">Cancel</button>
+              <button
+                v-if="editingJobId"
+                class="btn btn-ghost btn-small"
+                type="button"
+                @click="resetJobForm"
+              >
+                Cancel
+              </button>
             </div>
           </form>
         </div>
 
         <p v-if="loadingJobs" class="admin-note">Loading jobs...</p>
-        <p v-else-if="jobs.length === 0" class="admin-note">No jobs yet. Add your first listing above.</p>
+        <p v-else-if="jobs.length === 0" class="admin-note">
+          No jobs yet. Add your first listing above.
+        </p>
 
         <div v-else class="table-wrap">
           <table class="admin-table">
@@ -554,20 +997,65 @@
             <tbody>
               <tr v-for="j in jobs" :key="j.id">
                 <td>{{ j.id }}</td>
-                <td><strong>{{ j.title }}</strong></td>
+                <td>
+                  <strong>{{ j.title }}</strong>
+                </td>
                 <td>{{ j.company }}</td>
                 <td>{{ j.field }}</td>
                 <td>{{ j.type }}</td>
                 <td>
-                  <span :class="['status-badge', j.active ? 'status-approved' : 'status-pending']">{{ j.active ? 'Live' : 'Hidden' }}</span>
+                  <span
+                    :class="[
+                      'status-badge',
+                      j.active ? 'status-approved' : 'status-pending',
+                    ]"
+                    >{{ j.active ? "Live" : "Hidden" }}</span
+                  >
                 </td>
                 <td class="col-actions">
-                  <button class="btn btn-ghost btn-small" title="Edit" @click="startEditJob(j)">
-                    <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  <button
+                    class="btn btn-ghost btn-small"
+                    title="Edit"
+                    @click="startEditJob(j)"
+                  >
+                    <svg
+                      class="btn-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                      />
+                      <path
+                        d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                      />
+                    </svg>
                     Edit
                   </button>
-                  <button class="btn btn-accent btn-small" title="Delete" @click="removeJob(j)" :disabled="busyId === j.id">
-                    <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  <button
+                    class="btn btn-accent btn-small"
+                    title="Delete"
+                    @click="removeJob(j)"
+                    :disabled="busyId === j.id"
+                  >
+                    <svg
+                      class="btn-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path
+                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      />
+                    </svg>
                     Delete
                   </button>
                 </td>
@@ -580,7 +1068,10 @@
       <!-- Placements tab -->
       <div v-if="tab === 'placements'">
         <div class="banner-info">
-          <strong>5% Commission Model:</strong> once a graduate is placed through ApplyDirect SA, 5% of their annual salary is billed monthly for up to 24 months from their employment start date. Commission stops automatically after 2 years.
+          <strong>5% Commission Model:</strong> once a graduate is placed
+          through ApplyDirect SA, 5% of their annual salary is billed monthly
+          for up to 24 months from their employment start date. Commission stops
+          automatically after 2 years.
         </div>
 
         <div class="stats-grid placement-stats">
@@ -590,11 +1081,13 @@
           </div>
           <div class="stat-card">
             <span class="stat-label">Collecting Now</span>
-            <span class="stat-value">{{ placementStatusCount('active') }}</span>
+            <span class="stat-value">{{ placementStatusCount("active") }}</span>
           </div>
           <div class="stat-card">
             <span class="stat-label">Completed (2 yrs)</span>
-            <span class="stat-value">{{ placementStatusCount('completed') }}</span>
+            <span class="stat-value">{{
+              placementStatusCount("completed")
+            }}</span>
           </div>
           <div class="stat-card">
             <span class="stat-label">Commission Earned</span>
@@ -603,48 +1096,98 @@
         </div>
 
         <div class="panel-card">
-          <h3 class="panel-title">{{ editingPlacementId ? 'Edit Placement' : 'Record New Placement' }}</h3>
+          <h3 class="panel-title">
+            {{ editingPlacementId ? "Edit Placement" : "Record New Placement" }}
+          </h3>
           <form @submit.prevent="savePlacement" class="admin-form">
             <div class="form-row-2">
               <div class="field">
                 <label>Student *</label>
-                <select v-model="placementForm.studentId" required :disabled="!!editingPlacementId">
+                <select
+                  v-model="placementForm.studentId"
+                  required
+                  :disabled="!!editingPlacementId"
+                >
                   <option value="" disabled>Select student...</option>
-                  <option v-for="s in students" :key="s.id" :value="s.id">{{ s.firstName }} {{ s.lastName }} — {{ s.email }}</option>
+                  <option v-for="s in students" :key="s.id" :value="s.id">
+                    {{ s.firstName }} {{ s.lastName }} — {{ s.email }}
+                  </option>
                 </select>
               </div>
               <div class="field">
                 <label>Job *</label>
-                <select v-model="placementForm.jobId" required :disabled="!!editingPlacementId">
+                <select
+                  v-model="placementForm.jobId"
+                  required
+                  :disabled="!!editingPlacementId"
+                >
                   <option value="" disabled>Select job...</option>
-                  <option v-for="j in jobs" :key="j.id" :value="j.id">{{ j.title }} @ {{ j.company }}</option>
+                  <option v-for="j in jobs" :key="j.id" :value="j.id">
+                    {{ j.title }} @ {{ j.company }}
+                  </option>
                 </select>
               </div>
             </div>
             <div class="form-row-2">
               <div class="field">
                 <label>Annual Salary (R) *</label>
-                <input type="number" min="1" step="0.01" v-model.number="placementForm.salary" placeholder="e.g. 300000" required />
+                <input
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  v-model.number="placementForm.salary"
+                  placeholder="e.g. 300000"
+                  required
+                />
               </div>
               <div class="field">
                 <label>Employment Start Date *</label>
-                <input type="date" v-model="placementForm.employmentStart" required />
+                <input
+                  type="date"
+                  v-model="placementForm.employmentStart"
+                  required
+                />
               </div>
             </div>
-            <p v-if="placementForm.salary > 0" class="admin-note placement-note">
-              5% commission = <strong>R {{ placementMonthly(placementForm.salary) }}</strong> per month for up to 24 months (R {{ placementLifetime(placementForm.salary) }} total).
+            <p
+              v-if="placementForm.salary > 0"
+              class="admin-note placement-note"
+            >
+              5% commission =
+              <strong>R {{ placementMonthly(placementForm.salary) }}</strong>
+              per month for up to 24 months (R
+              {{ placementLifetime(placementForm.salary) }} total).
             </p>
             <div class="form-actions">
-              <button class="btn btn-primary btn-small" type="submit" :disabled="savingPlacement">
-                {{ savingPlacement ? 'Saving...' : editingPlacementId ? 'Save Changes' : 'Record Placement' }}
+              <button
+                class="btn btn-primary btn-small"
+                type="submit"
+                :disabled="savingPlacement"
+              >
+                {{
+                  savingPlacement
+                    ? "Saving..."
+                    : editingPlacementId
+                      ? "Save Changes"
+                      : "Record Placement"
+                }}
               </button>
-              <button v-if="editingPlacementId" class="btn btn-ghost btn-small" type="button" @click="resetPlacementForm">Cancel</button>
+              <button
+                v-if="editingPlacementId"
+                class="btn btn-ghost btn-small"
+                type="button"
+                @click="resetPlacementForm"
+              >
+                Cancel
+              </button>
             </div>
           </form>
         </div>
 
         <p v-if="loadingPlacements" class="admin-note">Loading placements...</p>
-        <p v-else-if="placements.length === 0" class="admin-note">No placements yet. Record the first graduate placement above.</p>
+        <p v-else-if="placements.length === 0" class="admin-note">
+          No placements yet. Record the first graduate placement above.
+        </p>
 
         <div v-else class="table-wrap">
           <table class="admin-table placement-table">
@@ -674,21 +1217,68 @@
                 <td>R {{ formatRands(p.salary) }}</td>
                 <td>{{ p.employmentStart }}</td>
                 <td>
-                  <span :class="['status-badge', p.status === 'completed' ? 'status-pending' : 'status-approved']">{{ p.status }}</span>
+                  <span
+                    :class="[
+                      'status-badge',
+                      p.status === 'completed'
+                        ? 'status-pending'
+                        : 'status-approved',
+                    ]"
+                    >{{ p.status }}</span
+                  >
                 </td>
                 <td>{{ p.monthsActive }} / 24</td>
                 <td>R {{ formatRands(p.monthlyCommission) }}</td>
                 <td>
                   <strong>R {{ formatRands(p.totalCommission) }}</strong>
-                  <span v-if="p.status === 'active'" class="sub-cell">+ R {{ formatRands(p.monthlyCommission) }}/mo</span>
+                  <span v-if="p.status === 'active'" class="sub-cell"
+                    >+ R {{ formatRands(p.monthlyCommission) }}/mo</span
+                  >
                 </td>
                 <td class="col-actions">
-                  <button class="btn btn-ghost btn-small" title="Edit" @click="startEditPlacement(p)">
-                    <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  <button
+                    class="btn btn-ghost btn-small"
+                    title="Edit"
+                    @click="startEditPlacement(p)"
+                  >
+                    <svg
+                      class="btn-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                      />
+                      <path
+                        d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                      />
+                    </svg>
                     Edit
                   </button>
-                  <button class="btn btn-accent btn-small" title="Delete" @click="removePlacement(p)" :disabled="busyId === p.id">
-                    <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  <button
+                    class="btn btn-accent btn-small"
+                    title="Delete"
+                    @click="removePlacement(p)"
+                    :disabled="busyId === p.id"
+                  >
+                    <svg
+                      class="btn-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path
+                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      />
+                    </svg>
                     Delete
                   </button>
                 </td>
@@ -702,36 +1292,36 @@
 </template>
 
 <script>
-import { adminAPI } from '../store/api.js'
-import { getCurrentUser, logout } from '../store/auth.js'
+import { adminAPI } from "../store/api.js";
+import { getCurrentUser, logout } from "../store/auth.js";
 
 export default {
-  name: 'AdminDashboard',
+  name: "AdminDashboard",
   data() {
     return {
       adminUser: getCurrentUser(),
-      tab: 'students',
+      tab: "students",
       users: [],
       packages: [],
       orders: [],
-      adminForm: { firstName: '', lastName: '', email: '', password: '' },
+      adminForm: { firstName: "", lastName: "", email: "", password: "" },
       creatingAdmin: false,
       adminCreated: null,
       editingAdmin: null,
       savingAdminEdit: false,
-      editAdminError: '',
+      editAdminError: "",
       applications: [],
       loadingApplications: false,
       savingApplicationId: null,
       selectedApplication: null,
-      msgUserId: '',
-      msgPhone: '',
-      msgText: '',
+      msgUserId: "",
+      msgPhone: "",
+      msgText: "",
       msgBusy: false,
-      msgError: '',
+      msgError: "",
       featuresText: {},
-      search: '',
-      filter: 'all',
+      search: "",
+      filter: "all",
       loadingUsers: false,
       loadingPackages: false,
       loadingOrders: false,
@@ -739,218 +1329,252 @@ export default {
       loadingJobs: false,
       savingJob: false,
       editingJobId: null,
-      jobForm: { title: '', company: '', location: '', field: '', type: 'full-time', salary: '', description: '' },
+      jobForm: {
+        title: "",
+        company: "",
+        location: "",
+        field: "",
+        type: "full-time",
+        salary: "",
+        description: "",
+      },
       fieldOptions: [
-        'Information Technology & Computer Science',
-        'Engineering',
-        'Business & Finance',
-        'Marketing & Communications',
-        'Health Sciences',
-        'Law',
-        'Education & Teaching',
-        'Science & Mathematics',
-        'Social Sciences & Humanities',
-        'Agriculture & Environmental',
-        'Other'
+        "Information Technology & Computer Science",
+        "Engineering",
+        "Business & Finance",
+        "Marketing & Communications",
+        "Health Sciences",
+        "Law",
+        "Education & Teaching",
+        "Science & Mathematics",
+        "Social Sciences & Humanities",
+        "Agriculture & Environmental",
+        "Other",
       ],
       busyId: null,
-      message: '',
+      message: "",
       placements: [],
       loadingPlacements: false,
       savingPlacement: false,
       editingPlacementId: null,
-      placementForm: { studentId: '', jobId: '', salary: null, employmentStart: '' }
-    }
+      placementForm: {
+        studentId: "",
+        jobId: "",
+        salary: null,
+        employmentStart: "",
+      },
+    };
   },
   computed: {
     adminName() {
-      const u = this.adminUser
-      return u ? (u.firstName || u.email) : 'Admin'
+      const u = this.adminUser;
+      return u ? u.firstName || u.email : "Admin";
     },
     students() {
-      return this.users.filter(u => u.role !== 'admin')
+      return this.users.filter((u) => u.role !== "admin");
     },
     admins() {
-      return this.users.filter(u => u.role === 'admin')
+      return this.users.filter((u) => u.role === "admin");
     },
     filteredStudents() {
-      const q = this.search.trim().toLowerCase()
-      return this.students.filter(u => {
-        const matchesSearch = !q ||
-          (u.firstName + ' ' + u.lastName).toLowerCase().includes(q) ||
-          (u.email || '').toLowerCase().includes(q)
-        const matchesFilter = this.filter === 'all' || u.status === this.filter
-        return matchesSearch && matchesFilter
-      })
+      const q = this.search.trim().toLowerCase();
+      return this.students.filter((u) => {
+        const matchesSearch =
+          !q ||
+          (u.firstName + " " + u.lastName).toLowerCase().includes(q) ||
+          (u.email || "").toLowerCase().includes(q);
+        const matchesFilter = this.filter === "all" || u.status === this.filter;
+        return matchesSearch && matchesFilter;
+      });
     },
     totalRevenue() {
       return this.orders
-        .filter(o => o.status === 'paid')
+        .filter((o) => o.status === "paid")
         .reduce((sum, o) => sum + Number(o.amount), 0)
-        .toLocaleString('en-ZA')
+        .toLocaleString("en-ZA");
     },
     placementTotal() {
       return this.placements
         .reduce((sum, p) => sum + Number(p.totalCommission || 0), 0)
-        .toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    }
+        .toLocaleString("en-ZA", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+    },
   },
   mounted() {
-    this.loadUsers()
-    this.loadPackages()
-    this.loadOrders()
-    this.loadJobs()
-    this.loadPlacements()
-    this.loadApplications()
+    this.loadUsers();
+    this.loadPackages();
+    this.loadOrders();
+    this.loadJobs();
+    this.loadPlacements();
+    this.loadApplications();
   },
   methods: {
     sanitizeName(v) {
       // Letters only (incl. accented letters), spaces, hyphens, apostrophes and dots.
-      return v.replace(/[^A-Za-z\u00C0-\u024F'\- .]/g, '').replace(/\s{2,}/g, ' ')
+      return v
+        .replace(/[^A-Za-z\u00C0-\u024F'\- .]/g, "")
+        .replace(/\s{2,}/g, " ");
     },
     countStatus(status) {
-      return this.students.filter(u => u.status === status).length
+      return this.students.filter((u) => u.status === status).length;
     },
     formatDate(date) {
-      if (!date) return '—'
-      return new Date(date).toLocaleDateString('en-ZA', {
-        year: 'numeric', month: 'short', day: 'numeric'
-      })
+      if (!date) return "—";
+      return new Date(date).toLocaleDateString("en-ZA", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
     },
     async loadUsers() {
-      this.loadingUsers = true
+      this.loadingUsers = true;
       try {
-        this.users = await adminAPI.getUsers()
+        this.users = await adminAPI.getUsers();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to load users')
+        this.showMessage(err.error || "Failed to load users");
       } finally {
-        this.loadingUsers = false
+        this.loadingUsers = false;
       }
     },
     async loadPackages() {
-      this.loadingPackages = true
+      this.loadingPackages = true;
       try {
-        this.packages = await adminAPI.getPackages()
-        this.featuresText = {}
-        this.packages.forEach(p => {
-          this.featuresText[p.id] = Array.isArray(p.features) ? p.features.join('\n') : ''
-        })
+        this.packages = await adminAPI.getPackages();
+        this.featuresText = {};
+        this.packages.forEach((p) => {
+          this.featuresText[p.id] = Array.isArray(p.features)
+            ? p.features.join("\n")
+            : "";
+        });
       } catch (err) {
-        this.showMessage(err.error || 'Failed to load plans')
+        this.showMessage(err.error || "Failed to load plans");
       } finally {
-        this.loadingPackages = false
+        this.loadingPackages = false;
       }
     },
     async loadOrders() {
-      this.loadingOrders = true
+      this.loadingOrders = true;
       try {
-        this.orders = await adminAPI.getOrders()
+        this.orders = await adminAPI.getOrders();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to load orders')
+        this.showMessage(err.error || "Failed to load orders");
       } finally {
-        this.loadingOrders = false
+        this.loadingOrders = false;
       }
     },
     async setUserStatus(user, status) {
-      this.busyId = user.id
-      this.message = ''
+      this.busyId = user.id;
+      this.message = "";
       try {
-        const data = await adminAPI.updateUserStatus(user.id, status)
-        let text = `Student ${status}.`
-        const notifications = data.notifications || []
-        if (status === 'approved' && notifications.length > 0) {
-          notifications.forEach(n => {
-            if (n.channel === 'email') {
+        const data = await adminAPI.updateUserStatus(user.id, status);
+        let text = `Student ${status}.`;
+        const notifications = data.notifications || [];
+        if (status === "approved" && notifications.length > 0) {
+          notifications.forEach((n) => {
+            if (n.channel === "email") {
               text += n.delivered
-                ? ' Email sent.'
-                : n.sandbox ? ' Email sandbox (see backend log).' : ' Email failed.'
+                ? " Email sent."
+                : n.sandbox
+                  ? " Email sandbox (see backend log)."
+                  : " Email failed.";
             }
-            if (n.channel === 'whatsapp') {
+            if (n.channel === "whatsapp") {
               if (n.waLink) {
-                text += ` WhatsApp ready: ${n.waLink}`
+                text += ` WhatsApp ready: ${n.waLink}`;
               } else if (n.delivered) {
-                text += ' WhatsApp sent.'
+                text += " WhatsApp sent.";
               } else {
-                text += ' WhatsApp sandbox.'
+                text += " WhatsApp sandbox.";
               }
             }
-          })
+          });
         }
-        this.showMessage(text)
-        await this.loadUsers()
+        this.showMessage(text);
+        await this.loadUsers();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to update student')
+        this.showMessage(err.error || "Failed to update student");
       } finally {
-        this.busyId = null
+        this.busyId = null;
       }
     },
     async savePackage(p) {
-      this.busyId = p.id
-      this.message = ''
+      this.busyId = p.id;
+      this.message = "";
       try {
-        const features = (this.featuresText[p.id] || '')
-          .split('\n')
-          .map(f => f.trim())
-          .filter(f => f.length > 0)
+        const features = (this.featuresText[p.id] || "")
+          .split("\n")
+          .map((f) => f.trim())
+          .filter((f) => f.length > 0);
         await adminAPI.updatePackage(p.id, {
           name: p.name,
           price: p.price,
           description: p.description,
           maxUniversities: p.maxUniversities,
           features,
-          highlighted: p.highlighted
-        })
-        this.showMessage(`Plan "${p.name}" saved. It is now live on the Payment Plans page.`)
-        await this.loadPackages()
+          highlighted: p.highlighted,
+        });
+        this.showMessage(
+          `Plan "${p.name}" saved. It is now live on the Payment Plans page.`,
+        );
+        await this.loadPackages();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to save plan')
+        this.showMessage(err.error || "Failed to save plan");
       } finally {
-        this.busyId = null
+        this.busyId = null;
       }
     },
     onSelectStudent() {
-      const u = this.users.find(x => x.id === this.msgUserId)
-      this.msgPhone = u ? (u.phone || '') : ''
+      const u = this.users.find((x) => x.id === this.msgUserId);
+      this.msgPhone = u ? u.phone || "" : "";
     },
     async openWhatsApp() {
-      this.msgBusy = true
-      this.msgError = ''
-      this.message = ''
+      this.msgBusy = true;
+      this.msgError = "";
+      this.message = "";
       try {
         const data = await adminAPI.sendWhatsApp({
           phone: this.msgPhone,
-          message: this.msgText
-        })
-        window.open(data.waLink, '_blank')
+          message: this.msgText,
+        });
+        window.open(data.waLink, "_blank");
       } catch (err) {
-        this.msgError = err.error || 'Failed to open WhatsApp'
+        this.msgError = err.error || "Failed to open WhatsApp";
       } finally {
-        this.msgBusy = false
+        this.msgBusy = false;
       }
     },
     async createAdmin() {
-      this.creatingAdmin = true
-      this.message = ''
-      this.adminCreated = null
+      this.creatingAdmin = true;
+      this.message = "";
+      this.adminCreated = null;
       try {
         const data = await adminAPI.createUser({
           firstName: this.adminForm.firstName,
           lastName: this.adminForm.lastName,
           email: this.adminForm.email,
           password: this.adminForm.password,
-          role: 'admin'
-        })
+          role: "admin",
+        });
         this.adminCreated = {
           email: this.adminForm.email,
-          password: this.adminForm.password
-        }
-        this.adminForm = { firstName: '', lastName: '', email: '', password: '' }
-        this.showMessage(`Admin "${data.user.firstName} ${data.user.lastName}" created.`)
-        await this.loadUsers()
+          password: this.adminForm.password,
+        };
+        this.adminForm = {
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+        };
+        this.showMessage(
+          `Admin "${data.user.firstName} ${data.user.lastName}" created.`,
+        );
+        await this.loadUsers();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to create admin')
+        this.showMessage(err.error || "Failed to create admin");
       } finally {
-        this.creatingAdmin = false
+        this.creatingAdmin = false;
       }
     },
     startEditAdmin(admin) {
@@ -959,105 +1583,115 @@ export default {
         firstName: admin.firstName,
         lastName: admin.lastName,
         email: admin.email,
-        password: ''
-      }
-      this.editAdminError = ''
+        password: "",
+      };
+      this.editAdminError = "";
     },
     closeEditAdmin() {
-      this.editingAdmin = null
-      this.editAdminError = ''
+      this.editingAdmin = null;
+      this.editAdminError = "";
     },
     async saveAdminEdit() {
-      this.savingAdminEdit = true
-      this.editAdminError = ''
-      this.message = ''
+      this.savingAdminEdit = true;
+      this.editAdminError = "";
+      this.message = "";
       try {
         const payload = {
           firstName: this.editingAdmin.firstName,
           lastName: this.editingAdmin.lastName,
-          email: this.editingAdmin.email
-        }
+          email: this.editingAdmin.email,
+        };
         if (this.editingAdmin.password) {
-          payload.password = this.editingAdmin.password
+          payload.password = this.editingAdmin.password;
         }
-        await adminAPI.updateUser(this.editingAdmin.id, payload)
-        const name = `${this.editingAdmin.firstName} ${this.editingAdmin.lastName}`
-        this.showMessage(`Login details updated for "${name}".`)
-        this.closeEditAdmin()
-        await this.loadUsers()
+        await adminAPI.updateUser(this.editingAdmin.id, payload);
+        const name = `${this.editingAdmin.firstName} ${this.editingAdmin.lastName}`;
+        this.showMessage(`Login details updated for "${name}".`);
+        this.closeEditAdmin();
+        await this.loadUsers();
       } catch (err) {
-        this.editAdminError = err.error || 'Failed to update admin'
+        this.editAdminError = err.error || "Failed to update admin";
       } finally {
-        this.savingAdminEdit = false
+        this.savingAdminEdit = false;
       }
     },
     async loadApplications() {
-      this.loadingApplications = true
+      this.loadingApplications = true;
       try {
-        this.applications = await adminAPI.getApplications()
+        this.applications = await adminAPI.getApplications();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to load applications')
+        this.showMessage(err.error || "Failed to load applications");
       } finally {
-        this.loadingApplications = false
+        this.loadingApplications = false;
       }
     },
     async setApplicationStatus(app, status) {
-      this.savingApplicationId = app.id
-      this.message = ''
+      this.savingApplicationId = app.id;
+      this.message = "";
       try {
-        await adminAPI.updateApplicationStatus(app.id, status)
-        app.status = status
-        this.showMessage(`Application for "${app.jobTitle}" marked as ${status}.`)
+        await adminAPI.updateApplicationStatus(app.id, status);
+        app.status = status;
+        this.showMessage(
+          `Application for "${app.jobTitle}" marked as ${status}.`,
+        );
       } catch (err) {
-        this.showMessage(err.error || 'Failed to update application')
+        this.showMessage(err.error || "Failed to update application");
       } finally {
-        this.savingApplicationId = null
+        this.savingApplicationId = null;
       }
     },
     appStatusClass(status) {
       const map = {
-        pending: 'status-pending',
-        shortlisted: 'status-approved',
-        hired: 'status-approved',
-        rejected: 'status-rejected'
-      }
-      return map[status] || 'status-pending'
+        pending: "status-pending",
+        shortlisted: "status-approved",
+        hired: "status-approved",
+        rejected: "status-rejected",
+      };
+      return map[status] || "status-pending";
     },
     showMessage(text) {
-      this.message = text
+      this.message = text;
       window.setTimeout(() => {
-        if (this.message === text) this.message = ''
-      }, 6000)
+        if (this.message === text) this.message = "";
+      }, 6000);
     },
     async loadJobs() {
-      this.loadingJobs = true
+      this.loadingJobs = true;
       try {
-        this.jobs = await adminAPI.getJobs()
+        this.jobs = await adminAPI.getJobs();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to load jobs')
+        this.showMessage(err.error || "Failed to load jobs");
       } finally {
-        this.loadingJobs = false
+        this.loadingJobs = false;
       }
     },
     resetJobForm() {
-      this.jobForm = { title: '', company: '', location: '', field: '', type: 'full-time', salary: '', description: '' }
-      this.editingJobId = null
+      this.jobForm = {
+        title: "",
+        company: "",
+        location: "",
+        field: "",
+        type: "full-time",
+        salary: "",
+        description: "",
+      };
+      this.editingJobId = null;
     },
     startEditJob(job) {
-      this.editingJobId = job.id
+      this.editingJobId = job.id;
       this.jobForm = {
         title: job.title,
         company: job.company,
-        location: job.location || '',
+        location: job.location || "",
         field: job.field,
         type: job.type,
-        salary: job.salary || '',
-        description: job.description || ''
-      }
+        salary: job.salary || "",
+        description: job.description || "",
+      };
     },
     async saveJob() {
-      this.savingJob = true
-      this.message = ''
+      this.savingJob = true;
+      this.message = "";
       try {
         const payload = {
           title: this.jobForm.title.trim(),
@@ -1066,124 +1700,154 @@ export default {
           field: this.jobForm.field,
           type: this.jobForm.type,
           salary: this.jobForm.salary.trim() || null,
-          description: this.jobForm.description.trim() || null
-        }
+          description: this.jobForm.description.trim() || null,
+        };
         if (this.editingJobId) {
-          await adminAPI.updateJob(this.editingJobId, payload)
-          this.showMessage('Job updated. It is live on the Graduate Jobs page.')
+          await adminAPI.updateJob(this.editingJobId, payload);
+          this.showMessage(
+            "Job updated. It is live on the Graduate Jobs page.",
+          );
         } else {
-          await adminAPI.createJob(payload)
-          this.showMessage('Job published. It is now live on the Graduate Jobs page.')
+          await adminAPI.createJob(payload);
+          this.showMessage(
+            "Job published. It is now live on the Graduate Jobs page.",
+          );
         }
-        this.resetJobForm()
-        await this.loadJobs()
+        this.resetJobForm();
+        await this.loadJobs();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to save job')
+        this.showMessage(err.error || "Failed to save job");
       } finally {
-        this.savingJob = false
+        this.savingJob = false;
       }
     },
     async removeJob(job) {
-      if (!confirm(`Delete "${job.title}" at ${job.company}? This cannot be undone.`)) return
-      this.busyId = job.id
-      this.message = ''
+      if (
+        !confirm(
+          `Delete "${job.title}" at ${job.company}? This cannot be undone.`,
+        )
+      )
+        return;
+      this.busyId = job.id;
+      this.message = "";
       try {
-        await adminAPI.deleteJob(job.id)
-        this.showMessage('Job deleted.')
-        await this.loadJobs()
+        await adminAPI.deleteJob(job.id);
+        this.showMessage("Job deleted.");
+        await this.loadJobs();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to delete job')
+        this.showMessage(err.error || "Failed to delete job");
       } finally {
-        this.busyId = null
+        this.busyId = null;
       }
     },
     placementStatusCount(status) {
-      return this.placements.filter(p => p.status === status).length
+      return this.placements.filter((p) => p.status === status).length;
     },
     placementMonthly(salary) {
-      const amount = (Number(salary) * 0.05) / 12
-      return amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      const amount = (Number(salary) * 0.05) / 12;
+      return amount.toLocaleString("en-ZA", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     },
     placementLifetime(salary) {
-      const amount = ((Number(salary) * 0.05) / 12) * 24
-      return amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      const amount = ((Number(salary) * 0.05) / 12) * 24;
+      return amount.toLocaleString("en-ZA", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     },
     formatRands(value) {
-      return Number(value || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      return Number(value || 0).toLocaleString("en-ZA", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     },
     async loadPlacements() {
-      this.loadingPlacements = true
+      this.loadingPlacements = true;
       try {
-        this.placements = await adminAPI.getPlacements()
+        this.placements = await adminAPI.getPlacements();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to load placements')
+        this.showMessage(err.error || "Failed to load placements");
       } finally {
-        this.loadingPlacements = false
+        this.loadingPlacements = false;
       }
     },
     resetPlacementForm() {
-      this.placementForm = { studentId: '', jobId: '', salary: null, employmentStart: '' }
-      this.editingPlacementId = null
+      this.placementForm = {
+        studentId: "",
+        jobId: "",
+        salary: null,
+        employmentStart: "",
+      };
+      this.editingPlacementId = null;
     },
     startEditPlacement(placement) {
-      this.editingPlacementId = placement.id
+      this.editingPlacementId = placement.id;
       this.placementForm = {
         studentId: placement.studentId,
         jobId: placement.jobId,
         salary: Number(placement.salary),
-        employmentStart: placement.employmentStart
-      }
+        employmentStart: placement.employmentStart,
+      };
     },
     async savePlacement() {
-      this.savingPlacement = true
-      this.message = ''
+      this.savingPlacement = true;
+      this.message = "";
       try {
         const payload = {
           studentId: Number(this.placementForm.studentId),
           jobId: Number(this.placementForm.jobId),
           salary: Number(this.placementForm.salary),
-          employmentStart: this.placementForm.employmentStart
-        }
+          employmentStart: this.placementForm.employmentStart,
+        };
         if (this.editingPlacementId) {
           await adminAPI.updatePlacement(this.editingPlacementId, {
             salary: payload.salary,
-            employmentStart: payload.employmentStart
-          })
-          this.showMessage('Placement updated. Commission recalculated.')
+            employmentStart: payload.employmentStart,
+          });
+          this.showMessage("Placement updated. Commission recalculated.");
         } else {
-          await adminAPI.createPlacement(payload)
-          this.showMessage('Placement recorded. 5% commission tracking started.')
+          await adminAPI.createPlacement(payload);
+          this.showMessage(
+            "Placement recorded. 5% commission tracking started.",
+          );
         }
-        this.resetPlacementForm()
-        await this.loadPlacements()
+        this.resetPlacementForm();
+        await this.loadPlacements();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to save placement')
+        this.showMessage(err.error || "Failed to save placement");
       } finally {
-        this.savingPlacement = false
+        this.savingPlacement = false;
       }
     },
     async removePlacement(placement) {
-      if (!confirm(`Remove ${placement.studentName} from "${placement.jobTitle}"? This deletes their commission record.`)) return
-      this.busyId = placement.id
-      this.message = ''
+      if (
+        !confirm(
+          `Remove ${placement.studentName} from "${placement.jobTitle}"? This deletes their commission record.`,
+        )
+      )
+        return;
+      this.busyId = placement.id;
+      this.message = "";
       try {
-        await adminAPI.deletePlacement(placement.id)
-        this.showMessage('Placement deleted.')
-        await this.loadPlacements()
+        await adminAPI.deletePlacement(placement.id);
+        this.showMessage("Placement deleted.");
+        await this.loadPlacements();
       } catch (err) {
-        this.showMessage(err.error || 'Failed to delete placement')
+        this.showMessage(err.error || "Failed to delete placement");
       } finally {
-        this.busyId = null
+        this.busyId = null;
       }
     },
     handleLogout() {
-      logout()
+      logout();
       // Return to the main (student) login page, not the admin sign-in page.
-      const host = window.location.hostname || 'localhost'
-      window.location.href = `http://${host}:3004/login`
-    }
-  }
-}
+      const host = window.location.hostname || "localhost";
+      window.location.href = `http://${host}:3004/login`;
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -1244,6 +1908,18 @@ export default {
   background: rgba(255, 255, 255, 0.2);
 }
 
+.admin-user-site-btn {
+  text-decoration: none;
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--primary-dark);
+}
+
+.admin-user-site-btn:hover {
+  background: var(--gold-light);
+  color: var(--primary-dark);
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1276,11 +1952,17 @@ export default {
 }
 
 .stat-value.stat-pending,
-.stat-pending { color: #B7791F; }
+.stat-pending {
+  color: #b7791f;
+}
 .stat-value.stat-approved,
-.stat-approved { color: var(--success); }
+.stat-approved {
+  color: var(--success);
+}
 .stat-value.stat-rejected,
-.stat-rejected { color: var(--accent); }
+.stat-rejected {
+  color: var(--accent);
+}
 
 .admin-tabs {
   display: flex;
@@ -1527,8 +2209,8 @@ export default {
 }
 
 .status-pending {
-  background: #FFF4D6;
-  color: #B7791F;
+  background: #fff4d6;
+  color: #b7791f;
 }
 
 .status-rejected,
@@ -1732,32 +2414,80 @@ export default {
 }
 
 @media (max-width: 900px) {
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .admin-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .admin-tab { white-space: nowrap; }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .admin-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-tab {
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 768px) {
-  .stats-grid { grid-template-columns: 1fr; }
-  .form-row-3 { grid-template-columns: 1fr; }
-  .form-row-2 { grid-template-columns: 1fr; }
-  .admin-nav-inner { padding: 0 20px; }
-  .admin-tabs { gap: 4px; margin: 16px 0; }
-  .admin-tab { padding: 10px 14px; font-size: 0.85rem; }
-  .panel-card { padding: 18px; }
-  .toolbar { flex-direction: column; align-items: stretch; }
-  .search-input { min-width: 0; }
-  .filter-chips { flex-wrap: wrap; }
-  .table-wrap { margin-bottom: 32px; }
-  .plans-list, .plan-edit-card { padding: 16px; }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+  .form-row-2 {
+    grid-template-columns: 1fr;
+  }
+  .admin-nav-inner {
+    padding: 0 20px;
+  }
+  .admin-tabs {
+    gap: 4px;
+    margin: 16px 0;
+  }
+  .admin-tab {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+  .panel-card {
+    padding: 18px;
+  }
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-input {
+    min-width: 0;
+  }
+  .filter-chips {
+    flex-wrap: wrap;
+  }
+  .table-wrap {
+    margin-bottom: 32px;
+  }
+  .plans-list,
+  .plan-edit-card {
+    padding: 16px;
+  }
 }
 
 @media (max-width: 480px) {
-  .admin-nav-inner { padding: 0 14px; }
-  .admin-nav-user { display: none; }
-  .stat-card { padding: 14px 16px; }
-  .stat-value { font-size: 1.3rem; }
-  .admin-tab { padding: 9px 10px; }
-  .plans-list, .plan-edit-card { padding: 12px; }
+  .admin-nav-inner {
+    padding: 0 14px;
+  }
+  .admin-nav-user {
+    display: none;
+  }
+  .stat-card {
+    padding: 14px 16px;
+  }
+  .stat-value {
+    font-size: 1.3rem;
+  }
+  .admin-tab {
+    padding: 9px 10px;
+  }
+  .plans-list,
+  .plan-edit-card {
+    padding: 12px;
+  }
 }
 </style>

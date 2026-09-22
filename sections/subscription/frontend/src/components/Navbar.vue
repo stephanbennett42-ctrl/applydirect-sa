@@ -1,73 +1,99 @@
 <template>
   <header class="site-nav">
-    <div class="container nav-inner">
-      <router-link to="/" class="nav-brand">
-        ApplyDirect <span>SA</span>
-      </router-link>
+    <div class="nav-inner">
+      <a
+        :href="mainAppUrl('/institutions')"
+        class="nav-brand"
+        @click="closeMenu"
+      >
+        ApplyDirect-<span>SA</span>
+      </a>
 
-      <nav class="nav-links">
-        <router-link to="/payment-plan" class="nav-link">Payment Plans</router-link>
-        <router-link to="/jobs" class="nav-link">Graduate Jobs</router-link>
-        <router-link v-if="isLoggedIn()" to="/payment" class="nav-link">Checkout</router-link>
-      </nav>
-
-      <div class="nav-auth">
-        <template v-if="isLoggedIn()">
-          <span class="nav-user">Hi, {{ currentUser.firstName }}</span>
-          <button class="nav-btn" @click="handleLogout">Logout</button>
-        </template>
-        <router-link v-else to="/login" class="btn btn-primary btn-sm">Log In</router-link>
-      </div>
-
-      <button class="nav-toggle" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen ? 'true' : 'false'" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
+      <button
+        class="nav-toggle"
+        type="button"
+        @click="menuOpen = !menuOpen"
+        :aria-expanded="menuOpen ? 'true' : 'false'"
+        aria-controls="subscription-nav-links"
+        aria-label="Toggle navigation"
+      >
+        <span></span><span></span><span></span>
       </button>
-    </div>
 
-    <!-- Mobile menu -->
-    <div v-if="menuOpen" class="mobile-menu">
-      <router-link to="/payment-plan" class="mobile-link" @click="menuOpen = false">Payment Plans</router-link>
-      <router-link to="/jobs" class="mobile-link" @click="menuOpen = false">Graduate Jobs</router-link>
-      <router-link v-if="isLoggedIn()" to="/payment" class="mobile-link" @click="menuOpen = false">Checkout</router-link>
-      <div class="mobile-auth">
-        <template v-if="isLoggedIn()">
-          <span class="mobile-user">Hi, {{ currentUser.firstName }}</span>
-          <button class="nav-btn" @click="handleLogout">Logout</button>
-        </template>
-        <router-link v-else to="/login" class="btn btn-primary btn-sm" @click="menuOpen = false">Log In</router-link>
-      </div>
+      <nav
+        id="subscription-nav-links"
+        class="nav-links"
+        :class="{ 'is-open': menuOpen }"
+      >
+        <a
+          :href="mainAppUrl('/institutions')"
+          class="nav-link"
+          @click="closeMenu"
+          >Universities</a
+        >
+        <a :href="mainAppUrl('/profile')" class="nav-link" @click="closeMenu"
+          >Profile</a
+        >
+        <a :href="mainAppUrl('/about')" class="nav-link" @click="closeMenu"
+          >About Us</a
+        >
+        <a :href="mainAppUrl('/contact')" class="nav-link" @click="closeMenu"
+          >Contact</a
+        >
+        <router-link
+          to="/payment-plan"
+          class="nav-link subscription-link"
+          @click="closeMenu"
+          >Subscription</router-link
+        >
+        <a
+          :href="mainAppUrl('/profile')"
+          class="profile-avatar"
+          :aria-label="`Open ${userInitials} profile`"
+          title="Profile"
+          >{{ userInitials }}</a
+        >
+      </nav>
     </div>
   </header>
 </template>
 
 <script>
-import { getCurrentUser, isLoggedIn, logout } from '../store/auth.js'
+import { getCurrentUser } from "../store/auth.js";
 
 export default {
-  name: 'Navbar',
+  name: "Navbar",
   data() {
     return {
       currentUser: getCurrentUser(),
-      menuOpen: false
-    }
+      menuOpen: false,
+    };
   },
-  created() {
-    this.loggedIn = isLoggedIn()
+  computed: {
+    userInitials() {
+      if (!this.currentUser) return "?";
+      const firstName = this.currentUser.firstName?.trim() || "";
+      const surname = (
+        this.currentUser.surname ||
+        this.currentUser.lastName ||
+        ""
+      ).trim();
+      const initials =
+        `${firstName.charAt(0)}${surname.charAt(0)}`.toUpperCase();
+      return (
+        initials || (this.currentUser.email?.charAt(0) || "?").toUpperCase()
+      );
+    },
   },
   methods: {
-    isLoggedIn() {
-      return isLoggedIn()
+    mainAppUrl(path) {
+      return `http://localhost:5173${path}`;
     },
-    handleLogout() {
-      logout()
-      this.currentUser = null
-      this.menuOpen = false
-      this.$router.push('/login')
-    }
-  }
-}
+    closeMenu() {
+      this.menuOpen = false;
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -78,22 +104,23 @@ export default {
   background: var(--primary-dark);
   color: var(--text-white);
   box-shadow: var(--shadow-md);
-  border-bottom: 3px solid var(--flag-stripe);
 }
 
 .nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 68px;
-  gap: 16px;
+  min-height: 68px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 30px;
+  gap: 24px;
 }
 
 .nav-brand {
-  font-size: 1.25rem;
+  font-size: 1.55rem;
   font-weight: 800;
   color: var(--text-white);
-  letter-spacing: -0.02em;
   white-space: nowrap;
 }
 
@@ -103,19 +130,49 @@ export default {
 
 .nav-links {
   display: flex;
-  gap: 24px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: var(--transition);
+  padding: 9px 16px;
+  border-radius: 999px;
+  color: var(--text-white);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .nav-link:hover,
 .nav-link.router-link-active {
-  color: var(--gold-light);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text-white);
+}
+
+.subscription-link.router-link-active {
+  background: var(--gold);
+  color: #101010;
+  box-shadow: 0 4px 12px rgba(255, 184, 28, 0.35);
+}
+
+.profile-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 2px solid var(--text-white);
+  border-radius: 50%;
+  background: var(--gold);
+  color: #001242;
+  font-size: 0.85rem;
+  font-weight: 800;
 }
 
 .nav-auth {
@@ -147,7 +204,6 @@ export default {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Hamburger - hidden on desktop */
 .nav-toggle {
   display: none;
   flex-direction: column;
@@ -183,54 +239,35 @@ export default {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* Mobile menu panel */
-.mobile-menu {
-  display: none;
-  background: var(--primary-dark);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 12px 20px 20px;
-  flex-direction: column;
-}
-
-.mobile-link {
-  padding: 14px 4px;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  font-size: 0.95rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  transition: var(--transition);
-}
-
-.mobile-link:hover,
-.mobile-link.router-link-active {
-  color: var(--gold-light);
-}
-
-.mobile-auth {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 16px;
-}
-
-.mobile-user {
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.85);
-}
-
 @media (max-width: 768px) {
-  .nav-links,
-  .nav-auth {
-    display: none;
-  }
-
   .nav-toggle {
     display: flex;
   }
 
-  .mobile-menu {
+  .nav-inner {
+    padding: 10px 18px;
+    flex-wrap: wrap;
+  }
+
+  .nav-links {
+    display: none;
+    width: 100%;
+    margin-left: 0;
+    padding: 8px 0 4px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nav-links.is-open {
     display: flex;
+  }
+
+  .nav-link {
+    width: 100%;
+    text-align: left;
+  }
+  .profile-avatar {
+    align-self: flex-start;
   }
 }
 </style>
