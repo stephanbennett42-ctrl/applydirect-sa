@@ -60,9 +60,11 @@
               {{ loading ? 'Signing in...' : 'Sign In as Admin' }}
             </button>
 
+            <div class="demo-box">
+              <p class="demo-title">Admin Credentials</p>
+              <p>admin@uniapply.co.za / admin123</p>
+            </div>
           </form>
-
-          <button type="button" class="btn btn-ghost btn-block user-login-button" @click="goToUserLogin">User Login</button>
         </div>
       </div>
     </div>
@@ -72,11 +74,6 @@
 <script>
 import { login, getCurrentUser } from '../store/auth.js'
 
-function userBaseUrl() {
-  const host = window.location.hostname || 'localhost'
-  return `http://${host}:3004/login`
-}
-
 export default {
   name: 'AdminLogin',
   data() {
@@ -84,8 +81,7 @@ export default {
       email: '',
       password: '',
       error: '',
-      loading: false,
-      userUrl: userBaseUrl()
+      loading: false
     }
   },
   mounted() {
@@ -106,9 +102,6 @@ export default {
       } else {
         this.error = result.error || 'Login failed'
       }
-    },
-    goToUserLogin() {
-      window.location.href = this.userUrl
     }
   }
 }

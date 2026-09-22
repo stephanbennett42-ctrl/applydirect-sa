@@ -38,7 +38,9 @@
           Don't have an account? <router-link to="/register">Sign up</router-link>
         </p>
 
-        <button type="button" class="btn btn-ghost btn-block admin-login-button" @click="goToAdminLogin">Admin Login</button>
+        <p class="switch-text admin-switch">
+          Are you an admin? <a :href="adminUrl" target="_blank" rel="noopener">Admin Login</a>
+        </p>
       </div>
     </div>
   </div>
@@ -73,14 +75,11 @@ export default {
       this.loading = false
 
       if (result.success) {
-        const host = window.location.hostname || 'localhost'
-        window.location.href = `http://${host}:5173/institutions`
+        const redirect = this.$route.query.redirect || '/payment-plan'
+        this.$router.push(redirect)
       } else {
         this.error = result.error || 'Login failed'
       }
-    },
-    goToAdminLogin() {
-      window.location.href = this.adminUrl
     }
   }
 }

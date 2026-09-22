@@ -1,31 +1,92 @@
 <template>
 
-  <div class="profile-page" :class="{ 'hero-mode': !showProfileContent }">
+  <div class="profile-page">
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="top-header">
+
+       <nav class="navbar navbar-expand-lg navbar-dark bg-navy sticky-top py-2">
+
+    <div class="container-fluid px-3 px-md-4">
+
+      <!-- The mobile toggle controls the navigation links on smaller screens. -->
+
+      <button 
+
+        class="navbar-toggler border-0" 
+
+        type="button" 
+
+        data-bs-toggle="collapse" 
+
+        data-bs-target="#navbarContent"
+
+        aria-controls="navbarContent"
+
+        aria-expanded="false"
+
+        aria-label="Toggle navigation"
+
+      >
+
+        <span class="navbar-toggler-icon"></span>
+
+      </button>
+
+      <!-- Logo, route links, and the logged-in account share one right-aligned row. -->
+
+      <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarContent">
+
+        <!-- NAV LINKS -->
+
+        <div class="navbar-nav d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 ms-auto pt-2 pt-lg-0">
+
+          <router-link to="/" class="navbar-brand logo-nav-item fw-bold fs-4 text-white">
+
+            ApplyDirect-<span class="text-gold">SA</span>
+
+          </router-link>
+
+          <router-link to="/" class="sa-nav-tab tab-green text-center">Universities</router-link>
+
+          <router-link to="/portfolio" class="sa-nav-tab tab-gold text-center">Profile</router-link>
+
+          <router-link to="/about" class="sa-nav-tab tab-red text-center">About Us</router-link>
+
+          <router-link to="/contact" class="sa-nav-tab tab-blue text-center">Contact</router-link>
+
+          <router-link to="/subscription" class="sa-nav-tab tab-black text-center">Subscription</router-link>
+
+          <!-- The yellow badge displays the logged-in user's initials. -->
+          <div class="profile-account">
+            <span>{{ profileDisplayName }}</span>
+            <div class="profile-icon" :title="profileInitials">
+              {{ profileInitials }}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+    </header>
+
+
 
     <!-- ================= PAGE LAYOUT ================= -->
 
     <div class="page-layout">
 
-      <aside class="sidebar" :class="{ 'is-collapsed': isSidebarCollapsed }">
+      <aside class="sidebar">
 
-        <div class="sidebar-heading">
-          <div class="sidebar-title">
-            My Application
-          </div>
+        <div class="sidebar-title">
 
-          <button
-            class="sidebar-toggle"
-            type="button"
-            :aria-label="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-            :title="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-            @click="isSidebarCollapsed = !isSidebarCollapsed"
-          >
-            <span class="sidebar-toggle-lines" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-          </button>
+          My Application
 
         </div>
 
@@ -43,7 +104,7 @@
 
           <span class="number">1</span>
 
-          <span class="sidebar-label">Personal Details</span>
+          Personal Details
 
         </button>
 
@@ -61,7 +122,7 @@
 
           <span class="number">2</span>
 
-          <span class="sidebar-label">Academic Details</span>
+          Academic Details
 
         </button>
 
@@ -79,7 +140,7 @@
 
           <span class="number">3</span>
 
-          <span class="sidebar-label">Study Preferences</span>
+          Study Preferences
 
         </button>
 
@@ -97,7 +158,7 @@
 
           <span class="number">4</span>
 
-          <span class="sidebar-label">Documents</span>
+          Documents
 
         </button>
 
@@ -115,7 +176,7 @@
 
           <span class="number">5</span>
 
-          <span class="sidebar-label">Application Status</span>
+          Application Status
 
         </button>
 
@@ -125,7 +186,7 @@
 
         <!-- HERO SECTION -->
 
-        <section v-if="showHero" class="portfolio-hero">
+        <section class="portfolio-hero">
 
           <div class="hero-overlay">
 
@@ -157,7 +218,7 @@
 
         <!-- ================= MAIN CONTENT ================= -->
 
-        <main v-if="showProfileContent" class="main-content">
+        <main class="main-content">
 
         <div class="page-title">
 
@@ -1023,8 +1084,6 @@
 
                   class="explore-course-button"
 
-                  @click="$router.push('/institutions')"
-
                 >
 
                   Explore Course
@@ -1375,13 +1434,7 @@ export default {
 
       profileId: null,
 
-      activeSection: "",
-
-      showHero: true,
-
-      showProfileContent: false,
-
-      isSidebarCollapsed: true,
+      activeSection: "personal",
 
       formMessage: "",
 
@@ -1639,27 +1692,17 @@ export default {
 
     scrollToProfile() {
 
-      this.showHero = false;
+      const profileSection = document.querySelector(".main-content");
 
-      this.showProfileContent = true;
+      if (profileSection) {
 
-      this.activeSection = "personal";
+        profileSection.scrollIntoView({
 
-      this.$nextTick(() => {
+          behavior: "smooth"
 
-        const profileSection = document.querySelector(".main-content");
+        });
 
-        if (profileSection) {
-
-          profileSection.scrollIntoView({
-
-            behavior: "smooth"
-
-          });
-
-        }
-
-      });
+      }
 
     },
 
@@ -1932,10 +1975,6 @@ export default {
     goToSection(section) {
 
       this.activeSection = section;
-
-      this.showHero = false;
-
-      this.showProfileContent = true;
 
     },
 
@@ -2814,8 +2853,6 @@ export default {
   --surface: #ffffff;
   --soft: #f5f7fb;
   min-height: 100vh;
-  margin: 0;
-  padding: 0;
   background: #f4f6f9;
   color: var(--ink);
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
@@ -2904,16 +2941,12 @@ export default {
 /* ================= PAGE LAYOUT ================= */
 .page-layout {
   display: flex;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
+  min-height: calc(100vh - 74px);
 }
 
 .content-shell {
   flex: 1;
   min-width: 0;
-  margin: 0;
-  padding: 0;
 }
 
 /* ================= SIDEBAR ================= */
@@ -2925,68 +2958,15 @@ export default {
   background: var(--navy-dark);
   color: #fff;
   border-right: 1px solid rgba(255,255,255,0.08);
-  transition: width 0.25s ease, padding 0.25s ease;
-}
-
-.sidebar.is-collapsed {
-  width: 78px;
-  padding-right: 12px;
-  padding-left: 12px;
-}
-
-.sidebar-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 4px 0 18px;
-}
-
-.sidebar.is-collapsed .sidebar-heading {
-  justify-content: center;
 }
 
 .sidebar-title {
-  margin: 0 10px;
+  margin: 4px 10px 18px;
   color: var(--gold);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 1.4px;
   text-transform: uppercase;
-}
-
-.sidebar-toggle {
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
-  border: 1px solid rgba(255,255,255,0.22);
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.sidebar-toggle:hover {
-  background: var(--green);
-}
-
-.sidebar-toggle-lines,
-.sidebar-toggle-lines span {
-  display: block;
-}
-
-.sidebar-toggle-lines {
-  width: 14px;
-  margin: 0 auto;
-}
-
-.sidebar-toggle-lines span {
-  height: 2px;
-  margin: 3px 0;
-  border-radius: 2px;
-  background: currentColor;
 }
 
 .sidebar-item {
@@ -3044,28 +3024,15 @@ export default {
   color: #102039;
 }
 
-.sidebar.is-collapsed .sidebar-title,
-.sidebar.is-collapsed .sidebar-label {
-  display: none;
-}
-
-.sidebar.is-collapsed .sidebar-item {
-  justify-content: center;
-  padding-right: 6px;
-  padding-left: 6px;
-}
-
 /* ================= HERO ================= */
 .portfolio-hero {
   position: relative;
-  height: calc(100vh - 74px);
-  min-height: calc(100vh - 74px);
-  margin: 0;
+  min-height: 360px;
   display: flex;
   align-items: center;
   overflow: hidden;
   background:
-    linear-gradient(120deg, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.28)),
+    linear-gradient(120deg, rgba(0, 18, 66, 0.96), rgba(0, 27, 94, 0.78)),
     url("https://i.ibb.co/7dd2SKdH/OIP-2.jpg") center / cover no-repeat;
 }
 
@@ -3079,12 +3046,6 @@ export default {
   transform: translateY(-50%);
   border: 35px solid rgba(255,184,28,0.14);
   border-radius: 50%;
-}
-
-.profile-page.hero-mode {
-  height: calc(100vh - 74px);
-  min-height: 0;
-  overflow: hidden;
 }
 
 .hero-overlay {
@@ -3605,10 +3566,7 @@ export default {
   }
   .sidebar { display: none; }
   .main-content { padding: 25px 16px; }
-  .portfolio-hero {
-    height: calc(100vh - 120px);
-    min-height: calc(100vh - 120px);
-  }
+  .portfolio-hero { min-height: 330px; }
   .hero-overlay { padding: 45px 24px; }
   .hero-content h1 { font-size: 35px; letter-spacing: -1px; }
   .hero-description { font-size: 14px; }
