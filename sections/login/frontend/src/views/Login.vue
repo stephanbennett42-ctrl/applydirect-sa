@@ -20,29 +20,87 @@
 
         <form @submit.prevent="handleLogin" class="auth-form">
           <div v-if="error" class="alert alert-error">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="15" y1="9" x2="9" y2="15" />
+              <line x1="9" y1="9" x2="15" y2="15" />
+            </svg>
             <span>{{ error }}</span>
           </div>
 
           <div class="field">
             <label for="email">Email Address</label>
-            <input id="email" type="email" v-model="email" placeholder="you@example.com" required autocomplete="username" />
+            <input
+              id="email"
+              type="email"
+              v-model="email"
+              placeholder="you@example.com"
+              required
+              autocomplete="username"
+            />
           </div>
 
           <div class="field">
             <label for="password">Password</label>
             <div class="password-wrap">
-              <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="••••••••" required autocomplete="current-password" />
-              <button type="button" class="toggle-pass" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'">
-                <svg v-if="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              <input
+                id="password"
+                :type="showPassword ? 'text' : 'password'"
+                v-model="password"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="toggle-pass"
+                @click="showPassword = !showPassword"
+                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              >
+                <svg
+                  v-if="!showPassword"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <svg
+                  v-else
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                  />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
               </button>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block" :disabled="loading">
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            :disabled="loading"
+          >
             <span v-if="loading" class="spinner"></span>
-            {{ loading ? 'Signing in...' : 'Log In' }}
+            {{ loading ? "Signing in..." : "Log In" }}
           </button>
         </form>
 
@@ -53,43 +111,61 @@
         </div>
       </div>
 
-      <p class="footer-note">ApplyDirect SA © 2026 — South African university applications made simple.</p>
+      <p class="footer-note">
+        ApplyDirect SA © 2026 — South African university applications made
+        simple.
+      </p>
     </div>
   </div>
 </template>
 
 <script>
-import { login } from '../store/auth.js'
+import { login } from "../store/auth.js";
 
 export default {
-  name: 'Login',
+  name: "Login",
   data() {
     return {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       showPassword: false,
-      error: '',
-      loading: false
-    }
+      error: "",
+      loading: false,
+    };
   },
   methods: {
     async handleLogin() {
-      this.error = ''
-      this.loading = true
+      this.error = "";
+      this.loading = true;
 
-      const result = await login(this.email, this.password)
+      const result = await login(this.email, this.password);
 
-      this.loading = false
+      this.loading = false;
 
       if (result.success) {
-        const redirect = this.$route.query.redirect || '/dashboard'
-        this.$router.push(redirect)
+        const redirect =
+          this.$route.query.redirect || "http://localhost:5173/institutions";
+
+        if (/^https?:\/\//i.test(redirect)) {
+          const destination = new URL(redirect);
+          destination.searchParams.set(
+            "auth_token",
+            localStorage.getItem("uniapply_token") || "",
+          );
+          destination.searchParams.set(
+            "auth_user",
+            localStorage.getItem("uniapply_currentUser") || "{}",
+          );
+          window.location.href = destination.toString();
+        } else {
+          this.$router.push(redirect);
+        }
       } else {
-        this.error = result.error || 'Login failed'
+        this.error = result.error || "Login failed";
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -306,7 +382,9 @@ export default {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .demo-box {
@@ -338,8 +416,14 @@ export default {
 }
 
 @media (max-width: 480px) {
-  .login-wrap { padding: 32px 16px 24px; }
-  .login-card { padding: 28px 22px; }
-  .brand { margin-bottom: 24px; }
+  .login-wrap {
+    padding: 32px 16px 24px;
+  }
+  .login-card {
+    padding: 28px 22px;
+  }
+  .brand {
+    margin-bottom: 24px;
+  }
 }
 </style>
