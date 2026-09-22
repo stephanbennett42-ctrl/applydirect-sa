@@ -23,6 +23,22 @@ export default defineConfig({
     port: 5173,
     allowedHosts: true,
     proxy: {
+      '/api/auth': {
+        target: 'http://localhost:3002',
+        changeOrigin: true
+      },
+      '/api/packages': {
+        target: 'http://localhost:3002',
+        changeOrigin: true
+      },
+      '/api/orders': {
+        target: 'http://localhost:3002',
+        changeOrigin: true
+      },
+      '/api/jobs': {
+        target: 'http://localhost:3002',
+        changeOrigin: true
+      },
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true

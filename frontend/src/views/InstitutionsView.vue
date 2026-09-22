@@ -13,6 +13,52 @@
       </button>
     </div>
 
+    <!-- SEARCH & FILTER BAR -->
+    <div class="position-fixed top-0 start-0 w-100 z-search-filter filter-bar-nav-margin">
+      <div class="container py-2">
+        <div class="row g-2">
+          <div class="col-12 col-lg">
+            <input 
+              type="text" 
+              class="form-control rounded-pill bg-light border-0 px-3" 
+              placeholder="Search university or city..." 
+              v-model="searchQuery"
+              aria-label="Search university or city"
+            />
+          </div>
+          <div class="col-6 col-lg-auto">
+            <select 
+              class="form-select rounded-pill bg-light border-0" 
+              v-model="selectedProvince"
+              aria-label="Filter by province"
+            >
+              <option value="">All Provinces</option>
+              <option value="Gauteng">Gauteng</option>
+              <option value="Western Cape">Western Cape</option>
+              <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+              <option value="Eastern Cape">Eastern Cape</option>
+              <option value="Free State">Free State</option>
+              <option value="Limpopo">Limpopo</option>
+              <option value="Mpumalanga">Mpumalanga</option>
+              <option value="North West">North West</option>
+              <option value="Northern Cape">Northern Cape</option>
+            </select>
+          </div>
+          <div class="col-6 col-lg-auto">
+            <select 
+              class="form-select rounded-pill bg-light border-0" 
+              v-model="selectedType"
+              aria-label="Filter by institution type"
+            >
+              <option value="">All Types</option>
+              <option value="University">University</option>
+              <option value="TVET">TVET</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 1. SEARCHING RADAR OVERLAY -->
     <Transition name="overlay-fade">
       <div 
