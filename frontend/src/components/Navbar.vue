@@ -194,6 +194,35 @@ export default {
   max-width: 600px;
 }
 
+.navbar-nav {
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+@media (min-width: 992px) {
+  .navbar-collapse {
+    min-width: 0;
+  }
+
+  .navbar-collapse > div:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .navbar-collapse > div:first-child > div {
+    flex-wrap: nowrap;
+    max-width: none;
+  }
+
+  .navbar-nav {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+  }
+}
+
 /* BASE NAV TAB STYLING */
 .sa-nav-tab {
   padding: 8px 14px;

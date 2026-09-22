@@ -5,6 +5,7 @@
         <span class="admin-nav-brand">ApplyDirect <span>SA</span> Admin</span>
         <div class="admin-nav-right">
           <span class="admin-nav-user">Hi, {{ adminName }}</span>
+          <a class="admin-nav-btn" :href="userUrl">User Login</a>
           <button class="admin-nav-btn" @click="handleLogout">Sign Out</button>
         </div>
       </div>
@@ -705,11 +706,17 @@
 import { adminAPI } from '../store/api.js'
 import { getCurrentUser, logout } from '../store/auth.js'
 
+function userBaseUrl() {
+  const host = window.location.hostname || 'localhost'
+  return `http://${host}:3004/login`
+}
+
 export default {
   name: 'AdminDashboard',
   data() {
     return {
       adminUser: getCurrentUser(),
+      userUrl: userBaseUrl(),
       tab: 'students',
       users: [],
       packages: [],

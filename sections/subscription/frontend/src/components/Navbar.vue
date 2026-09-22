@@ -6,8 +6,6 @@
       </router-link>
 
       <nav class="nav-links">
-        <router-link to="/payment-plan" class="nav-link">Payment Plans</router-link>
-        <router-link to="/jobs" class="nav-link">Graduate Jobs</router-link>
         <router-link v-if="isLoggedIn()" to="/payment" class="nav-link">Checkout</router-link>
       </nav>
 
@@ -16,7 +14,6 @@
           <span class="nav-user">Hi, {{ currentUser.firstName }}</span>
           <button class="nav-btn" @click="handleLogout">Logout</button>
         </template>
-        <router-link v-else to="/login" class="btn btn-primary btn-sm">Log In</router-link>
       </div>
 
       <button class="nav-toggle" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen ? 'true' : 'false'" aria-label="Toggle menu">
@@ -28,15 +25,12 @@
 
     <!-- Mobile menu -->
     <div v-if="menuOpen" class="mobile-menu">
-      <router-link to="/payment-plan" class="mobile-link" @click="menuOpen = false">Payment Plans</router-link>
-      <router-link to="/jobs" class="mobile-link" @click="menuOpen = false">Graduate Jobs</router-link>
       <router-link v-if="isLoggedIn()" to="/payment" class="mobile-link" @click="menuOpen = false">Checkout</router-link>
       <div class="mobile-auth">
         <template v-if="isLoggedIn()">
           <span class="mobile-user">Hi, {{ currentUser.firstName }}</span>
           <button class="nav-btn" @click="handleLogout">Logout</button>
         </template>
-        <router-link v-else to="/login" class="btn btn-primary btn-sm" @click="menuOpen = false">Log In</router-link>
       </div>
     </div>
   </header>
