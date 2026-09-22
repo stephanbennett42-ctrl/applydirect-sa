@@ -1,14 +1,17 @@
 /**
  * Payment plans used by the PaymentPlan page as a local fallback
  * when the backend is unreachable. Mirrors the seeded database packages.
+ * Two plans: Basic (free) and Premium (R500) — Premium unlocks the
+ * premium Graduate Jobs section.
  */
 export const paymentPlans = [
   {
     id: 1,
     name: 'Basic',
-    price: 'R 150',
+    price: 'Free',
+    priceRaw: 0,
     period: 'one-time',
-    description: 'Application to one university',
+    description: 'Application to one university (free)',
     features: [
       'Application to 1 university',
       'Document verification',
@@ -19,25 +22,10 @@ export const paymentPlans = [
     highlighted: false
   },
   {
-    id: 2,
-    name: 'Standard',
-    price: 'R 380',
-    period: 'one-time',
-    description: 'Application to up to 3 universities',
-    features: [
-      'Application to up to 3 universities',
-      'Document verification',
-      'Application submission',
-      'Status tracking',
-      'Priority email & phone support',
-      'Program matching assistance'
-    ],
-    highlighted: true
-  },
-  {
     id: 3,
     name: 'Premium',
     price: 'R 500',
+    priceRaw: 500,
     period: 'one-time',
     description: 'Application to up to 5 universities + career guidance',
     features: [
@@ -49,6 +37,6 @@ export const paymentPlans = [
       'Career guidance session',
       'Job placement assistance after graduation'
     ],
-    highlighted: false
+    highlighted: true
   }
 ]

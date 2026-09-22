@@ -52,44 +52,6 @@ const getPortfolio = (req, res) => {
     });
 };
 
-const getPortfolioByEmail = (req, res) => {
-    const email = decodeURIComponent(req.params.email);
-    const profileQuery = `
-        SELECT *
-        FROM student_profiles
-        WHERE email = ?
-        ORDER BY profile_id DESC
-        LIMIT 1
-    `;
-
-    db.query(profileQuery, [email], (err, profileResults) => {
-        if (err) {
-            console.error('Error fetching profile by email:', err);
-            return res.status(500).json({ message: 'Error fetching profile' });
-        }
-
-        if (profileResults.length === 0) {
-            return res.status(404).json({ message: 'Profile not found' });
-        }
-
-        const profile = profileResults[0];
-        db.query(
-            `SELECT subject_id, subject_name, mark, grade
-             FROM student_subjects
-             WHERE profile_id = ?`,
-            [profile.profile_id],
-            (subjectError, subjects) => {
-                if (subjectError) {
-                    console.error('Error fetching subjects:', subjectError);
-                    return res.status(500).json({ message: 'Error fetching subjects' });
-                }
-
-                res.json({ profile, subjects });
-            }
-        );
-    });
-};
-
 
 // =========================
 // CREATE PROFILE
@@ -387,7 +349,6 @@ const deletePortfolio = (req, res) => {
 
 module.exports = {
     getPortfolio,
-    getPortfolioByEmail,
     createPortfolio,
     updatePortfolio,
     deletePortfolio

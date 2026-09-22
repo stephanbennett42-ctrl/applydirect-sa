@@ -15,6 +15,7 @@ import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import PaymentPlan from '../views/PaymentPlan.vue'
 import Payment from '../views/Payment.vue'
+import PaymentReturn from '../views/PaymentReturn.vue'
 import GraduateJobs from '../views/GraduateJobs.vue'
 
 const routes = [
@@ -23,6 +24,7 @@ const routes = [
   { path: '/register', name: 'Register', component: Register },
   { path: '/payment-plan', name: 'PaymentPlan', component: PaymentPlan },
   { path: '/payment', name: 'Payment', component: Payment, meta: { requiresAuth: true } },
+  { path: '/payment/return', name: 'PaymentReturn', component: PaymentReturn },
   { path: '/jobs', name: 'GraduateJobs', component: GraduateJobs },
 
   // Catch-all

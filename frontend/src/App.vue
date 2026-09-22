@@ -1,44 +1,41 @@
 <template>
   <div id="app">
     <!-- NAVBAR COMPONENT -->
-    <Navbar :search-filter="searchFilter" />
+    <Navbar />
 
     <!-- MAIN CONTENT AREA -->
     <main>
-      <router-view
-        :search-filter="searchFilter"
-        @reset-filters="resetFilters"
-      />
+      <router-view :search-filter="searchFilter" @reset-filters="resetFilters" />
     </main>
   </div>
 </template>
 
 <script>
-import Navbar from "./components/Navbar.vue";
+import Navbar from './components/Navbar.vue';
 
 export default {
-  name: "App",
+  name: 'App',
   components: {
-    Navbar,
+    Navbar
   },
   data() {
     return {
       searchFilter: {
-        searchQuery: "",
-        selectedProvince: "",
-        selectedType: "",
-      },
+        searchQuery: '',
+        selectedProvince: '',
+        selectedType: ''
+      }
     };
   },
   methods: {
     resetFilters() {
       this.searchFilter = {
-        searchQuery: "",
-        selectedProvince: "",
-        selectedType: "",
+        searchQuery: '',
+        selectedProvince: '',
+        selectedType: ''
       };
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -29,6 +29,11 @@
           </button>
         </form>
 
+        <div class="demo-box">
+          <p class="demo-title">Demo Student</p>
+          <p>thabo@email.com / password123</p>
+        </div>
+
         <p class="switch-text">
           Don't have an account? <router-link to="/register">Sign up</router-link>
         </p>
@@ -70,34 +75,8 @@ export default {
       this.loading = false
 
       if (result.success) {
-        const redirect = this.$route.query.redirect
-
-        if (redirect && /^https?:\/\//i.test(redirect)) {
-          const destination = new URL(redirect)
-          destination.searchParams.set(
-            'auth_token',
-            localStorage.getItem('uniapply_token') || ''
-          )
-          destination.searchParams.set(
-            'auth_user',
-            localStorage.getItem('uniapply_currentUser') || '{}'
-          )
-          window.location.href = destination.toString()
-        } else if (redirect) {
-          this.$router.push(redirect)
-        } else {
-          const host = window.location.hostname || 'localhost'
-          const destination = new URL(`http://${host}:5173/institutions`)
-          destination.searchParams.set(
-            'auth_token',
-            localStorage.getItem('uniapply_token') || ''
-          )
-          destination.searchParams.set(
-            'auth_user',
-            localStorage.getItem('uniapply_currentUser') || '{}'
-          )
-          window.location.href = destination.toString()
-        }
+        const redirect = this.$route.query.redirect || '/payment-plan'
+        this.$router.push(redirect)
       } else {
         this.error = result.error || 'Login failed'
       }
@@ -209,6 +188,27 @@ export default {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.demo-box {
+  margin-top: 20px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 14px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-light);
+  line-height: 1.7;
+}
+
+.demo-title {
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 2px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .switch-text {

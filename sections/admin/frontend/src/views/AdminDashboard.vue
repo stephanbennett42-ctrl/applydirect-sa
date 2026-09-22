@@ -87,24 +87,6 @@
           </div>
         </div>
 
-        <div class="account-access-panel">
-          <div>
-            <strong>Access a student account</strong>
-            <span class="admin-note">Enter the approved student's full name to open their account view.</span>
-          </div>
-          <div class="account-access-controls">
-            <input
-              v-model="accountName"
-              class="search-input account-name-input"
-              placeholder="Student full name"
-              @keyup.enter="accessStudentByName"
-            />
-            <button class="btn btn-primary btn-small" type="button" @click="accessStudentByName">
-              Access account
-            </button>
-          </div>
-        </div>
-
         <p v-if="loadingUsers" class="admin-note">Loading students...</p>
         <p v-else-if="filteredStudents.length === 0" class="admin-note">No students match your search.</p>
 
@@ -166,16 +148,6 @@
                     >
                       <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
                       Reset
-                    </button>
-                    <button
-                      v-if="u.status === 'approved'"
-                      class="btn btn-ghost btn-small icon-btn"
-                      @click="viewStudentAccount(u)"
-                      :disabled="busyId === u.id"
-                      aria-label="View student account"
-                      title="View student account"
-                    >
-                      View account
                     </button>
                   </template>
                   <span v-else class="admin-note">—</span>
@@ -759,7 +731,6 @@ export default {
       msgError: '',
       featuresText: {},
       search: '',
-      accountName: '',
       filter: 'all',
       loadingUsers: false,
       loadingPackages: false,
@@ -912,62 +883,6 @@ export default {
       } finally {
         this.busyId = null
       }
-    },
-    viewStudentAccount(user) {
-      const enteredName = window.prompt(
-        `Enter the student's full name to open their account:\n\n${user.firstName} ${user.lastName}`
-      )
-
-      if (enteredName === null) return
-
-      const expectedName = `${user.firstName} ${user.lastName}`.trim().toLowerCase()
-      if (enteredName.trim().toLowerCase() !== expectedName) {
-        this.showMessage('The student name did not match. Account access was cancelled.')
-        return
-      }
-
-      this.openStudentAccount(user)
-    },
-    accessStudentByName() {
-      const enteredName = this.accountName.trim().toLowerCase()
-      if (!enteredName) {
-        this.showMessage('Enter the student\'s full name first.')
-        return
-      }
-
-      const user = this.students.find(u =>
-        `${u.firstName} ${u.lastName}`.trim().toLowerCase() === enteredName
-      )
-
-      if (!user) {
-        this.showMessage('No student was found with that full name.')
-        return
-      }
-
-      if (user.status !== 'approved') {
-        this.showMessage(`This account is ${user.status}. Approve it before accessing the account.`)
-        return
-      }
-
-      this.openStudentAccount(user)
-    },
-    openStudentAccount(user) {
-      const host = window.location.hostname || 'localhost'
-      const selectedUser = encodeURIComponent(JSON.stringify({
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phone: user.phone,
-        university: user.university,
-        fieldOfStudy: user.fieldOfStudy,
-        status: user.status,
-        role: user.role
-      }))
-      const adminToken = encodeURIComponent(localStorage.getItem('uniapply_admin_token') || '')
-
-      window.location.href =
-        `http://${host}:5173/portfolio?admin_view=1&auth_token=${adminToken}&auth_user=${selectedUser}`
     },
     async savePackage(p) {
       this.busyId = p.id
@@ -1263,8 +1178,9 @@ export default {
     },
     handleLogout() {
       logout()
+      // Return to the main (student) login page, not the admin sign-in page.
       const host = window.location.hostname || 'localhost'
-      window.location.href = `http://${host}:3005/admin/login`
+      window.location.href = `http://${host}:3004/login`
     }
   }
 }
@@ -1508,35 +1424,6 @@ export default {
   gap: 16px;
   flex-wrap: wrap;
   margin-bottom: 16px;
-}
-
-.account-access-panel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding: 16px;
-  background: var(--primary-50);
-  border: 1px solid var(--primary-100);
-  border-radius: var(--radius-md);
-}
-
-.account-access-panel > div:first-child {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.account-access-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: min(100%, 390px);
-}
-
-.account-name-input {
-  min-width: 0;
 }
 
 .search-input {

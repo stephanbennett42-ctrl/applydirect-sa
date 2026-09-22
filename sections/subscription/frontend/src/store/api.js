@@ -130,6 +130,22 @@ export const ordersAPI = {
     })
   },
 
+  /** Start a real PayFast redirect for a pending order */
+  payfastInit(orderId) {
+    return apiFetch('/payfast/init', {
+      method: 'POST',
+      body: JSON.stringify({ orderId })
+    })
+  },
+
+  /** Confirm a payment after PayFast redirects the user back (return URL) */
+  payfastConfirm(payload) {
+    return apiFetch('/payfast/confirm', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+  },
+
   /** Get all orders for the current user */
   getAll() {
     return apiFetch('/orders')
@@ -146,7 +162,12 @@ export const ordersAPI = {
 // ============================================
 
 export const jobsAPI = {
-  /** List all active jobs, optional { field, type, q } filters */
+  /** Check the current user's premium access to the Graduate Jobs section (auth) */
+  getAccess() {
+    return apiFetch('/jobs/access')
+  },
+
+  /** List all active jobs, optional { field, type, q } filters (premium) */
   getAll(params = {}) {
     const qs = new URLSearchParams()
     if (params.field) qs.set('field', params.field)

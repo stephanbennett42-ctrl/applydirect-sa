@@ -42,18 +42,35 @@ router.post('/', requireAuth, async (req, res) => {
       return res.status(409).json({ error: 'You already have an active order for this package' })
     }
 
-    // Create the order (pending)
+    // Free plans (price 0, e.g. Basic) activate immediately — no payment step.
+    const isFree = Number(pkg.price) <= 0
+    const orderStatus = isFree ? 'paid' : 'pending'
+
+    // Create the order
     const [result] = await db.query(
       'INSERT INTO orders (user_id, package_id, amount, status) VALUES (?, ?, ?, ?)',
-      [req.user.id, packageId, pkg.price, 'pending']
+      [req.user.id, packageId, pkg.price, orderStatus]
     )
+
+    if (isFree) {
+      // Record the free activation as a payment for history/audit
+      await db.query(
+        'INSERT INTO payments (order_id, amount, method, status, transaction_ref) VALUES (?, ?, ?, ?, ?)',
+        [result.insertId, 0, 'free', 'success', 'FREE-' + result.insertId]
+      )
+      // Auto-approve the user just like a paid plan does
+      await db.query(
+        'UPDATE users SET status = ? WHERE id = ? AND status = ?',
+        ['approved', req.user.id, 'pending']
+      )
+    }
 
     res.status(201).json({
       id: result.insertId,
       userId: req.user.id,
       packageId,
       amount: Number(pkg.price),
-      status: 'pending',
+      status: orderStatus,
       packageName: pkg.name
     })
   } catch (err) {
