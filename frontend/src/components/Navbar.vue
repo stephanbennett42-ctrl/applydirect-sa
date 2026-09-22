@@ -125,6 +125,15 @@
           >
             {{ userInitials }}
           </router-link>
+
+          <button
+            v-if="currentUser"
+            type="button"
+            class="logout-button"
+            @click="logout"
+          >
+            Log Out
+          </button>
         </div>
       </div>
     </div>
@@ -177,6 +186,13 @@ export default {
           Collapse.getInstance(navCollapse) || new Collapse(navCollapse);
         bsCollapse.hide();
       }
+    },
+    logout() {
+      localStorage.removeItem("uniapply_token");
+      localStorage.removeItem("uniapply_currentUser");
+      window.location.href =
+        "http://localhost:3007/?logout=1&redirect=" +
+        encodeURIComponent("http://localhost:5173/institutions");
     },
   },
 };
@@ -236,6 +252,26 @@ export default {
   box-shadow: 0 4px 12px rgba(255, 184, 28, 0.45);
   color: #001242;
   transform: translateY(-1px);
+}
+
+.logout-button {
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50rem;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease-in-out,
+    border-color 0.25s ease-in-out;
+}
+
+.logout-button:hover {
+  background-color: rgba(224, 60, 49, 0.9);
+  border-color: #e03c31;
 }
 
 @media (max-width: 991.98px) {

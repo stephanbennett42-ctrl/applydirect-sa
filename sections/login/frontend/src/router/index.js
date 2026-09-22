@@ -50,7 +50,14 @@ function mainAppRedirect(target = "http://localhost:5173/institutions") {
  * Dashboard requires a logged-in user; logged-in users skip the login page.
  */
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !isLoggedIn()) {
+  if (to.query.logout === "1") {
+    localStorage.removeItem("uniapply_token");
+    localStorage.removeItem("uniapply_currentUser");
+
+    const query = { ...to.query };
+    delete query.logout;
+    next({ name: "Login", query });
+  } else if (to.meta.requiresAuth && !isLoggedIn()) {
     next({ name: "Login", query: { redirect: to.fullPath } });
   } else if (to.name === "Login" && isLoggedIn()) {
     const redirect = to.query.redirect || "http://localhost:5173/institutions";

@@ -3,8 +3,8 @@
  * - Serves on port 3005 and auto-opens the browser on startup.
  * - API calls are proxied to the admin backend on port 3003.
  */
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
   plugins: [vue()],
@@ -13,14 +13,14 @@ export default defineConfig({
     // on the same network can open this site via http://<this-ip>:3005
     host: true,
     port: 3005,
-    open: true,
+    open: false,
     // Accept requests from any host/IP so LAN devices are not rejected.
     allowedHosts: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:3003',
-        changeOrigin: true
-      }
-    }
-  }
-})
+      "/api": {
+        target: "http://localhost:3003",
+        changeOrigin: true,
+      },
+    },
+  },
+});
