@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- NAVBAR COMPONENT -->
-    <Navbar :search-filter="searchFilter" />
+    <Navbar />
 
     <!-- MAIN CONTENT AREA -->
     <main>

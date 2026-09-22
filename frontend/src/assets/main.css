@@ -80,6 +80,76 @@ main {
 }
 
 /* ==========================================================================
+   1b. SUBSCRIPTION DESIGN TOKENS (parity - shared with the subscription module)
+   ========================================================================== */
+
+:root {
+  --flag-red: #E03C31;
+  --flag-red-dark: #C22B21;
+  --flag-blue: #001489;
+  --flag-blue-dark: #000A52;
+  --flag-green: #007749;
+  --flag-green-light: #00A96F;
+  --flag-gold: #FFB81C;
+  --flag-gold-light: #FFD35C;
+  --flag-black: #000000;
+  --flag-white: #ffffff;
+
+  --primary: var(--flag-blue);
+  --primary-light: #3B4DCD;
+  --primary-dark: var(--flag-blue-dark);
+  --primary-50: #E9EDFC;
+  --primary-100: #C9D3F7;
+
+  --accent: var(--flag-red);
+  --accent-hover: var(--flag-red-dark);
+  --accent-50: #FBE9E7;
+
+  --gold: var(--flag-gold);
+  --gold-light: var(--flag-gold-light);
+
+  --success: var(--flag-green);
+  --success-light: #D9F0E6;
+
+  --bg: #ffffff;
+  --bg-subtle: #f7f8fa;
+  --bg-dark: #f0f2f5;
+
+  --text: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-light: #6b7280;
+  --text-muted: #9ca3af;
+  --text-white: #ffffff;
+
+  --border: #e5e7eb;
+  --border-light: #f3f4f6;
+
+  --flag-stripe: linear-gradient(90deg,
+    var(--flag-black) 0%, var(--flag-black) 13%,
+    var(--flag-gold) 13%, var(--flag-gold) 26%,
+    var(--flag-green) 26%, var(--flag-green) 39%,
+    var(--flag-white) 39%, var(--flag-white) 47%,
+    var(--flag-red) 47%, var(--flag-red) 74%,
+    var(--flag-white) 74%, var(--flag-white) 86%,
+    var(--flag-blue) 86%, var(--flag-blue) 100%);
+
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.02);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.06), 0 10px 10px -5px rgba(0,0,0,0.01);
+
+  --radius: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  --transition: all 0.2s ease;
+  --transition-fast: all 0.12s ease;
+}
+
+/* ==========================================================================
    3. TOP NAVIGATION ACCENT
    ========================================================================== */
 
@@ -163,9 +233,150 @@ main {
     var(--sa-blue)
   );
 
-  background-size: 300% 100%;
+background-size: 300% 100%;
   animation: saTopLineFlow 6s linear infinite;
 }
 
 /* ==========================================================================
-*/
+   6. SUBSCRIPTION GLOBAL UTILITIES (parity - shared with the subscription module)
+   ========================================================================== */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+  color: var(--text-light);
+  font-size: 1rem;
+  margin-bottom: 48px;
+  max-width: 540px;
+  line-height: 1.7;
+}
+
+.section-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.section-header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  margin-bottom: 48px;
+}
+
+.page-header {
+  position: relative;
+  background: var(--primary-dark);
+  color: var(--text-white);
+  padding: 120px 32px 48px;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: var(--flag-stripe);
+}
+
+.page-header h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.page-header p {
+  font-size: 1.05rem;
+  opacity: 0.8;
+  max-width: 560px;
+  line-height: 1.7;
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--text-white);
+}
+
+.btn-accent:hover {
+  background: var(--accent-hover);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+}
+
+.btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--primary);
+  padding: 11px 16px;
+}
+
+.btn-ghost:hover {
+  background: var(--primary-50);
+}
+
+.btn-lg {
+  padding: 14px 32px;
+  font-size: 0.95rem;
+}
+
+.banner-link {
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   7. UNI-SCROLL SEARCH & FILTER BAR (institutions page)
+   ========================================================================== */
+
+.z-search-filter {
+  z-index: 50;
+}
+
+.filter-bar-nav-margin {
+  top: 68px;
+}
+
+@media (max-width: 768px) {
+  .section-title { font-size: 1.6rem; }
+  .section-subtitle { font-size: 0.95rem; margin-bottom: 32px; }
+  .page-header h1 { font-size: 1.8rem; }
+  .page-header { padding: 100px 20px 36px; }
+  .container { padding: 0 20px; }
+  .btn-lg { padding: 12px 24px; font-size: 0.9rem; }
+}
+
+@media (max-width: 480px) {
+  .page-header { padding: 88px 16px 32px; }
+  .page-header h1 { font-size: 1.55rem; }
+  .page-header p { font-size: 0.95rem; }
+  .section-title { font-size: 1.4rem; }
+  .container { padding: 0 16px; }
+}

@@ -1,44 +1,19 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { isLoggedIn } from "../store/auth.js";
 import InstitutionsView from "../views/InstitutionsView.vue";
 import AboutView from "../views/AboutView.vue";
 import Portfolio from "../views/Portfolio.vue";
 import ContactView from "../views/contact.vue";
 import SavedView from "../views/SavedView.vue";
-
-const LOGIN_APP_URL = "http://localhost:3007";
-
-function isLoggedIn() {
-  return Boolean(
-    localStorage.getItem("uniapply_token") &&
-    localStorage.getItem("uniapply_currentUser"),
-  );
-}
-
-function importLoginSession(to) {
-  const token = to.query.auth_token;
-  const encodedUser = to.query.auth_user;
-
-  if (!token || !encodedUser) return null;
-
-  try {
-    const user = JSON.parse(encodedUser);
-    localStorage.setItem("uniapply_token", token);
-    localStorage.setItem("uniapply_currentUser", JSON.stringify(user));
-
-    const query = { ...to.query };
-    delete query.auth_token;
-    delete query.auth_user;
-
-    return { path: to.path, query };
-  } catch {
-    return null;
-  }
-}
+import Login from "../views/Login.vue";
+import Register from "../views/Register.vue";
+import PaymentPlan from "../views/PaymentPlan.vue";
+import Payment from "../views/Payment.vue";
+import GraduateJobs from "../views/GraduateJobs.vue";
 
 // Subscription/payment lives in the separate subscription app (port 3004)
 const SubscriptionRedirect = {
-  template:
-    '<div class="container my-5"><p>Opening the subscription &amp; payment page&hellip;</p></div>',
+  template: '<div class="container my-5"><p>Opening the subscription &amp; payment page&hellip;</p></div>',
   mounted() {
     window.location.href = "http://localhost:3004";
   },
@@ -88,6 +63,37 @@ const routes = [
   },
 
   {
+    path: "/login",
+    name: "Login",
+    component: Login,
+  },
+
+  {
+    path: "/register",
+    name: "Register",
+    component: Register,
+  },
+
+  {
+    path: "/payment-plan",
+    name: "PaymentPlan",
+    component: PaymentPlan,
+  },
+
+  {
+    path: "/payment",
+    name: "Payment",
+    component: Payment,
+    meta: { requiresAuth: true },
+  },
+
+  {
+    path: "/jobs",
+    name: "GraduateJobs",
+    component: GraduateJobs,
+  },
+
+  {
     path: "/subscription",
     name: "Subscription",
     component: SubscriptionRedirect,
@@ -99,16 +105,14 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
-  const cleanedRoute = importLoginSession(to);
-  if (cleanedRoute) return cleanedRoute;
-
-  if (isLoggedIn()) return true;
-
-  const requestedUrl = `${window.location.origin}${to.fullPath}`;
-  window.location.href = `${LOGIN_APP_URL}/?redirect=${encodeURIComponent(requestedUrl)}`;
-
-  return false;
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isLoggedIn()) {
+    next({ name: "Login", query: { redirect: to.fullPath } });
+  } else if (to.name === "Login" && isLoggedIn()) {
+    next({ name: "PaymentPlan" });
+  } else {
+    next();
+  }
 });
 
 export default router;
