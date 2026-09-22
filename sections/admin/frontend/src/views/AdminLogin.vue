@@ -60,9 +60,9 @@
               {{ loading ? 'Signing in...' : 'Sign In as Admin' }}
             </button>
 
-            <div class="demo-box">
-              <p class="demo-title">Admin Credentials</p>
-              <p>admin@uniapply.co.za / admin123</p>
+            <div class="login-switch">
+              <span>Looking for the student portal?</span>
+              <a :href="userLoginUrl">Go to user login</a>
             </div>
           </form>
         </div>
@@ -82,6 +82,11 @@ export default {
       password: '',
       error: '',
       loading: false
+    }
+  },
+  computed: {
+    userLoginUrl() {
+      return `http://${window.location.hostname}:3007/?forceLogin=1`
     }
   },
   mounted() {
@@ -298,24 +303,29 @@ export default {
   to { transform: rotate(360deg); }
 }
 
-.demo-box {
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 14px;
-  text-align: center;
-  font-size: 0.8rem;
+.login-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
   color: var(--text-light);
-  line-height: 1.7;
+  font-size: 0.82rem;
+  text-align: center;
 }
 
-.demo-title {
-  font-weight: 700;
+.login-switch a {
   color: var(--primary);
-  margin-bottom: 2px;
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.login-switch a:hover {
+  text-decoration: underline;
+}
+
+.login-switch a:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 3px;
 }
 
 @media (max-width: 900px) {

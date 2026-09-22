@@ -1,6 +1,6 @@
 <template>
   <div id="app-wrapper">
-    <Navbar />
+    <Navbar v-if="$route.name !== 'Login' && $route.name !== 'Register'" />
     <main>
       <router-view />
     </main>

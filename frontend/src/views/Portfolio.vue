@@ -1,5 +1,12 @@
 <template>
   <div class="profile-page">
+    <div v-if="isAdminView" class="admin-view-banner">
+      <span>Admin view: {{ viewedStudentName }}'s account</span>
+      <button type="button" class="exit-admin-view" @click="exitAdminView">
+        Return to admin dashboard
+      </button>
+    </div>
+
     <!-- ================= PAGE LAYOUT ================= -->
 
     <div class="page-layout">
@@ -912,6 +919,25 @@ export default {
   // =========================
 
   computed: {
+    isAdminView() {
+      return this.$route.query.admin_view === "1";
+    },
+
+    viewedUser() {
+      if (!this.isAdminView) return null;
+
+      try {
+        return JSON.parse(localStorage.getItem("uniapply_currentUser") || "null");
+      } catch {
+        return null;
+      }
+    },
+
+    viewedStudentName() {
+      const user = this.viewedUser;
+      return user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "student";
+    },
+
     // Show the user's first name when available, otherwise use a neutral label.
     profileDisplayName() {
       return this.profile.firstName.trim() || "My Profile";
@@ -942,6 +968,13 @@ export default {
   // =========================
 
   methods: {
+    exitAdminView() {
+      localStorage.removeItem("uniapply_token");
+      localStorage.removeItem("uniapply_currentUser");
+      const host = window.location.hostname || "localhost";
+      window.location.href = `http://${host}:3005/admin`;
+    },
+
     scrollToProfile() {
       const profileSection = document.querySelector(".main-content");
 
@@ -1518,11 +1551,25 @@ export default {
 
     async getProfile() {
       try {
-        const response = await fetch("http://localhost:3000/api/portfolio/1");
+        const viewedUser = this.isAdminView ? this.viewedUser : null;
+        const endpoint = viewedUser?.email
+          ? `http://localhost:3000/api/portfolio/by-email/${encodeURIComponent(viewedUser.email)}`
+          : "http://localhost:3000/api/portfolio/1";
+        const response = await fetch(endpoint);
 
         const data = await response.json();
 
         if (!response.ok) {
+          if (this.isAdminView && viewedUser) {
+            this.profile.firstName = viewedUser.firstName || "";
+            this.profile.surname = viewedUser.lastName || "";
+            this.profile.email = viewedUser.email || "";
+            this.profile.phone = viewedUser.phone || "";
+            this.profile.school = viewedUser.university || "";
+            this.profile.field = viewedUser.fieldOfStudy || "";
+            return;
+          }
+
           console.error(data.message);
 
           return;
@@ -1607,7 +1654,9 @@ export default {
 
       try {
         const profileData = {
-          student_id: 1,
+          student_id: this.isAdminView && this.viewedUser
+            ? this.viewedUser.id
+            : 1,
 
           first_name: this.profile.firstName,
 
@@ -1724,6 +1773,40 @@ export default {
   background: #f4f6f9;
   color: var(--ink);
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
+}
+
+.admin-view-banner {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 20px;
+  background: #fff4cc;
+  border-bottom: 1px solid #e7c45d;
+  color: #5b4300;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.exit-admin-view {
+  padding: 6px 12px;
+  border: 1px solid #9b7600;
+  border-radius: 4px;
+  background: #fffdf2;
+  color: #5b4300;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.exit-admin-view:hover {
+  background: #ffffff;
 }
 
 /* ================= HEADER ================= */

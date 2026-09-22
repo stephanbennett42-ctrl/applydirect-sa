@@ -3,7 +3,7 @@
  * Centralised HTTP client for communicating with the login backend.
  * Automatically attaches the JWT token from localStorage.
  */
-const API_BASE = 'http://localhost:3006/api'
+const API_BASE = '/api'
 
 /**
  * Get the stored JWT token.
@@ -62,6 +62,14 @@ async function apiFetch(url, options = {}) {
 // ============================================
 
 export const authAPI = {
+  /** Create a student account without signing in automatically. */
+  register(details) {
+    return apiFetch('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(details)
+    })
+  },
+
   /** Log in with email and password. Returns { token, user } */
   login(email, password) {
     return apiFetch('/auth/login', {

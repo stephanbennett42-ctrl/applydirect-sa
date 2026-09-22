@@ -2,6 +2,7 @@
 
 const {
     getPortfolio,
+    getPortfolioByEmail,
     createPortfolio,
     updatePortfolio,
     deletePortfolio
@@ -10,6 +11,7 @@ const {
 const router = express.Router();
 
 // Return one portfolio profile using its profile ID.
+router.get('/by-email/:email', getPortfolioByEmail);
 router.get('/:profile_id', getPortfolio);
 
 // Create a new portfolio profile.

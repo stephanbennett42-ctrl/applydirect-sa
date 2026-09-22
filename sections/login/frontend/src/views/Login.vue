@@ -35,6 +35,10 @@
             <span>{{ error }}</span>
           </div>
 
+          <div v-if="success" class="alert alert-success">
+            <span>{{ success }}</span>
+          </div>
+
           <div class="field">
             <label for="email">Email Address</label>
             <input
@@ -104,10 +108,13 @@
           </button>
         </form>
 
-        <div class="demo-box">
-          <p class="demo-title">Demo Accounts</p>
-          <p>thabo@email.com / password123</p>
-          <p>admin@uniapply.co.za / admin123</p>
+        <a href="/register" class="create-user-button">
+          Create New User
+        </a>
+
+        <div class="login-switch">
+          <span>Are you an administrator?</span>
+          <a :href="adminLoginUrl">Go to admin login</a>
         </div>
       </div>
 
@@ -126,16 +133,25 @@ export default {
   name: "Login",
   data() {
     return {
-      email: "",
+      email: this.$route.query.email || "",
       password: "",
       showPassword: false,
       error: "",
+      success: this.$route.query.registered === "1"
+        ? "Account created. An admin must approve it before you can log in."
+        : "",
       loading: false,
     };
+  },
+  computed: {
+    adminLoginUrl() {
+      return `http://${window.location.hostname}:3005/admin/login`;
+    },
   },
   methods: {
     async handleLogin() {
       this.error = "";
+      this.success = "";
       this.loading = true;
 
       const result = await login(this.email, this.password);
@@ -372,6 +388,12 @@ export default {
   border: 1px solid rgba(197, 48, 48, 0.12);
 }
 
+.alert-success {
+  background: var(--success-light);
+  color: var(--success);
+  border: 1px solid rgba(0, 119, 73, 0.16);
+}
+
 .spinner {
   width: 18px;
   height: 18px;
@@ -387,25 +409,53 @@ export default {
   }
 }
 
-.demo-box {
-  margin-top: 20px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 14px;
-  text-align: center;
-  font-size: 0.82rem;
+.login-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 22px;
   color: var(--text-light);
-  line-height: 1.7;
+  font-size: 0.82rem;
+  text-align: center;
 }
 
-.demo-title {
-  font-weight: 700;
+.create-user-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 18px;
+  padding: 11px 16px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
   color: var(--primary);
-  margin-bottom: 2px;
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.create-user-button:hover {
+  background: var(--primary-50);
+}
+
+.create-user-button:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 3px;
+}
+
+.login-switch a {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.login-switch a:hover {
+  text-decoration: underline;
+}
+
+.login-switch a:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 3px;
 }
 
 .footer-note {

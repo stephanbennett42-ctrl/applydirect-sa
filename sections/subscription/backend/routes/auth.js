@@ -84,6 +84,10 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' })
     }
 
+    if (user.role === 'admin') {
+      return res.status(403).json({ error: 'Administrators must use the admin login page.', status: 'admin_login_required' })
+    }
+
     if (user.status === 'pending') {
       return res.status(403).json({ error: 'Your account is pending admin approval.', status: 'pending' })
     }

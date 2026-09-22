@@ -52,6 +52,18 @@ const APPS = [
     dir: "sections/admin/frontend",
     type: "frontend",
   },
+  {
+    name: "Login API",
+    port: 3006,
+    dir: "sections/login/backend",
+    type: "backend",
+  },
+  {
+    name: "Login Site",
+    port: 3007,
+    dir: "sections/login/frontend",
+    type: "frontend",
+  },
 ];
 
 const args = process.argv.slice(2);
@@ -209,7 +221,12 @@ function ensureDeps(app) {
 function databaseBackends() {
   if (onlySub) return ["sections/subscription/backend"];
   if (onlyAdmin) return ["sections/admin/backend"];
-  return ["backend", "sections/subscription/backend", "sections/admin/backend"];
+  return [
+    "backend",
+    "sections/subscription/backend",
+    "sections/admin/backend",
+    "sections/login/backend",
+  ];
 }
 
 function runDbSetup() {
