@@ -83,6 +83,13 @@
           <router-link to="/subscription" class="sa-nav-tab tab-black text-center" @click="closeMobileNav">
             Subscription
           </router-link>
+
+          <div class="profile-account" :title="profileDisplayName">
+            <span class="profile-name">{{ profileDisplayName }}</span>
+            <div class="profile-icon" :aria-label="`Logged in as ${profileDisplayName}`">
+              {{ profileInitials }}
+            </div>
+          </div>
         </div>
 
       </div>
@@ -101,7 +108,46 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      profile: {
+        firstName: '',
+        surname: ''
+      }
+    };
+  },
+  computed: {
+    profileDisplayName() {
+      return this.profile.firstName.trim() || 'My Profile';
+    },
+    profileInitials() {
+      const firstName = this.profile.firstName.trim();
+      const surname = this.profile.surname.trim();
+
+      if (!firstName && !surname) {
+        return '--';
+      }
+
+      return `${firstName.charAt(0)}${surname.charAt(0)}`.toUpperCase();
+    }
+  },
+  mounted() {
+    this.getProfile();
+  },
   methods: {
+    async getProfile() {
+      try {
+        const response = await fetch('http://localhost:3000/api/portfolio/1');
+        const data = await response.json();
+
+        if (response.ok && data.profile) {
+          this.profile.firstName = data.profile.first_name || '';
+          this.profile.surname = data.profile.last_name || '';
+        }
+      } catch (error) {
+        console.error('Error loading navbar profile:', error);
+      }
+    },
     closeMobileNav() {
       const navCollapse = this.$refs.navCollapse;
       if (navCollapse && navCollapse.classList.contains('show')) {
@@ -198,5 +244,42 @@ export default {
   background-color: #1a1a1a !important;
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.profile-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 4px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.profile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 50%;
+  background: #ffb81c;
+  color: #14223b;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(255, 184, 28, 0.35);
+}
+
+@media (max-width: 991px) {
+  .profile-account {
+    justify-content: flex-start;
+    margin: 4px 0 0;
+    padding: 8px 0 0;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+  }
 }
 </style>
