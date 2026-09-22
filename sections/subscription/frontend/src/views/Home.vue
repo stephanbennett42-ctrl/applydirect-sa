@@ -14,9 +14,6 @@
             <router-link to="/payment-plan" class="btn btn-primary btn-lg"
               >View Payment Plans</router-link
             >
-            <router-link to="/login" class="btn btn-ghost btn-lg"
-              >Log In</router-link
-            >
           </div>
         </div>
       </div>
@@ -127,17 +124,6 @@
             <p>Pay securely online — we take it from there.</p>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="cta">
-      <div class="container cta-inner">
-        <h2>Ready to start your university journey?</h2>
-        <p>Join hundreds of students who applied through ApplyDirect SA.</p>
-        <router-link to="/register" class="btn btn-light btn-lg"
-          >Create Free Account</router-link
-        >
       </div>
     </section>
   </div>
@@ -325,40 +311,6 @@ export default {
   line-height: 1.6;
   max-width: 260px;
   margin: 0 auto;
-}
-
-/* CTA */
-.cta {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--primary-dark) 100%
-  );
-  color: var(--text-white);
-  padding: 72px 0;
-  text-align: center;
-}
-
-.cta-inner h2 {
-  color: #ffffff;
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-}
-
-.cta-inner p {
-  color: rgba(255, 255, 255, 0.85);
-  margin-bottom: 26px;
-}
-
-.btn-light {
-  background: var(--gold-light);
-  color: var(--primary-dark);
-  border: none;
-}
-
-.btn-light:hover {
-  background: #ffd15c;
-  transform: translateY(-2px);
 }
 
 @media (max-width: 640px) {

@@ -102,19 +102,14 @@
             class="profile-avatar"
             :aria-label="
               currentUser
-                ? `Open ${currentUser.firstName || 'your'} profile`
+                ? `Open ${userFirstName || 'your'} profile`
                 : 'Open profile'
             "
             title="Profile"
             @click="closeMobileNav"
             >{{ userInitials }}</router-link
           >
-          <button
-            v-if="currentUser"
-            type="button"
-            class="logout-button"
-            @click="logout"
-          >
+          <button type="button" class="logout-button" @click="logout">
             Log Out
           </button>
         </div>
@@ -125,6 +120,7 @@
 
 <script>
 import { Collapse } from "bootstrap";
+import { getCurrentUser } from "../store/auth.js";
 
 export default {
   name: "Navbar",
@@ -133,12 +129,20 @@ export default {
     return { currentUser: this.getCurrentUser() };
   },
   computed: {
+    userFirstName() {
+      return (
+        this.currentUser?.firstName ||
+        this.currentUser?.first_name ||
+        ""
+      ).trim();
+    },
     userInitials() {
       if (!this.currentUser) return "?";
-      const firstName = this.currentUser.firstName?.trim() || "";
+      const firstName = this.userFirstName;
       const surname = (
         this.currentUser.surname ||
         this.currentUser.lastName ||
+        this.currentUser.last_name ||
         ""
       ).trim();
       const initials =
@@ -148,11 +152,15 @@ export default {
       );
     },
   },
+  watch: {
+    "$route.fullPath"() {
+      this.currentUser = this.getCurrentUser();
+    },
+  },
   methods: {
     getCurrentUser() {
       try {
-        const storedUser = localStorage.getItem("uniapply_currentUser");
-        return storedUser ? JSON.parse(storedUser) : null;
+        return getCurrentUser();
       } catch {
         return null;
       }
