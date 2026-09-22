@@ -394,19 +394,15 @@ export default {
       try {
 
         console.log('Sending contact form:', this.form);
+        const response = await fetch("/api/contact", {
+          method: "POST",
 
-        const response = await fetch(
-          'http://127.0.0.1:3000/api/contact',
-          {
-            method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
 
-            headers: {
-              'Content-Type': 'application/json'
-            },
-
-            body: JSON.stringify(this.form)
-          }
-        );
+          body: JSON.stringify(this.form)
+        });
 
 
         // Get response as text first
