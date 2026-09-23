@@ -1,217 +1,196 @@
-require("dotenv").config();
+import dotenv from 'dotenv'
+import express from 'express'
+import cors from 'cors'
+import db from './db.js'
 
-const express = require("express");
-const cors = require("cors");
+// Import Route Handlers (All using ES Module imports)
+import portfolioRoutes from './routes/profile.js'
+import contactRoutes from './routes/contact.js'
+import authRoutes from './routes/auth.js'
+import jobsRoutes from './routes/jobs.js'
+import ordersRoutes from './routes/orders.js'
+import packagesRoutes from './routes/packages.js'
+import payfastRoutes from './routes/payfast.js'
+import adminRoutes from './routes/admin.js'
+import placementRoutes from './routes/placements.js'
 
-// Team database connection
-const db = require("./db");
+// Load environment variables
+dotenv.config()
 
-// Existing Routes
-const portfolioRoutes = require("./routes/profile");
-const contactRoutes = require("./routes/contact");
+const app = express()
 
-// Newly Integrated Routes
-// Make sure this file is named auth.js inside backend/routes/
-const authRoutes = require("./routes/auth"); 
-const jobsRoutes = require("./routes/jobs");
-const ordersRoutes = require("./routes/orders");
-const packagesRoutes = require("./routes/packages");
-const payfastRoutes = require("./routes/payfast");
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
+// Global Middleware
+app.use(cors())
+app.use(express.json())
 
 
 // =====================================================
 // INSTITUTIONS API
 // =====================================================
 
-app.get("/api/institutions", async (req, res) => {
+app.get('/api/institutions', async (req, res) => {
   try {
-    const { province, status } = req.query;
+    const { province, status } = req.query
 
-    let sql = "SELECT * FROM institutions";
-    const params = [];
-    const conditions = [];
+    let sql = 'SELECT * FROM institutions'
+    const params = []
+    const conditions = []
 
     if (province) {
-      conditions.push("province = ?");
-      params.push(province);
+      conditions.push('province = ?')
+      params.push(province)
     }
 
     if (status) {
-      conditions.push("application_status = ?");
-      params.push(status);
+      conditions.push('application_status = ?')
+      params.push(status)
     }
 
     if (conditions.length > 0) {
-      sql += " WHERE " + conditions.join(" AND ");
+      sql += ' WHERE ' + conditions.join(' AND ')
     }
 
-    sql += " ORDER BY name ASC";
+    sql += ' ORDER BY name ASC'
 
-    const [rows] = await db.query(sql, params);
+    const [rows] = await db.query(sql, params)
 
     res.json({
       success: true,
       count: rows.length,
       data: rows
-    });
-
+    })
   } catch (error) {
-    console.error("Database query error:", error);
-
+    console.error('Database query error:', error)
     res.status(500).json({
       success: false,
-      message: "Server error retrieving institutions"
-    });
+      message: 'Server error retrieving institutions'
+    })
   }
-});
+})
 
-
-app.get("/api/institutions/:id", async (req, res) => {
+app.get('/api/institutions/:id', async (req, res) => {
   try {
     const [rows] = await db.query(
-      "SELECT * FROM institutions WHERE institution_id = ?",
+      'SELECT * FROM institutions WHERE institution_id = ?',
       [req.params.id]
-    );
+    )
 
     if (rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Institution not found"
-      });
+        message: 'Institution not found'
+      })
     }
 
     res.json({
       success: true,
       data: rows[0]
-    });
-
+    })
   } catch (error) {
-    console.error("Database query error:", error);
-
+    console.error('Database query error:', error)
     res.status(500).json({
       success: false,
-      message: "Server error retrieving institution"
-    });
+      message: 'Server error retrieving institution'
+    })
   }
-});
+})
 
 
 // =====================================================
 // REMINDERS API
 // =====================================================
 
-app.post("/api/reminders", async (req, res) => {
-  const {
-    name,
-    phone_number, // accept phone_number from body for compatibility
-    phone,
-    channel,
-    institution_id
-  } = req.body;
-
-  const userPhone = phone || phone_number;
+app.post('/api/reminders', async (req, res) => {
+  const { name, phone_number, phone, institution_id } = req.body
+  const userPhone = phone || phone_number
 
   if (!userPhone || !institution_id) {
     return res.status(400).json({
       success: false,
-      message: "Phone number and institution ID are required."
-    });
+      message: 'Phone number and institution ID are required.'
+    })
   }
 
   try {
-    // Aligned with standard users table columns (first_name, phone)
     await db.query(
       `INSERT INTO users (first_name, phone)
        VALUES (?, ?)
        ON DUPLICATE KEY UPDATE
        first_name = VALUES(first_name)`,
-      [
-        name || "Valued Student",
-        userPhone
-      ]
-    );
+      [name || 'Valued Student', userPhone]
+    )
 
     const [[user]] = await db.query(
-      "SELECT id FROM users WHERE phone = ?",
+      'SELECT id FROM users WHERE phone = ?',
       [userPhone]
-    );
+    )
 
     await db.query(
       `INSERT INTO institution_reminders (user_id, institution_id)
        VALUES (?, ?)
        ON DUPLICATE KEY UPDATE notify_on_open = TRUE`,
-      [
-        user.id,
-        institution_id
-      ]
-    );
+      [user.id, institution_id]
+    )
 
     res.status(201).json({
       success: true,
-      message: "Reminder set successfully!"
-    });
-
+      message: 'Reminder set successfully!'
+    })
   } catch (error) {
-    console.error("Reminder subscription error:", error);
-
+    console.error('Reminder subscription error:', error)
     res.status(500).json({
       success: false,
-      message: "Failed to set reminder."
-    });
+      message: 'Failed to set reminder.'
+    })
   }
-});
+})
 
 
 // =====================================================
 // MOUNT ALL MODULE ROUTES
 // =====================================================
 
-app.use("/api/portfolio", portfolioRoutes);
+app.use('/api/portfolio', portfolioRoutes)
 
 app.use(
-  "/api/contact",
+  '/api/contact',
   (req, res, next) => {
-    console.log(
-      "CONTACT REQUEST:",
-      req.method,
-      req.originalUrl
-    );
-    next();
+    console.log('CONTACT REQUEST:', req.method, req.originalUrl)
+    next()
   },
   contactRoutes
-);
+)
 
-// Subscription & Auth endpoints
-app.use("/api/auth", authRoutes);
-app.use("/api/jobs", jobsRoutes);
-app.use("/api/orders", ordersRoutes);
-app.use("/api/packages", packagesRoutes);
-app.use("/api/payfast", payfastRoutes);
+// Public & User Endpoints
+app.use('/api/auth', authRoutes)
+app.use('/api/jobs', jobsRoutes)
+app.use('/api/orders', ordersRoutes)
+app.use('/api/packages', packagesRoutes)
+app.use('/api/payfast', payfastRoutes)
+
+// Admin Endpoints
+app.use('/api/admin', adminRoutes)
+app.use('/api/placements', placementRoutes)
 
 
 // =====================================================
 // ROOT / SERVER TEST
 // =====================================================
 
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
   res.json({
-    message: "ApplyDirect-SA Unified Backend is running",
-    status: "OK"
-  });
-});
+    message: 'ApplyDirect-SA Unified Backend is running',
+    status: 'OK'
+  })
+})
 
 
 // =====================================================
 // START SERVER
 // =====================================================
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  console.log(`Server running on port ${PORT}`)
+})

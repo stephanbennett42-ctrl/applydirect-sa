@@ -113,31 +113,25 @@ export default {
     async loadPlans() {
       this.loading = true
       try {
-        const data = await packagesAPI.getAll()
+        // Bypass failing server call and use local data directly
+        const data = paymentPlans; 
         this.plans = data
           .filter(p => VISIBLE_PLAN_NAMES.includes(p.name))
           .map(p => ({
             id: p.id,
             name: p.name,
-            price: formatPrice(p.price),
-            priceRaw: Number(p.price),
+            price: p.price,
+            priceRaw: Number(p.price.replace(/\D/g, '')),
             period: 'one-time',
             description: p.description,
             features: Array.isArray(p.features) ? p.features : [],
             highlighted: !!p.highlighted
           }))
-        // If no visible card is flagged as featured, feature the most expensive one.
         if (this.plans.length && !this.plans.some(pl => pl.highlighted)) {
           this.plans[this.plans.length - 1].highlighted = true
         }
       } catch (err) {
-        this.loadError = 'Could not load plans from the server. Showing local copy.'
-        this.plans = paymentPlans
-          .filter(p => VISIBLE_PLAN_NAMES.includes(p.name))
-          .map(p => ({
-            ...p,
-            priceRaw: Number(p.price.replace(/\D/g, ''))
-          }))
+        this.loadError = 'Could not load local plans.'
       } finally {
         this.loading = false
       }
@@ -161,6 +155,12 @@ export default {
 </script>
 
 <style scoped>
+.plans-page {
+  background-color: #f4f6f9;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
 .pricing-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -171,28 +171,30 @@ export default {
 
 .plans-note {
   text-align: center;
-  color: var(--text-light);
+  color: #4a4a4a;
   font-size: 0.92rem;
   padding: 60px 0;
 }
 
 .price-card {
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
+  border: 1.5px solid #e5e7eb;
+  border-radius: var(--radius-md, 6px);
   padding: 32px 28px;
   position: relative;
-  transition: var(--transition);
-  background: var(--bg);
+  transition: var(--transition, all 0.2s ease);
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
 }
 
 .price-card:hover {
-  border-color: var(--primary-light);
-  box-shadow: var(--shadow-md);
+  border-color: var(--primary-light, #3B4DCD);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06);
 }
 
 .price-card.featured {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-lg);
+  border-color: var(--accent, #E03C31);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06);
 }
 
 .featured-tag {
@@ -200,10 +202,10 @@ export default {
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--accent);
+  background: var(--accent, #E03C31);
   color: white;
   padding: 4px 16px;
-  border-radius: var(--radius);
+  border-radius: var(--radius, 4px);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -214,7 +216,7 @@ export default {
 .price-head {
   text-align: center;
   padding-bottom: 24px;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid #f3f4f6;
   margin-bottom: 24px;
 }
 
@@ -222,11 +224,12 @@ export default {
   font-size: 1.15rem;
   font-weight: 700;
   margin-bottom: 4px;
+  color: #1a1a1a !important;
 }
 
 .price-head p {
   font-size: 0.85rem;
-  color: var(--text-light);
+  color: #4a4a4a !important;
   margin-bottom: 18px;
 }
 
@@ -240,18 +243,19 @@ export default {
 .price-num {
   font-size: 2.4rem;
   font-weight: 800;
-  color: var(--primary-dark);
+  color: #000A52 !important;
   letter-spacing: -0.03em;
 }
 
 .price-period {
   font-size: 0.85rem;
-  color: var(--text-light);
+  color: #6b7280 !important;
 }
 
 .price-features {
   list-style: none;
   margin-bottom: 28px;
+  padding-left: 0;
 }
 
 .price-features li {
@@ -260,8 +264,8 @@ export default {
   gap: 10px;
   padding: 9px 0;
   font-size: 0.88rem;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-light);
+  color: #4a4a4a !important;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .price-features li:last-child {
@@ -269,7 +273,7 @@ export default {
 }
 
 .price-features svg {
-  color: var(--success);
+  color: #007749;
   flex-shrink: 0;
 }
 
@@ -293,9 +297,13 @@ export default {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--primary);
+  color: #001489;
   margin-bottom: 6px;
   display: block;
+}
+
+.section-title {
+  color: #1a1a1a !important;
 }
 
 .faq-list {
@@ -304,7 +312,7 @@ export default {
 }
 
 .faq-item {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .faq-q {
@@ -318,18 +326,18 @@ export default {
   align-items: center;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text);
+  color: #1a1a1a !important;
   text-align: left;
   font-family: inherit;
 }
 
 .faq-q:hover {
-  color: var(--primary);
+  color: #001489;
 }
 
 .faq-chevron {
-  color: var(--text-muted);
-  transition: var(--transition);
+  color: #9ca3af;
+  transition: var(--transition, all 0.2s ease);
   flex-shrink: 0;
 }
 
@@ -344,7 +352,7 @@ export default {
 .faq-a p {
   font-size: 0.9rem;
   line-height: 1.7;
-  color: var(--text-light);
+  color: #4a4a4a !important;
 }
 
 /* Methods */
@@ -353,10 +361,11 @@ export default {
   align-items: center;
   gap: 24px;
   padding: 28px 32px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md, 6px);
   margin-bottom: 64px;
   flex-wrap: wrap;
+  background: #ffffff;
 }
 
 .methods-label {
@@ -364,7 +373,7 @@ export default {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted);
+  color: #9ca3af;
   flex-shrink: 0;
 }
 
@@ -379,12 +388,12 @@ export default {
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: #4a4a4a;
   font-weight: 500;
 }
 
 .method-chip svg {
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 @media (max-width: 768px) {

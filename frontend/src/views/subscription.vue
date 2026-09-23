@@ -9,7 +9,6 @@
           <p>We handle your university applications so you can focus on your future. Choose a plan, pay securely, and let us do the rest.</p>
           <div class="hero-actions">
             <router-link to="/payment-plan" class="btn btn-primary btn-lg">View Payment Plans</router-link>
-            <router-link to="/login" class="btn btn-ghost btn-lg">Log In</router-link>
           </div>
         </div>
       </div>

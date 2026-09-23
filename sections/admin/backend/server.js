@@ -8,7 +8,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import authRoutes from "./routes/auth.js";
+import authRoutes from "./routes/adminauth.js";
 import adminRoutes from "./routes/admin.js";
 import jobsRoutes from "./routes/jobs.js";
 import placementsRoutes from "./routes/placements.js";

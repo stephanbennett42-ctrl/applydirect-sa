@@ -378,6 +378,12 @@ export default {
 </script>
 
 <style scoped>
+.payment-page {
+  background-color: #f4f6f9;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
 .checkout-grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
@@ -387,15 +393,17 @@ export default {
 }
 
 .checkout-form-wrapper {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md, 6px);
   padding: 36px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
 }
 
 .form-section {
   margin-bottom: 32px;
   padding-bottom: 32px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .form-section:last-of-type {
@@ -406,7 +414,7 @@ export default {
 
 .form-section h3 {
   font-size: 1.1rem;
-  color: var(--primary);
+  color: #000A52 !important;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -417,8 +425,8 @@ export default {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary-50);
-  color: var(--primary);
+  background: #e0e7ff;
+  color: #001489;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -437,7 +445,24 @@ export default {
 .form-group label {
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--text);
+  color: #1a1a1a !important;
+}
+
+.form-group input,
+.form-group select {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  border: 1.5px solid #d1d5db;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #3B4DCD;
+  outline: none;
 }
 
 .form-row-2 {
@@ -450,25 +475,26 @@ export default {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: #f9fafb !important;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
   padding: 14px 16px;
   font-size: 0.95rem;
+  color: #1a1a1a !important;
 }
 
 .selected-plan strong {
-  color: var(--primary-dark);
+  color: #000A52 !important;
 }
 
 .selected-plan span {
-  color: var(--text-light);
+  color: #4b5563 !important;
   margin-left: auto;
 }
 
 .change-plan {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: #3B4DCD;
   font-weight: 600;
 }
 
@@ -481,36 +507,33 @@ export default {
 
 .method-tab {
   padding: 12px 10px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg);
+  border: 1.5px solid #e5e7eb;
+  border-radius: 4px;
+  background: #ffffff !important;
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-fast);
+  color: #4b5563 !important;
   font-family: inherit;
   text-align: center;
 }
 
 .method-tab.active {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-.method-tab:hover:not(.active) {
-  border-color: var(--primary-light);
+  border-color: #3B4DCD;
+  color: #3B4DCD !important;
+  background: #f0f4ff !important;
 }
 
 .bank-info {
-  background: var(--bg);
+  background: #f9fafb !important;
   padding: 20px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
 }
 
 .bank-info > p {
   font-size: 0.9rem;
-  color: var(--text-light);
+  color: #4b5563 !important;
   margin-bottom: 16px;
 }
 
@@ -524,7 +547,7 @@ export default {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #e5e7eb;
   font-size: 0.92rem;
 }
 
@@ -533,20 +556,20 @@ export default {
 }
 
 .bank-row span {
-  color: var(--text-light);
+  color: #4b5563 !important;
 }
 
 .bank-row strong {
-  color: var(--primary);
+  color: #1a1a1a !important;
 }
 
 .instant-info {
   font-size: 0.92rem;
-  color: var(--text-light);
+  color: #4b5563 !important;
   margin-bottom: 16px;
   padding: 14px;
-  background: rgba(43, 108, 176, 0.06);
-  border-radius: var(--radius);
+  background: #f0f4ff;
+  border-radius: 4px;
 }
 
 .checkbox-label {
@@ -554,7 +577,7 @@ export default {
   align-items: flex-start;
   gap: 10px;
   font-size: 0.88rem;
-  color: var(--text-light);
+  color: #4b5563 !important;
   cursor: pointer;
   margin-bottom: 12px;
 }
@@ -565,7 +588,7 @@ export default {
 }
 
 .checkbox-label a {
-  color: var(--primary-light);
+  color: #3B4DCD;
   font-weight: 600;
 }
 
@@ -577,6 +600,12 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  background-color: #E03C31;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .btn-full {
@@ -601,7 +630,7 @@ export default {
   align-items: flex-start;
   gap: 10px;
   padding: 14px;
-  border-radius: var(--radius);
+  border-radius: 4px;
   font-size: 0.85rem;
   line-height: 1.5;
   margin-bottom: 16px;
@@ -613,41 +642,43 @@ export default {
 }
 
 .alert-error {
-  background: var(--accent-50);
-  color: var(--accent);
-  border: 1px solid rgba(197, 48, 48, 0.12);
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
 .success-panel {
   max-width: 520px;
   margin: 64px auto;
   text-align: center;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
   padding: 48px 40px;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
 }
 
 .success-icon {
-  color: var(--success);
+  color: #007749;
   margin: 0 auto 18px;
 }
 
 .success-panel h2 {
   font-size: 1.6rem;
+  color: #1a1a1a !important;
   margin-bottom: 10px;
 }
 
 .success-panel > p {
-  color: var(--text-light);
+  color: #4b5563 !important;
   margin-bottom: 24px;
 }
 
 .success-details {
   text-align: left;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
+  background: #f9fafb !important;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
   padding: 16px 20px;
   margin-bottom: 28px;
 }
@@ -656,7 +687,7 @@ export default {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #e5e7eb;
   font-size: 0.92rem;
 }
 
@@ -665,26 +696,30 @@ export default {
 }
 
 .success-row span {
-  color: var(--text-light);
+  color: #4b5563 !important;
 }
 
 .success-row strong {
-  color: var(--text);
+  color: #1a1a1a !important;
 }
 
 .summary-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
   padding: 32px;
   position: sticky;
   top: 88px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
+  color: #1a1a1a !important;
 }
 
 .summary-card h3 {
   font-size: 1.1rem;
+  color: #000A52 !important;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .summary-plan {
@@ -693,10 +728,10 @@ export default {
 
 .plan-badge {
   display: inline-block;
-  background: var(--primary);
+  background: #3B4DCD;
   color: white;
   padding: 4px 12px;
-  border-radius: var(--radius);
+  border-radius: 4px;
   font-size: 0.78rem;
   font-weight: 700;
   margin-bottom: 8px;
@@ -704,12 +739,13 @@ export default {
 
 .summary-plan p {
   font-size: 0.9rem;
-  color: var(--text-light);
+  color: #4b5563 !important;
 }
 
 .summary-breakdown {
   padding: 16px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #f3f4f6;
+  border-top: 1px solid #f3f4f6;
   margin-bottom: 20px;
 }
 
@@ -718,32 +754,33 @@ export default {
   justify-content: space-between;
   padding: 8px 0;
   font-size: 0.92rem;
-  color: var(--text-light);
+  color: #4b5563 !important;
 }
 
 .summary-row.total {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #e5e7eb;
   margin-top: 8px;
   padding-top: 12px;
   font-weight: 700;
   font-size: 1.05rem;
-  color: var(--primary-dark);
+  color: #000A52 !important;
 }
 
 .summary-features h4 {
   font-size: 0.9rem;
-  color: var(--text);
+  color: #1a1a1a !important;
   margin-bottom: 12px;
 }
 
 .summary-features ul {
   list-style: none;
+  padding-left: 0;
 }
 
 .summary-features li {
   padding: 6px 0;
   font-size: 0.88rem;
-  color: var(--text-light);
+  color: #4b5563 !important;
 }
 
 .security-badges {
@@ -751,12 +788,12 @@ export default {
   gap: 12px;
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #f3f4f6;
 }
 
 .security-badges span {
   font-size: 0.78rem;
-  color: var(--text-light);
+  color: #6b7280 !important;
   font-weight: 500;
 }
 

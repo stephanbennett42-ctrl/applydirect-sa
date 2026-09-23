@@ -1,14 +1,6 @@
 /**
- * Admin Placements Routes (Admin module)
- * CRUD for graduate job placements with 5% commission tracking.
- * Commission = 5% of annual salary, collected for up to 24 months from employment start.
- *
- * GET    /api/admin/placements       — List all placements with commission data
- * POST   /api/admin/placements       — Record a placement
- * PATCH  /api/admin/placements/:id   — Update a placement
- * DELETE /api/admin/placements/:id   — Delete a placement
- *
- * All routes require an admin JWT.
+ * Admin Placements Routes
+ * Location: backend/routes/placements.js
  */
 import { Router } from 'express'
 import db from '../db.js'
@@ -48,10 +40,6 @@ function enrichPlacement(row) {
   }
 }
 
-/**
- * GET /api/admin/placements
- * Returns all placements with computed commission fields.
- */
 router.get('/', async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -71,11 +59,6 @@ router.get('/', async (req, res) => {
   }
 })
 
-/**
- * POST /api/admin/placements
- * Record a new placement.
- * Body: { studentId, jobId, salary, employmentStart }
- */
 router.post('/', async (req, res) => {
   try {
     const { studentId, jobId, salary, employmentStart } = req.body
@@ -125,10 +108,6 @@ router.post('/', async (req, res) => {
   }
 })
 
-/**
- * PATCH /api/admin/placements/:id
- * Update a placement. Only provided fields are changed.
- */
 router.patch('/:id', async (req, res) => {
   try {
     const placementId = req.params.id
@@ -166,10 +145,6 @@ router.patch('/:id', async (req, res) => {
   }
 })
 
-/**
- * DELETE /api/admin/placements/:id
- * Delete a placement.
- */
 router.delete('/:id', async (req, res) => {
   try {
     const [rows] = await db.query('SELECT id FROM placements WHERE id = ?', [req.params.id])

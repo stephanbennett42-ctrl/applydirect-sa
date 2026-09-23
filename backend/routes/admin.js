@@ -1,15 +1,6 @@
 /**
- * Admin Routes (Admin panel module)
- *
- * GET   /api/admin/users         — List all users
- * POST  /api/admin/users         — Create an admin/student account directly
- * PATCH /api/admin/users/:id     — Approve or reject a student (triggers acceptance notification)
- * GET   /api/admin/packages      — List all packages
- * PATCH /api/admin/packages/:id  — Update a package (price, features, etc.)
- * GET   /api/admin/orders        — List all orders with student + package details
- * POST  /api/admin/messages/whatsapp — Build a ready-to-send WhatsApp link
- *
- * All routes require an admin JWT.
+ * Admin Routes
+ * Location: backend/routes/admin.js
  */
 import { Router } from 'express'
 import bcrypt from 'bcryptjs'
@@ -23,14 +14,13 @@ router.use(requireAdmin)
 
 /**
  * GET /api/admin/users
- * Returns every user, pending accounts first.
  */
 router.get('/users', async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT id, first_name, last_name, email, phone, university, field_of_study, status, role, registered_date
        FROM users
-       ORDER BY (status = 'pending') DESC, created_at DESC`
+       ORDER BY (status = 'pending') DESC, registered_date DESC`
     )
 
     res.json(rows.map(u => ({
@@ -53,9 +43,6 @@ router.get('/users', async (req, res) => {
 
 /**
  * POST /api/admin/users
- * Create a new account directly from the admin panel.
- * Body: { firstName, lastName, email, password, role }
- * role: 'admin' | 'student' (defaults to 'student'). Created accounts start approved.
  */
 router.post('/users', async (req, res) => {
   try {
@@ -100,10 +87,6 @@ router.post('/users', async (req, res) => {
 
 /**
  * POST /api/admin/messages/whatsapp
- * Build a ready-to-send WhatsApp link for a student's mobile number.
- * Body: { userId, phone, message }
- * - Provide userId to use the student's saved phone, or phone directly.
- * Returns { waLink } — opening this sends the pre-filled message on WhatsApp.
  */
 router.post('/messages/whatsapp', async (req, res) => {
   try {
@@ -123,8 +106,6 @@ router.post('/messages/whatsapp', async (req, res) => {
     }
 
     const waLink = buildWhatsAppLink(number, String(message).trim())
-    console.log(`[admin notification] [whatsapp ready] ${number} — ${waLink}`)
-
     res.json({ message: 'WhatsApp link ready', waLink })
   } catch (err) {
     console.error('Build WhatsApp message error:', err)
@@ -134,9 +115,6 @@ router.post('/messages/whatsapp', async (req, res) => {
 
 /**
  * PUT /api/admin/users/:id
- * Edit an admin account's login details.
- * Body (any subset): { firstName, lastName, email, password }
- * Password is optional — omit it to keep the current one.
  */
 router.put('/users/:id', async (req, res) => {
   try {
@@ -221,7 +199,6 @@ router.put('/users/:id', async (req, res) => {
 
 /**
  * GET /api/admin/applications
- * Returns every job application with student and job details, newest first.
  */
 router.get('/applications', async (req, res) => {
   try {
@@ -263,7 +240,6 @@ router.get('/applications', async (req, res) => {
 
 /**
  * PATCH /api/admin/applications/:id
- * Update an application's status: 'shortlisted' | 'hired' | 'rejected' | 'pending'
  */
 router.patch('/applications/:id', async (req, res) => {
   try {
@@ -290,8 +266,6 @@ router.patch('/applications/:id', async (req, res) => {
 
 /**
  * PATCH /api/admin/users/:id
- * Body: { status: 'approved' | 'rejected' }
- * Approving a pending student sends the acceptance notification (email + WhatsApp).
  */
 router.patch('/users/:id', async (req, res) => {
   try {
@@ -320,7 +294,12 @@ router.patch('/users/:id', async (req, res) => {
 
     const notifications = []
     if (status === 'approved' && user.status !== 'approved') {
-      notifications.push(...await sendAcceptanceNotification(user))
+      const result = await sendAcceptanceNotification(user)
+      if (Array.isArray(result)) {
+        notifications.push(...result)
+      } else if (result) {
+        notifications.push(result)
+      }
     }
 
     res.json({
@@ -346,7 +325,6 @@ router.patch('/users/:id', async (req, res) => {
 
 /**
  * GET /api/admin/orders
- * Returns every order with the purchasing student and package details.
  */
 router.get('/orders', async (req, res) => {
   try {
@@ -378,7 +356,6 @@ router.get('/orders', async (req, res) => {
 
 /**
  * GET /api/admin/packages
- * Returns all packages with parsed features.
  */
 router.get('/packages', async (req, res) => {
   try {
@@ -401,7 +378,6 @@ router.get('/packages', async (req, res) => {
 
 /**
  * PATCH /api/admin/packages/:id
- * Body (any subset): { name, price, description, maxUniversities, features, highlighted }
  */
 router.patch('/packages/:id', async (req, res) => {
   try {

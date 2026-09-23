@@ -1,10 +1,9 @@
 <template>
-  <div id="app">
-    <!-- NAVBAR COMPONENT -->
+  <div id="app" class="app-container">
+    <!-- TOP NAVBAR: Displays on all pages across your app -->
     <Navbar :search-filter="searchFilter" />
 
-    <!-- MAIN CONTENT AREA -->
-    <main>
+    <main class="main-content">
       <router-view
         :search-filter="searchFilter"
         @reset-filters="resetFilters"
@@ -14,7 +13,7 @@
 </template>
 
 <script>
-import MainNavbar from "./components/MainNavbar.vue/index.js"; 
+import Navbar from './components/MainNavbar.vue'
 
 export default {
   name: "App",
@@ -44,13 +43,16 @@ export default {
 
 <style>
 /* GLOBAL LAYOUT STYLES */
-#app {
+.app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #001242;
 }
 
-main {
+.main-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 </style>

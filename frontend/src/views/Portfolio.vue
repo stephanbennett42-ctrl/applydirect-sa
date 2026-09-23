@@ -108,7 +108,7 @@
 
           <!-- ================= PERSONAL ================= -->
 
-          <section v-if="activeSection === 'personal'" class="card">
+          <section id="personal" class="card">
             <div class="section-header">
               <div>
                 <h2>Personal Details</h2>
@@ -309,7 +309,7 @@
 
           <!-- ================= ACADEMIC ================= -->
 
-          <section v-if="activeSection === 'academic'" class="card">
+          <section id="academic" class="card">
             <div class="section-header">
               <div>
                 <h2>Academic Details</h2>
@@ -444,7 +444,7 @@
 
           <!-- ================= PREFERENCES ================= -->
 
-          <section v-if="activeSection === 'preferences'" class="card">
+          <section id="preferences" class="card">
             <div class="section-header">
               <div>
                 <h2>Study Preferences</h2>
@@ -574,7 +574,7 @@
 
           <!-- ================= DOCUMENTS ================= -->
 
-          <section v-if="activeSection === 'documents'" class="card">
+          <section id="documents" class="card">
             <div class="section-header">
               <div>
                 <h2>Documents</h2>
@@ -684,7 +684,7 @@
 
           <!-- ================= STATUS ================= -->
 
-          <section v-if="activeSection === 'status'" class="card">
+          <section id="status" class="card">
             <div class="section-header">
               <div>
                 <h2>Application Status</h2>
@@ -863,41 +863,22 @@ export default {
         address: null,
       },
 
-      // Stores the suggested courses
-
       courseSuggestions: [],
-
-      // Lets us know if the user clicked
-
-      // the suggestion button
 
       courseSearchAttempted: false,
     };
   },
 
-  // =========================
-
-  // PAGE LOADED
-
-  // =========================
-
   mounted() {
     this.getProfile();
+    this.setupScrollSpy();
   },
 
-  // =========================
-
-  // COMPUTED
-
-  // =========================
-
   computed: {
-    // Show the user's first name when available, otherwise use a neutral label.
     profileDisplayName() {
       return this.profile.firstName.trim() || "My Profile";
     },
 
-    // Owam uses OG by default; other users receive their first and surname initials.
     profileInitials() {
       const firstName = this.profile.firstName.trim();
 
@@ -915,12 +896,6 @@ export default {
     },
   },
 
-  // =========================
-
-  // VALIDATION
-
-  // =========================
-
   methods: {
     scrollToProfile() {
       const profileSection = document.querySelector(".main-content");
@@ -930,6 +905,38 @@ export default {
           behavior: "smooth",
         });
       }
+    },
+
+    goToSection(section) {
+      this.activeSection = section;
+      const element = document.getElementById(section);
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    },
+
+    setupScrollSpy() {
+      const sections = ['personal', 'academic', 'preferences', 'documents', 'status'];
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            this.activeSection = entry.target.id;
+          }
+        });
+      }, {
+        root: null,
+        rootMargin: '-20% 0px -60% 0px',
+        threshold: 0
+      });
+
+      sections.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      });
     },
 
     setFormMessage(message) {
@@ -1060,40 +1067,18 @@ export default {
       return true;
     },
 
-    validateIdNumber() {
-      return /^\d{13}$/.test(this.profile.idNumber.trim());
-    },
-
-    validatePhoneNumber() {
-      return /^0\d{9}$/.test(this.profile.phone.trim());
-    },
-
-    validateEmail() {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.profile.email.trim());
-    },
-
     validatePersonalDetails() {
       const requiredFields = [
         { key: "firstName", label: "First name" },
-
         { key: "surname", label: "Surname" },
-
         { key: "idNumber", label: "ID number" },
-
         { key: "dateOfBirth", label: "Date of birth" },
-
         { key: "gender", label: "Gender" },
-
         { key: "nationality", label: "Nationality" },
-
         { key: "email", label: "Email" },
-
         { key: "phone", label: "Phone number" },
-
         { key: "address", label: "Address" },
-
         { key: "province", label: "Province" },
-
         { key: "city", label: "City" },
       ];
 
@@ -1155,14 +1140,6 @@ export default {
       return valid;
     },
 
-    canAccessSection(section) {
-      return true;
-    },
-
-    goToSection(section) {
-      this.activeSection = section;
-    },
-
     validateBeforeSave() {
       if (this.activeSection === "personal") {
         return this.validatePersonalDetails();
@@ -1178,12 +1155,6 @@ export default {
 
       return true;
     },
-
-    // =========================
-
-    // SUBJECT METHODS
-
-    // =========================
 
     activateSubject(index) {
       this.activeSubjectIndex = index;
@@ -1203,11 +1174,7 @@ export default {
       }
 
       return this.subjectSuggestions.filter((suggestion) =>
-        suggestion
-
-          .toLowerCase()
-
-          .startsWith(searchTerm),
+        suggestion.toLowerCase().startsWith(searchTerm),
       );
     },
 
@@ -1238,17 +1205,11 @@ export default {
         return;
       }
 
-      // Maximum file size: 5 MB
-
       const maxFileSize = 5 * 1024 * 1024;
-
-      // Check whether the file is a PDF
 
       const isPDF =
         file.type === "application/pdf" ||
         file.name.toLowerCase().endsWith(".pdf");
-
-      // Reject files that are not PDF
 
       if (!isPDF) {
         this.documents[documentType] = null;
@@ -1259,14 +1220,10 @@ export default {
           message: "Invalid file. Please upload a PDF document only.",
         };
 
-        // Clear the selected file
-
         event.target.value = "";
 
         return;
       }
-
-      // Check file size
 
       if (file.size > maxFileSize) {
         this.documents[documentType] = null;
@@ -1282,8 +1239,6 @@ export default {
         return;
       }
 
-      // Save the valid file
-
       this.documents[documentType] = file;
 
       this.documentMessages[documentType] = {
@@ -1292,12 +1247,6 @@ export default {
         message: `${file.name} uploaded successfully.`,
       };
     },
-
-    // =========================
-
-    // COURSE SUGGESTIONS
-
-    // =========================
 
     suggestCourses() {
       const field = this.profile.field.trim().toLowerCase();
@@ -1308,27 +1257,17 @@ export default {
 
       const suggestions = [];
 
-      // Check Mathematics
-
       const mathematics = subjects.find(
         (subject) => subject.name.toLowerCase() === "mathematics",
       );
 
       const mathematicsMark = mathematics ? Number(mathematics.mark) : 0;
 
-      // Check English
-
       const english = subjects.find(
         (subject) => subject.name.toLowerCase() === "english",
       );
 
       const englishMark = english ? Number(english.mark) : 0;
-
-      // =========================
-
-      // INFORMATION TECHNOLOGY
-
-      // =========================
 
       if (
         field.includes("information technology") ||
@@ -1353,14 +1292,7 @@ export default {
             "Higher Certificate in Information Technology",
           );
         }
-      }
-
-      // =========================
-
-      // ACCOUNTING
-
-      // =========================
-      else if (field.includes("accounting")) {
+      } else if (field.includes("accounting")) {
         if (mathematicsMark >= 50) {
           suggestions.push(
             "Bachelor of Accounting",
@@ -1378,14 +1310,7 @@ export default {
             "Higher Certificate in Accounting",
           );
         }
-      }
-
-      // =========================
-
-      // BUSINESS
-
-      // =========================
-      else if (field.includes("business")) {
+      } else if (field.includes("business")) {
         suggestions.push(
           "Bachelor of Business Administration",
 
@@ -1395,14 +1320,7 @@ export default {
 
           "Diploma in Financial Management",
         );
-      }
-
-      // =========================
-
-      // ENGINEERING
-
-      // =========================
-      else if (field.includes("engineering")) {
+      } else if (field.includes("engineering")) {
         if (mathematicsMark >= 60) {
           suggestions.push(
             "Bachelor of Engineering",
@@ -1420,14 +1338,7 @@ export default {
             "Engineering Higher Certificate",
           );
         }
-      }
-
-      // =========================
-
-      // NURSING
-
-      // =========================
-      else if (field.includes("nursing")) {
+      } else if (field.includes("nursing")) {
         suggestions.push(
           "Bachelor of Nursing",
 
@@ -1435,14 +1346,7 @@ export default {
 
           "Higher Certificate in Nursing",
         );
-      }
-
-      // =========================
-
-      // TEACHING
-
-      // =========================
-      else if (field.includes("teaching")) {
+      } else if (field.includes("teaching")) {
         suggestions.push(
           "Bachelor of Education",
 
@@ -1450,14 +1354,7 @@ export default {
 
           "Higher Certificate in Education",
         );
-      }
-
-      // =========================
-
-      // LAW
-
-      // =========================
-      else if (field.includes("law")) {
+      } else if (field.includes("law")) {
         suggestions.push(
           "Bachelor of Laws",
 
@@ -1465,25 +1362,12 @@ export default {
 
           "Higher Certificate in Criminal Justice",
         );
-      }
-
-      // =========================
-
-      // OTHER
-
-      // =========================
-      else if (field !== "") {
+      } else if (field !== "") {
         suggestions.push(`Explore ${this.profile.field}-related courses`);
       }
 
       this.courseSuggestions = suggestions;
     },
-
-    // =========================
-
-    // GET PROFILE
-
-    // =========================
 
     async getProfile() {
       try {
@@ -1498,12 +1382,6 @@ export default {
         }
 
         this.profileId = data.profile.profile_id;
-
-        // =========================
-
-        // PERSONAL DETAILS
-
-        // =========================
 
         this.profile.firstName = data.profile.first_name || "";
 
@@ -1521,23 +1399,11 @@ export default {
 
         this.profile.province = data.profile.province || "";
 
-        // =========================
-
-        // ACADEMIC DETAILS
-
-        // =========================
-
         this.profile.school = data.profile.school_name || "";
 
         this.profile.matricYear = data.profile.matric_year
           ? String(data.profile.matric_year)
           : "";
-
-        // =========================
-
-        // SUBJECTS
-
-        // =========================
 
         if (data.subjects && data.subjects.length > 0) {
           this.profile.subjects = data.subjects.map((subject) => ({
@@ -1555,19 +1421,9 @@ export default {
           ];
         }
       } catch (error) {
-        console.error(
-          "Error loading profile:",
-
-          error,
-        );
+        console.error("Error loading profile:", error);
       }
     },
-
-    // =========================
-
-    // SAVE / UPDATE PROFILE
-
-    // =========================
 
     async saveProfile() {
       if (!this.validateBeforeSave()) {
@@ -1615,8 +1471,6 @@ export default {
 
         let response;
 
-        // CREATE NEW PROFILE
-
         if (!this.profileId) {
           response = await fetch("http://localhost:3000/api/portfolio", {
             method: "POST",
@@ -1627,10 +1481,7 @@ export default {
 
             body: JSON.stringify(profileData),
           });
-        }
-
-        // UPDATE EXISTING PROFILE
-        else {
+        } else {
           response = await fetch(
             `http://localhost:3000/api/portfolio/${this.profileId}`,
 
@@ -1668,10 +1519,9 @@ export default {
 </script>
 
 <style scoped>
-/* =========================================
-   APPLYDIRECT-SA PROFILE
-   Youthful South African visual system
-========================================= */
+html {
+  scroll-behavior: smooth;
+}
 
 * {
   box-sizing: border-box;
@@ -1695,7 +1545,6 @@ export default {
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
 }
 
-/* ================= HEADER ================= */
 .top-header {
   position: sticky;
   top: 0;
@@ -1769,8 +1618,6 @@ export default {
   transform: translateY(-1px);
 }
 
-/* Active navigation follows the group's SA colour system.
-  Exact matching prevents the Universities link from staying active on Profile. */
 .sa-nav-tab.tab-green.router-link-exact-active,
 .sa-nav-tab.tab-green.active {
   background: var(--green) !important;
@@ -1798,7 +1645,6 @@ export default {
   box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* ================= PAGE LAYOUT ================= */
 .page-layout {
   display: flex;
   min-height: calc(100vh - 74px);
@@ -1809,15 +1655,17 @@ export default {
   min-width: 0;
 }
 
-/* ================= SIDEBAR ================= */
 .sidebar {
+  position: sticky;
+  top: 74px;
   width: 255px;
   flex-shrink: 0;
-  min-height: calc(100vh - 74px);
+  height: calc(100vh - 74px);
   padding: 28px 18px;
   background: var(--navy-dark);
   color: #fff;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-y: auto;
 }
 
 .sidebar-title {
@@ -1884,7 +1732,6 @@ export default {
   color: #102039;
 }
 
-/* ================= HERO ================= */
 .portfolio-hero {
   position: relative;
   min-height: 360px;
@@ -1970,7 +1817,6 @@ export default {
   box-shadow: 2px 2px 0 var(--gold);
 }
 
-/* ================= MAIN CONTENT ================= */
 .main-content {
   width: 100%;
   max-width: 1180px;
@@ -2035,7 +1881,6 @@ export default {
   font-weight: 900;
 }
 
-/* ================= CARDS ================= */
 .card {
   position: relative;
   margin-bottom: 22px;
@@ -2085,7 +1930,6 @@ export default {
   font-size: 13px;
 }
 
-/* ================= FORMS ================= */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2144,7 +1988,6 @@ export default {
   margin-bottom: 18px;
 }
 
-/* ================= BUTTONS ================= */
 .card-actions,
 .bottom-actions {
   display: flex;
@@ -2179,7 +2022,6 @@ export default {
   box-shadow: 2px 2px 0 var(--gold);
 }
 
-/* ================= SUBJECTS ================= */
 .card h3 {
   margin: 27px 0 13px;
   color: var(--navy-dark);
@@ -2271,7 +2113,6 @@ export default {
   color: #15213a;
 }
 
-/* ================= COURSE SUGGESTIONS ================= */
 .course-suggestion-section {
   margin-top: 34px;
   padding-top: 25px;
@@ -2370,7 +2211,6 @@ export default {
   font-size: 13px;
 }
 
-/* ================= DOCUMENTS ================= */
 .document-notice {
   display: flex;
   align-items: flex-start;
@@ -2475,7 +2315,6 @@ export default {
   color: var(--green) !important;
 }
 
-/* ================= STATUS ================= */
 .status-box {
   display: flex;
   align-items: center;
@@ -2512,7 +2351,6 @@ export default {
   line-height: 1.5;
 }
 
-/* ================= RESPONSIVE ================= */
 @media (max-width: 1100px) {
   .main-content {
     padding: 34px 30px;
@@ -2539,7 +2377,6 @@ export default {
 }
 
 @media (max-width: 650px) {
-  /* Keep the account indicator readable when the navigation stacks vertically. */
   .top-header .navbar-collapse {
     margin-left: 0;
   }
@@ -2601,23 +2438,6 @@ export default {
   }
   .status-box {
     align-items: flex-start;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sa-nav-tab,
-  .sidebar-item,
-  .save-btn,
-  .suggest-button,
-  .add-subject,
-  .document-item,
-  .form-group input,
-  .form-group select,
-  .form-group textarea,
-  .subject-row input,
-  .hero-btn,
-  .course-card {
-    transition: none;
   }
 }
 </style>

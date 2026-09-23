@@ -1,57 +1,5 @@
 <template>
   <div class="page-shell">
-
-    <!-- ================= HEADER ================= -->
-    <header class="top-header">
-
-      <nav class="navbar">
-
-        <!-- Mobile-only control for opening and closing the navigation links. -->
-        <button
-          class="navbar-toggler"
-          type="button"
-          aria-controls="navbarContent"
-          :aria-expanded="isNavbarOpen"
-          aria-label="Toggle navigation"
-          @click="isNavbarOpen = !isNavbarOpen"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- The logo, navigation links, and logged-in user stay in one row on desktop. -->
-        <div
-          id="navbarContent"
-          class="navbar-collapse"
-          :class="{ 'is-open': isNavbarOpen }"
-        >
-          <div class="navbar-nav">
-
-            <router-link to="/" class="navbar-brand logo-nav-item">
-              ApplyDirect-<span>SA</span>
-            </router-link>
-
-            <router-link to="/" class="sa-nav-tab tab-green text-center">Universities</router-link>
-            <router-link to="/portfolio" class="sa-nav-tab tab-gold text-center">Profile</router-link>
-            <router-link to="/about" class="sa-nav-tab tab-red text-center">About Us</router-link>
-            <router-link to="/contact" class="sa-nav-tab tab-blue text-center">Contact</router-link>
-            <router-link to="/subscription" class="sa-nav-tab tab-black text-center">Subscription</router-link>
-
-            <!-- The badge uses the initials of the logged-in user's name. -->
-            <div class="profile-account">
-              <span>{{ profileDisplayName }}</span>
-              <div class="profile-icon" :title="profileInitials">
-                {{ profileInitials }}
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </nav>
-
-    </header>
-
-
     <!-- ================= HERO ================= -->
     <section class="contact-hero">
 
