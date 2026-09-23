@@ -6,9 +6,17 @@ const cors = require("cors");
 // Team database connection
 const db = require("./db");
 
-// Profile and Contact use the callback-based connection in config/db.js
+// Existing Routes
 const portfolioRoutes = require("./routes/profile");
 const contactRoutes = require("./routes/contact");
+
+// Newly Integrated Routes
+// Make sure this file is named auth.js inside backend/routes/
+const authRoutes = require("./routes/auth"); 
+const jobsRoutes = require("./routes/jobs");
+const ordersRoutes = require("./routes/orders");
+const packagesRoutes = require("./routes/packages");
+const payfastRoutes = require("./routes/payfast");
 
 const app = express();
 
@@ -20,8 +28,6 @@ app.use(express.json());
 // INSTITUTIONS API
 // =====================================================
 
-// GET /api/institutions
-// Supports optional ?province= and ?status= filtering.
 app.get("/api/institutions", async (req, res) => {
   try {
     const { province, status } = req.query;
@@ -65,7 +71,6 @@ app.get("/api/institutions", async (req, res) => {
 });
 
 
-// GET /api/institutions/:id
 app.get("/api/institutions/:id", async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -100,17 +105,18 @@ app.get("/api/institutions/:id", async (req, res) => {
 // REMINDERS API
 // =====================================================
 
-// POST /api/reminders
-// Subscribe a user to institution reminders.
 app.post("/api/reminders", async (req, res) => {
   const {
     name,
-    phone_number,
+    phone_number, // accept phone_number from body for compatibility
+    phone,
     channel,
     institution_id
   } = req.body;
 
-  if (!phone_number || !institution_id) {
+  const userPhone = phone || phone_number;
+
+  if (!userPhone || !institution_id) {
     return res.status(400).json({
       success: false,
       message: "Phone number and institution ID are required."
@@ -118,34 +124,29 @@ app.post("/api/reminders", async (req, res) => {
   }
 
   try {
-
-    // Insert user or update existing user with the same phone number.
+    // Aligned with standard users table columns (first_name, phone)
     await db.query(
-      `INSERT INTO users (name, phone_number, channel)
-       VALUES (?, ?, ?)
+      `INSERT INTO users (first_name, phone)
+       VALUES (?, ?)
        ON DUPLICATE KEY UPDATE
-       name = VALUES(name),
-       channel = VALUES(channel)`,
+       first_name = VALUES(first_name)`,
       [
         name || "Valued Student",
-        phone_number,
-        channel || "web"
+        userPhone
       ]
     );
 
-    // Retrieve the user's ID.
     const [[user]] = await db.query(
-      "SELECT user_id FROM users WHERE phone_number = ?",
-      [phone_number]
+      "SELECT id FROM users WHERE phone = ?",
+      [userPhone]
     );
 
-    // Create or reactivate the institution reminder.
     await db.query(
       `INSERT INTO institution_reminders (user_id, institution_id)
        VALUES (?, ?)
        ON DUPLICATE KEY UPDATE notify_on_open = TRUE`,
       [
-        user.user_id,
+        user.id,
         institution_id
       ]
     );
@@ -167,15 +168,10 @@ app.post("/api/reminders", async (req, res) => {
 
 
 // =====================================================
-// PROFILE / PORTFOLIO API
+// MOUNT ALL MODULE ROUTES
 // =====================================================
 
 app.use("/api/portfolio", portfolioRoutes);
-
-
-// =====================================================
-// CONTACT US API
-// =====================================================
 
 app.use(
   "/api/contact",
@@ -185,11 +181,17 @@ app.use(
       req.method,
       req.originalUrl
     );
-
     next();
   },
   contactRoutes
 );
+
+// Subscription & Auth endpoints
+app.use("/api/auth", authRoutes);
+app.use("/api/jobs", jobsRoutes);
+app.use("/api/orders", ordersRoutes);
+app.use("/api/packages", packagesRoutes);
+app.use("/api/payfast", payfastRoutes);
 
 
 // =====================================================
@@ -198,8 +200,8 @@ app.use(
 
 app.get("/", (req, res) => {
   res.json({
-    message: "ApplyDirect-SA Backend is running",
-    test: "THIS IS MY BACKEND"
+    message: "ApplyDirect-SA Unified Backend is running",
+    status: "OK"
   });
 });
 
