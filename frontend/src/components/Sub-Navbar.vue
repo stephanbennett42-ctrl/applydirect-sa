@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { getCurrentUser } from "../store/auth.js";
+import { getCurrentUser } from "../../../sections/subscription/frontend/src/store/auth.js";
 
 export default {
   name: "Navbar",

@@ -10,11 +10,11 @@
         <svg class="success-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 8 12 16 9 12"/></svg>
         <h2>Payment Successful</h2>
         <p>Your {{ planName }} subscription has been activated. A confirmation will be sent shortly.</p>
-<div class="success-details">
-            <div class="success-row"><span>Amount Paid</span><strong>{{ success.amount === 0 ? 'Free' : displayPrice(success.amount) }}</strong></div>
-            <div class="success-row"><span>Transaction Ref</span><strong>{{ success.transactionRef }}</strong></div>
-            <div v-if="success.cardLastFour" class="success-row"><span>Card ending in</span><strong>•••• {{ success.cardLastFour }}</strong></div>
-          </div>
+        <div class="success-details">
+          <div class="success-row"><span>Amount Paid</span><strong>{{ success.amount === 0 ? 'Free' : displayPrice(success.amount) }}</strong></div>
+          <div class="success-row"><span>Transaction Ref</span><strong>{{ success.transactionRef }}</strong></div>
+          <div v-if="success.cardLastFour" class="success-row"><span>Card ending in</span><strong>•••• {{ success.cardLastFour }}</strong></div>
+        </div>
         <button class="btn btn-primary" @click="$router.push('/payment-plan')">Back to Plans</button>
       </div>
 
@@ -226,15 +226,6 @@
 </template>
 
 <script>
-/**
- * Payment Page Component — Subscription module
- * Creates a real order on the backend (POST /api/orders) and processes
- * the simulated payment (POST /api/orders/:id/pay) with three methods:
- * 1. Credit/Debit Card
- * 2. EFT / Bank Transfer
- * 3. Instant EFT
- * Reads the selected plan from URL query parameters.
- */
 import { ordersAPI } from '../store/api.js'
 
 const formatPrice = n => 'R ' + Number(n || 0).toLocaleString('en-ZA')
@@ -293,7 +284,6 @@ export default {
   },
   methods: {
     sanitizeName(v) {
-      // Letters only (incl. accented letters), spaces, hyphens, apostrophes and dots.
       return v.replace(/[^A-Za-z\u00C0-\u024F'\- .]/g, '').replace(/\s{2,}/g, ' ')
     },
     displayPrice(n) {
@@ -309,8 +299,6 @@ export default {
 
       this.processing = true
       try {
-        // Free plan (price 0)? The backend marks the order as paid on creation —
-        // there is nothing to pay, so activate it right away.
         if (Number(this.planPrice) === 0) {
           const order = await ordersAPI.create(this.planId)
           this.success = {
@@ -321,16 +309,11 @@ export default {
           return
         }
 
-        // 1. Create the order for the selected package
         const order = await ordersAPI.create(this.planId)
-
-        // 2. Redirect to PayFast to complete the payment securely
         const redirect = await ordersAPI.payfastInit(order.id)
         this.sendToPayFast(redirect)
         return
       } catch (err) {
-        // PayFast not configured? Fall back to the simulated gateway
-        // so the checkout still works in demo environments.
         if (err.code === 'PAYFAST_NOT_CONFIGURED') {
           try {
             const order = await ordersAPI.create(this.planId)
@@ -463,7 +446,6 @@ export default {
   gap: 14px;
 }
 
-/* Selected plan */
 .selected-plan {
   display: flex;
   align-items: center;
@@ -490,7 +472,6 @@ export default {
   font-weight: 600;
 }
 
-/* Payment Method Tabs */
 .method-tabs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -520,7 +501,6 @@ export default {
   border-color: var(--primary-light);
 }
 
-/* EFT */
 .bank-info {
   background: var(--bg);
   padding: 20px;
@@ -560,7 +540,6 @@ export default {
   color: var(--primary);
 }
 
-/* Instant EFT */
 .instant-info {
   font-size: 0.92rem;
   color: var(--text-light);
@@ -570,7 +549,6 @@ export default {
   border-radius: var(--radius);
 }
 
-/* Terms */
 .checkbox-label {
   display: flex;
   align-items: flex-start;
@@ -640,7 +618,6 @@ export default {
   border: 1px solid rgba(197, 48, 48, 0.12);
 }
 
-/* Success */
 .success-panel {
   max-width: 520px;
   margin: 64px auto;
@@ -695,7 +672,6 @@ export default {
   color: var(--text);
 }
 
-/* Order Summary */
 .summary-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
