@@ -87,7 +87,7 @@ export default {
   },
   methods: {
     mainAppUrl(path) {
-      return `http://localhost:5173${path}`;
+      return path;
     },
     closeMenu() {
       this.menuOpen = false;

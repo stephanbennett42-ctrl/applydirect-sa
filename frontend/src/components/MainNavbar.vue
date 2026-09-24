@@ -171,9 +171,7 @@ export default {
     },
     logout() {
       clearSession();
-      window.location.href =
-        "http://localhost:3007/?logout=1&redirect=" +
-        encodeURIComponent("http://localhost:5173/institutions");
+      this.$router.push("/institutions");
     },
   },
 };

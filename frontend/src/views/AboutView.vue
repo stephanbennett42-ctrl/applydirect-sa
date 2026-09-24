@@ -105,7 +105,7 @@ export default {
   methods: {
     async fetchInstitutionStats() {
       try {
-        const response = await fetch('http://localhost:3000/api/institutions');
+        const response = await fetch('/api/institutions');
         const result = await response.json();
 
         if (result.success && Array.isArray(result.data)) {

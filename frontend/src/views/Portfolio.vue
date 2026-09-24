@@ -1371,7 +1371,7 @@ export default {
 
     async getProfile() {
       try {
-        const response = await fetch("http://localhost:3000/api/portfolio/1");
+        const response = await fetch("/api/portfolio/1");
 
         const data = await response.json();
 
@@ -1472,7 +1472,7 @@ export default {
         let response;
 
         if (!this.profileId) {
-          response = await fetch("http://localhost:3000/api/portfolio", {
+          response = await fetch("/api/portfolio", {
             method: "POST",
 
             headers: {
@@ -1483,7 +1483,7 @@ export default {
           });
         } else {
           response = await fetch(
-            `http://localhost:3000/api/portfolio/${this.profileId}`,
+            `/api/portfolio/${this.profileId}`,
 
             {
               method: "PUT",
