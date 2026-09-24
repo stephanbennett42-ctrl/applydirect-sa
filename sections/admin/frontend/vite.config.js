@@ -7,6 +7,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
+  base: '/admin/',
   plugins: [vue()],
   server: {
     // Listen on all network interfaces so other devices (phones/tablets)

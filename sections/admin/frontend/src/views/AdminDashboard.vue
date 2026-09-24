@@ -7,7 +7,7 @@
           <span class="admin-nav-user">Hi, {{ adminName }}</span>
           <a
             class="admin-nav-btn admin-user-site-btn"
-            href="http://localhost:5173/institutions"
+            href="/institutions"
             target="_blank"
             rel="noopener"
             aria-label="Open the user site"
@@ -1842,9 +1842,8 @@ export default {
     },
     handleLogout() {
       logout();
-      // Return to the main (student) login page, not the admin sign-in page.
-      const host = window.location.hostname || "localhost";
-      window.location.href = `http://${host}:3004/login`;
+      // Return to the main (student) site, not the admin sign-in page.
+      window.location.href = "/";
     },
   },
 };

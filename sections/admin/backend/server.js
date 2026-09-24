@@ -7,6 +7,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/adminauth.js";
 import adminRoutes from "./routes/admin.js";
@@ -16,7 +19,8 @@ import placementsRoutes from "./routes/placements.js";
 dotenv.config({ path: [".env", "../../../backend/.env"] });
 
 const app = express();
-const PORT = 3003;
+const PORT = process.env.PORT || 3003;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ============================================
 // Middleware
@@ -53,6 +57,21 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// ============================================
+// Static SPA (production build of the admin frontend)
+// Serves sections/admin/frontend/dist if it exists, with a SPA fallback.
+// ============================================
+const distDir = path.join(__dirname, "..", "frontend", "dist");
+
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+  app.use((req, res, next) => {
+    if (req.method !== "GET" || req.path.startsWith("/api")) return next();
+    res.sendFile(path.join(distDir, "index.html"));
+  });
+  console.log(`Serving admin frontend from ${distDir}`);
+}
 
 // ============================================
 // Start Server

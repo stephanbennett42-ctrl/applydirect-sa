@@ -355,6 +355,156 @@ router.get('/orders', async (req, res) => {
 })
 
 /**
+ * GET /api/admin/jobs
+ */
+router.get('/jobs', async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT j.*,
+              (SELECT COUNT(*) FROM job_applications a WHERE a.job_id = j.id) AS application_count
+       FROM jobs j
+       ORDER BY j.created_at DESC`
+    )
+
+    res.json(rows.map(j => ({
+      id: j.id,
+      title: j.title,
+      company: j.company,
+      location: j.location,
+      field: j.field,
+      type: j.type,
+      salary: j.salary,
+      description: j.description,
+      active: !!j.active,
+      applicationCount: Number(j.application_count),
+      createdAt: j.created_at
+    })))
+  } catch (err) {
+    console.error('Admin get jobs error:', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+/**
+ * POST /api/admin/jobs
+ */
+router.post('/jobs', async (req, res) => {
+  try {
+    const { title, company, location, field, type, salary, description } = req.body
+
+    if (!title || !company || !field) {
+      return res.status(400).json({ error: 'Title, company, and field are required' })
+    }
+
+    const [result] = await db.query(
+      'INSERT INTO jobs (title, company, location, field, type, salary, description) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [String(title).trim(), String(company).trim(), location || null, field, type || 'full-time', salary || null, description || null]
+    )
+
+    const [created] = await db.query('SELECT * FROM jobs WHERE id = ?', [result.insertId])
+    const j = created[0]
+
+    res.status(201).json({
+      message: 'Job published',
+      job: {
+        id: j.id,
+        title: j.title,
+        company: j.company,
+        location: j.location,
+        field: j.field,
+        type: j.type,
+        salary: j.salary,
+        description: j.description,
+        active: !!j.active,
+        applicationCount: 0,
+        createdAt: j.created_at
+      }
+    })
+  } catch (err) {
+    console.error('Admin create job error:', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+/**
+ * PATCH /api/admin/jobs/:id
+ */
+router.patch('/jobs/:id', async (req, res) => {
+  try {
+    const jobId = req.params.id
+    const { title, company, location, field, type, salary, description, active } = req.body
+
+    const [rows] = await db.query('SELECT * FROM jobs WHERE id = ?', [jobId])
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Job not found' })
+    }
+
+    const cur = rows[0]
+    const next = {
+      title: title !== undefined ? String(title).trim() : cur.title,
+      company: company !== undefined ? String(company).trim() : cur.company,
+      location: location !== undefined ? location : cur.location,
+      field: field !== undefined ? field : cur.field,
+      type: type !== undefined ? type : cur.type,
+      salary: salary !== undefined ? salary : cur.salary,
+      description: description !== undefined ? description : cur.description,
+      active: active !== undefined ? (active ? 1 : 0) : cur.active
+    }
+
+    if (next.title === '') {
+      return res.status(400).json({ error: 'Title cannot be empty' })
+    }
+
+    await db.query(
+      `UPDATE jobs
+       SET title = ?, company = ?, location = ?, field = ?, type = ?, salary = ?, description = ?, active = ?
+       WHERE id = ?`,
+      [next.title, next.company, next.location, next.field, next.type, next.salary, next.description, next.active, jobId]
+    )
+
+    const [updated] = await db.query('SELECT * FROM jobs WHERE id = ?', [jobId])
+    const j = updated[0]
+
+    res.json({
+      message: 'Job updated',
+      job: {
+        id: j.id,
+        title: j.title,
+        company: j.company,
+        location: j.location,
+        field: j.field,
+        type: j.type,
+        salary: j.salary,
+        description: j.description,
+        active: !!j.active,
+        createdAt: j.created_at
+      }
+    })
+  } catch (err) {
+    console.error('Admin update job error:', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+/**
+ * DELETE /api/admin/jobs/:id
+ */
+router.delete('/jobs/:id', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT id FROM jobs WHERE id = ?', [req.params.id])
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Job not found' })
+    }
+
+    await db.query('DELETE FROM jobs WHERE id = ?', [req.params.id])
+    res.json({ message: 'Job deleted' })
+  } catch (err) {
+    console.error('Admin delete job error:', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+/**
  * GET /api/admin/packages
  */
 router.get('/packages', async (req, res) => {

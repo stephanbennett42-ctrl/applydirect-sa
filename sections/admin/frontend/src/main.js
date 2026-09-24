@@ -14,6 +14,6 @@ app.mount('#app')
 // PWA service worker (offline fallback). Fails silently on non-secure contexts.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {})
+    navigator.serviceWorker.register('/admin/sw.js').catch(() => {})
   })
 }

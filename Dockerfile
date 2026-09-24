@@ -14,6 +14,12 @@ RUN cd frontend && npm ci
 COPY frontend ./frontend
 RUN cd frontend && npm run build-only
 
+# Install + build the admin frontend (served at /admin)
+COPY sections/admin/frontend/package.json sections/admin/frontend/package-lock.json ./sections/admin/frontend/
+RUN cd sections/admin/frontend && npm ci
+COPY sections/admin/frontend ./sections/admin/frontend
+RUN cd sections/admin/frontend && npm run build
+
 # Runtime image
 FROM node:20-slim
 WORKDIR /app
@@ -21,6 +27,7 @@ ENV NODE_ENV=production
 COPY --from=build /app/backend/node_modules ./backend/node_modules
 COPY backend ./backend
 COPY --from=build /app/frontend/dist ./frontend/dist
+COPY --from=build /app/sections/admin/frontend/dist ./sections/admin/frontend/dist
 COPY backend/Database /app/backend/Database
 EXPOSE 3000
 CMD ["sh", "-c", "node backend/init-db.js && node backend/server.js"]

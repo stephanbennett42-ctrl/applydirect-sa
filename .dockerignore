@@ -11,5 +11,4 @@ branding
 tools
 frontend/.env
 backend/.env
-sections
 .gitignore.bak

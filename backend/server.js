@@ -176,6 +176,28 @@ app.use('/api/payfast', payfastRoutes)
 // Admin Endpoints
 app.use('/api/admin', adminRoutes)
 app.use('/api/placements', placementRoutes)
+app.use('/api/admin/placements', placementRoutes)
+
+
+// =====================================================
+// STATIC ADMIN SPA (/admin subpath)
+// Serves sections/admin/frontend/dist at /admin, with its own
+// SPA fallback registered BEFORE the root fallback so client-side
+// admin routes (/admin/login, /admin ...) get the admin shell.
+// =====================================================
+
+const adminDistDir = path.join(__dirname, '..', 'sections', 'admin', 'frontend', 'dist')
+
+if (fs.existsSync(adminDistDir)) {
+  app.use('/admin', express.static(adminDistDir))
+  app.use('/admin', (req, res, next) => {
+    if (req.method !== 'GET' || req.path.startsWith('/api')) return next()
+    res.sendFile(path.join(adminDistDir, 'index.html'))
+  })
+  console.log(`Serving admin frontend from ${adminDistDir}`)
+} else {
+  console.log('Admin frontend dist not found, /admin will not be served')
+}
 
 
 // =====================================================
