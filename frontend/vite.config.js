@@ -23,26 +23,7 @@ export default defineConfig({
     port: 5173,
     allowedHosts: true,
     proxy: {
-      '/api/auth': {
-        target: 'http://localhost:3002',
-        changeOrigin: true
-      },
-      '/api/packages': {
-        target: 'http://localhost:3002',
-        changeOrigin: true
-      },
-      '/api/orders': {
-        target: 'http://localhost:3002',
-        changeOrigin: true
-      },
-      '/api/jobs': {
-        target: 'http://localhost:3002',
-        changeOrigin: true
-      },
-      '/api/payfast': {
-        target: 'http://localhost:3002',
-        changeOrigin: true
-      },
+      // All API calls go to the single unified backend (port 3000)
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true

@@ -75,7 +75,7 @@ export default {
       this.loading = false
 
       if (result.success) {
-        const redirect = this.$route.query.redirect || '/payment-plan'
+        const redirect = this.$route.query.redirect || '/institutions'
         this.$router.push(redirect)
       } else {
         this.error = result.error || 'Login failed'

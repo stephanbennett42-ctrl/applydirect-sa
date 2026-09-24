@@ -1,0 +1,15 @@
+**/node_modules
+**/dist
+.git
+logs
+uniapply.pids.json
+.vscode
+.idea
+*.log
+ApplyDirectSA-How-To-Run.pdf
+branding
+tools
+frontend/.env
+backend/.env
+sections
+.gitignore.bak

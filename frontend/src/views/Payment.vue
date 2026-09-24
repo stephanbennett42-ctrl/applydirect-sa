@@ -25,7 +25,7 @@
 
             <!-- Plan selection -->
             <div class="form-section">
-              <h3><span class="section-num">0</span> Selected Plan</h3>
+              <h3 class="selected-plan-title">Selected Plan</h3>
               <div class="selected-plan">
                 <strong>{{ planName }} Plan</strong>
                 <span>{{ displayPrice(planPrice) }}</span>
@@ -299,8 +299,27 @@ export default {
 
       this.processing = true
       try {
+        // 1. Create the order for the selected package.
+        //    A 409 means an active (paid) order already exists for this plan —
+        //    treat that as already activated instead of failing.
+        let order
+        try {
+          order = await ordersAPI.create(this.planId)
+        } catch (createErr) {
+          if (createErr.status === 409) {
+            this.success = {
+              amount: Number(this.planPrice),
+              transactionRef: 'EXISTING-' + this.planId
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+            return
+          }
+          throw createErr
+        }
+
+        // Free plan (price 0)? The backend marks the order as paid on creation —
+        // there is nothing to pay, so activate it right away.
         if (Number(this.planPrice) === 0) {
-          const order = await ordersAPI.create(this.planId)
           this.success = {
             amount: 0,
             transactionRef: order.status === 'paid' ? ('FREE-' + order.id) : 'FREE'
@@ -309,35 +328,37 @@ export default {
           return
         }
 
-        const order = await ordersAPI.create(this.planId)
-        const redirect = await ordersAPI.payfastInit(order.id)
-        this.sendToPayFast(redirect)
-        return
-      } catch (err) {
-        if (err.code === 'PAYFAST_NOT_CONFIGURED') {
-          try {
-            const order = await ordersAPI.create(this.planId)
-            const methodMap = {
-              card: 'credit_card',
-              eft: 'bank_transfer',
-              instant: 'instant_eft'
-            }
-            const payment = await ordersAPI.pay(order.id, {
-              cardNumber: this.form.cardNumber,
-              cardHolder: this.form.cardName,
-              expiry: this.form.expiry,
-              cvv: this.form.cvv,
-              paymentMethod: methodMap[this.paymentMethod]
-            })
-            this.success = payment
-            window.scrollTo({ top: 0, behavior: 'smooth' })
-            return
-          } catch (payErr) {
-            this.error = payErr.error || 'Payment failed. Please try again.'
-          }
-        } else {
-          this.error = err.error || 'Payment failed. Please try again.'
+        // 2. Redirect to PayFast to complete the payment securely.
+        //    If PayFast is not configured on the server, fall back to the
+        //    simulated gateway so the checkout still works in demo mode.
+        let payFastRedirect
+        try {
+          payFastRedirect = await ordersAPI.payfastInit(order.id)
+        } catch (pfErr) {
+          if (pfErr.code !== 'PAYFAST_NOT_CONFIGURED') throw pfErr
         }
+
+        if (payFastRedirect) {
+          this.sendToPayFast(payFastRedirect)
+          return
+        }
+
+        const methodMap = {
+          card: 'credit_card',
+          eft: 'bank_transfer',
+          instant: 'instant_eft'
+        }
+        const payment = await ordersAPI.pay(order.id, {
+          cardNumber: this.form.cardNumber,
+          cardHolder: this.form.cardName,
+          expiry: this.form.expiry,
+          cvv: this.form.cvv,
+          paymentMethod: methodMap[this.paymentMethod]
+        })
+        this.success = payment
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } catch (err) {
+        this.error = err.error || 'Payment failed. Please try again.'
       } finally {
         this.processing = false
       }

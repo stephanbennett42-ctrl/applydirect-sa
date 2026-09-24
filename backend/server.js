@@ -1,7 +1,12 @@
 import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
 import db from './db.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Import Route Handlers (All using ES Module imports)
 import portfolioRoutes from './routes/profile.js'
@@ -171,6 +176,24 @@ app.use('/api/payfast', payfastRoutes)
 // Admin Endpoints
 app.use('/api/admin', adminRoutes)
 app.use('/api/placements', placementRoutes)
+
+
+// =====================================================
+// STATIC SPA (production build of the frontend)
+// Serves frontend/dist if it exists, with a SPA fallback so
+// client-side routes (/institutions, /jobs, /payment ...) work.
+// =====================================================
+
+const distDir = path.join(__dirname, '..', 'frontend', 'dist')
+
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir))
+  app.use((req, res, next) => {
+    if (req.method !== 'GET' || req.path.startsWith('/api')) return next()
+    res.sendFile(path.join(distDir, 'index.html'))
+  })
+  console.log(`Serving built frontend from ${distDir}`)
+}
 
 
 // =====================================================
